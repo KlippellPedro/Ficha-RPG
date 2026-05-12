@@ -204,7 +204,7 @@ function adicionarAtaqueAutomatico(itemData) {
         }
     });
 
-    const attackType = INVENTORY_WEAPON_TYPE_TO_ATTACK_TYPE[itemData.tipo] || "Outro";
+    const attackType = itemData.atk_tipo || INVENTORY_WEAPON_TYPE_TO_ATTACK_TYPE[itemData.tipo] || "Outro";
 
     if (existingAttackRow) {
         // Atualiza o ataque existente

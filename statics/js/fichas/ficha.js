@@ -9,7 +9,7 @@
  */
 function verificarVisibilidadeClasses() {
     const ambientTypes = [];
-    const visibilityMap = { 'section-extras': false, 'section-avatar': false, 'section-lutador': false, 'section-cientista': false, 'section-amante': false, 'section-deus': false, 'section-diplomata': false, 'section-amigo': false, 'section-contrabandista': false, 'section-ceifeiro': false, 'section-demonio': false, 'section-anjo': false };
+    const visibilityMap = { 'section-extras': false, 'section-avatar': false, 'section-lutador': false, 'section-amante': false, 'section-deus': false, 'section-diplomata': false, 'section-amigo': false, 'section-contrabandista': false, 'section-ceifeiro': false, 'section-demonio': false, 'section-anjo': false };
     document.querySelectorAll('[id^="class_name_"]').forEach(select => {
         if (select.value === 'ceifeiro_almas') ambientTypes.push('soul');
         if (select.value === 'anjo') ambientTypes.push('feather');
@@ -19,7 +19,6 @@ function verificarVisibilidadeClasses() {
             if (data.showExtras) visibilityMap['section-extras'] = true;
             if (data.showAvatar) visibilityMap['section-avatar'] = true;
             if (data.showLutador) visibilityMap['section-lutador'] = true;
-            if (data.showCientista) visibilityMap['section-cientista'] = true;
             if (data.showAmante) visibilityMap['section-amante'] = true;
             if (data.showDeus) visibilityMap['section-deus'] = true;
             if (data.showDiplomata) visibilityMap['section-diplomata'] = true;
@@ -28,6 +27,40 @@ function verificarVisibilidadeClasses() {
             if (data.showCeifeiro) visibilityMap['section-ceifeiro'] = true;
             if (data.showDemonio) visibilityMap['section-demonio'] = true;
             if (data.showAnjo) visibilityMap['section-anjo'] = true;
+        }
+    });
+
+    // Lógica de Subclasse por linha (Cientista Lvl 5+)
+    document.querySelectorAll('.class-row').forEach(row => {
+        const nameSel = row.querySelector('[id^="class_name_"]');
+        const lvlInp = row.querySelector('[id^="class_lvl_"]');
+        const subInput = row.querySelector('[id^="class_sub_"]');
+        const index = nameSel?.id.split('_').pop();
+
+        if (nameSel && lvlInp && subInput) {
+            const isCientista = nameSel.value === 'cientista';
+            const lvl = parseInt(lvlInp.value) || 0;
+
+            if (isCientista) {
+                // Se o nível for resetado para baixo de 5, limpamos a subclasse salva
+                if (lvl < 5 && subInput.value !== "") {
+                    subInput.value = "";
+                }
+
+                const hasSubclass = subInput.value !== '';
+                formatarNomeClasseCientista(nameSel, subInput.value);
+
+                // Dispara o modal automaticamente ao atingir nível 5 sem subclasse
+                if (lvl >= 5 && !hasSubclass && currentCientistaIndex === null) {
+                    abrirModalCientistaSubclasse(index);
+                }
+
+                if (lvl >= 5 && hasSubclass) {
+                    row.classList.add('cientista-lvl5-row');
+                } else {
+                    row.classList.remove('cientista-lvl5-row');
+                }
+            }
         }
     });
 
@@ -107,15 +140,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (classesEncontradas.length > 0) {
             classesEncontradas.forEach(key => {
                 const idx = key.split('_').pop();
-                adicionarClasseUI(salvo[key], salvo[`class_lvl_${idx}`], parseInt(idx));
+                adicionarClasseUI(salvo[key], salvo[`class_lvl_${idx}`], parseInt(idx), salvo[`class_sub_${idx}`]);
 
                 // Garante que o estado visual e limites de nível sejam aplicados no carregamento
                 const selectEl = document.getElementById(`class_name_${idx}`);
                 if (selectEl) atualizarEstiloClasse(selectEl);
             });
-        } else {
-            adicionarClasseUI();
         }
-    } else { adicionarClasseUI(); }
+    } else { adicionarClasseUI(); } // Só adiciona se for a primeira vez absoluta (sem localStorage)
     atualizarTudo(); // Chama atualizarTudo uma única vez após carregar tudo
 });

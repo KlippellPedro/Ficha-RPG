@@ -19,12 +19,16 @@ function atualizarVida(mods, dados, bonusItens = {}) {
     document.querySelectorAll('.class-row').forEach(row => {
         const className = row.querySelector('[id^="class_name_"]')?.value;
         const lvl = parseInt(row.querySelector('[id^="class_lvl_"]')?.value) || 0;
+        const sub = row.querySelector('[id^="class_sub_"]')?.value || "";
         const data = CLASSES_DATA[className];
         if (data) {
-            let mod = mods[data.pv_attr] !== undefined ? mods[data.pv_attr] : modCon;
+            let pvLvl = data.pv_lvl;
+            if (className === 'cientista' && lvl >= 5 && sub === 'ferreiro') pvLvl = 4;
+
+            let mod = (data.pv_attr && mods[data.pv_attr] !== undefined) ? mods[data.pv_attr] : modCon;
             if (data.pv_mod_half) mod = Math.floor(mod / 2);
             if (data.pv_no_mod) mod = 0;
-            vidaGanha += (lvl * (mod + data.pv_lvl));
+            vidaGanha += (lvl * (mod + pvLvl));
         }
     });
     const racaKey = document.getElementById("raca")?.value || "nenhuma";
@@ -43,10 +47,14 @@ function atualizarMana(mods, dados, bonusItens = {}) {
     document.querySelectorAll('.class-row').forEach(row => {
         const className = row.querySelector('[id^="class_name_"]')?.value;
         const lvl = parseInt(row.querySelector('[id^="class_lvl_"]')?.value) || 0;
+        const sub = row.querySelector('[id^="class_sub_"]')?.value || "";
         const data = CLASSES_DATA[className];
         if (data) {
+            let pmLvl = data.pm_lvl;
+            if (className === 'cientista' && lvl >= 5 && sub === 'alquimista') pmLvl = 4;
+
             let mod = data.pm_attr ? (mods[data.pm_attr] || 0) : 0;
-            manaGanha += (lvl * (mod + data.pm_lvl));
+            manaGanha += (lvl * (mod + pmLvl));
         }
     });
     const racaKey = document.getElementById("raca")?.value || "nenhuma";

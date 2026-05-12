@@ -9,7 +9,7 @@ const CLASSES_DATA = {
     "militar": { nome: "Militar", pv_lvl: 7, pm_lvl: 1, skills: ["luta", "guerra"] },
     "assassino": { nome: "Assassino", pv_lvl: 3, pm_lvl: 3, skills: ["furtividade", "enganação"] },
     "lutador_nato": { nome: "Lutador Nato", pv_lvl: 5, pm_lvl: 3, skills: ["luta", "fortitude"], showLutador: true },
-    "cientista": { nome: "Inventor/Cientista", pv_lvl: 3, pm_lvl: 3, skills: ["investigação", "misticismo"], showCientista: true },
+    "cientista": { nome: "Cientista", pv_lvl: 2, pm_lvl: 2, skills: ["investigação", "misticismo"] },
     "especialista_medico": { nome: "Especialista Médico", pv_lvl: 2, pm_lvl: 3, skills: ["cura"], pv_attr: "sabedoria" },
     "amante_oculto": { nome: "Amante do Oculto", pv_lvl: 2, pm_lvl: 6, showAmante: true, skills: ["misticismo", "religião"] },
     "deus_acima": { nome: "Deus Acima de tudo", pv_lvl: 3, pm_lvl: 4, skills: ["vontade", "diplomacia"], showDeus: true },

@@ -174,6 +174,16 @@
                 </div>
                 <button type="button" class="btn-qty" onclick="alterarValor('pv_atual', 1)">+</button>
               </div>
+              <!-- Barra de Vida Temporária -->
+              <div class="bar-controls temp-bar-controls">
+                <label class="temp-label">Temp:</label>
+                <div class="bar-outer temp-bar-outer">
+                  <div id="bar-pv-temp" class="bar-inner pv-temp-color"></div>
+                  <div class="bar-text">
+                    <input type="number" id="pv_temp" class="save-input bar-value-input temp-value-input" value="0" oninput="atualizarTudo()" />
+                  </div>
+                </div>
+              </div>
             </div>
             <!-- Barra de Mana -->
             <div class="stat-group">
@@ -189,6 +199,16 @@
                   </div>
                 </div>
                 <button type="button" class="btn-qty" onclick="alterarValor('pm_atual', 1)">+</button>
+              </div>
+              <!-- Barra de Mana Temporária -->
+              <div class="bar-controls temp-bar-controls">
+                <label class="temp-label">Temp:</label>
+                <div class="bar-outer temp-bar-outer">
+                  <div id="bar-pm-temp" class="bar-inner pm-temp-color"></div>
+                  <div class="bar-text">
+                    <input type="number" id="pm_temp" class="save-input bar-value-input temp-value-input" value="0" oninput="atualizarTudo()" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -275,16 +295,6 @@
           <select id="lutador_estilo" class="save-input header-input">
             <option value="Porrada Única">Porrada Única</option>
             <option value="Múltiplas Porradas">Múltiplas Porradas</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="section-cientista" class="combat-header-row" style="display: none">
-        <div class="input-group">
-          <label>Cientista ou Inventor?</label>
-          <select id="cientista_tipo" class="save-input header-input">
-            <option value="Cientista">Cientista</option>
-            <option value="Inventor">Inventor</option>
           </select>
         </div>
       </div>
@@ -441,13 +451,30 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
       </div>
       <div id="section-poder-vampiro" class="extra-section-block">
         <label class="extra-section-label">PODERES DE VAMPIRO</label>
-        <div class="trait-textarea" style="text-align: left; height: auto; margin-bottom: 10px;">
-          <strong>MORDIDA:</strong> Caso morda um ser pode roubar 2d8 de vida, dano como perfuração.<br><br>
+        <div class="trait-textarea" style="text-align: left; height: auto; margin-bottom: 10px">
+          <strong>MORDIDA:</strong> Caso morda um ser pode roubar 2d8 de vida, dano como perfuração.<br /><br />
           <strong>MORCEGO:</strong> Pode se transformar em morcego: ½ vida/mana, +9 mov, inimigos com desvantagem ao te acertar e +6 em reflexos.
         </div>
-        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; border-top: 1px dashed rgba(255, 68, 68, 0.3); padding-top: 10px;">
-          <label for="vampiro_forma_morcego" style="color: #ff4444; font-size: 0.8rem; font-weight: bold; cursor: pointer;">TRANSFORMAR EM MORCEGO:</label>
-          <input type="checkbox" id="vampiro_forma_morcego" class="save-input" style="width: 20px; height: 20px; accent-color: #ff4444; cursor: pointer;" onchange="atualizarTudo()" />
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-top: 1px dashed rgba(255, 68, 68, 0.3);
+            padding-top: 10px;
+          "
+        >
+          <label for="vampiro_forma_morcego" style="color: #ff4444; font-size: 0.8rem; font-weight: bold; cursor: pointer"
+            >TRANSFORMAR EM MORCEGO:</label
+          >
+          <input
+            type="checkbox"
+            id="vampiro_forma_morcego"
+            class="save-input"
+            style="width: 20px; height: 20px; accent-color: #ff4444; cursor: pointer"
+            onchange="atualizarTudo()"
+          />
         </div>
       </div>
       <div id="section-poder-morto" class="extra-section-block">
@@ -505,7 +532,9 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
           </div>
           <div class="selection-option" onclick="escolherPoderMortoVivo('eu_to_morto')">
             <strong style="color: #ff4444">EU TO MORTO?</strong>
-            <p class="modal-text" style="margin: 5px 0 0 0">Impossível descobrir que você está morto sem magia/habilidades. Não perde 1 de Carisma, mas perde o bônus de Intimidação.</p>
+            <p class="modal-text" style="margin: 5px 0 0 0">
+              Impossível descobrir que você está morto sem magia/habilidades. Não perde 1 de Carisma, mas perde o bônus de Intimidação.
+            </p>
           </div>
         </div>
         <button type="button" class="btn-modal-close" onclick="document.getElementById('modal-poder-morto').style.display = 'none'">Fechar</button>
@@ -555,6 +584,25 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
             Desafio: Começar com -1 de Status
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal de Escolha de Subclasse Cientista -->
+    <div id="modal-cientista-subclasse" class="modal-overlay">
+      <div class="modal-content-box">
+        <h2 class="modal-title">Escolha a Especialização do Cientista</h2>
+        <p class="modal-text" style="margin-bottom: 20px">Ao atingir o Nível 5, o Cientista pode se especializar como Alquimista ou Ferreiro.</p>
+        <div class="modal-selection-list">
+          <div class="selection-option" onclick="escolherSubclasseCientista(currentCientistaIndex, 'alquimista')">
+            <strong style="color: #4ade80">ALQUIMISTA</strong>
+            <p class="modal-text" style="margin: 5px 0 0 0">Foco em Mana: Ganha 4 PM por nível (a partir do Nível 5).</p>
+          </div>
+          <div class="selection-option" onclick="escolherSubclasseCientista(currentCientistaIndex, 'ferreiro')">
+            <strong style="color: #f59e0b">FERREIRO</strong>
+            <p class="modal-text" style="margin: 5px 0 0 0">Foco em Vida: Ganha 4 PV por nível (a partir do Nível 5).</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" onclick="fecharModalCientistaSubclasse()">Fechar</button>
       </div>
     </div>
   </body>

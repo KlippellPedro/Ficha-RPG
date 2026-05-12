@@ -28,8 +28,6 @@ function atualizarTudo() {
     const inputsParaSalvar = document.querySelectorAll(".save-input");
     inputsParaSalvar.forEach(input => {
         const val = input.type === "checkbox" ? input.checked : input.value;
-        // Evita sobrescrever raça ou classes com valores vazios se o elemento ainda não estiver inicializado
-        if ((input.id === "raca" || input.id.startsWith("class_name")) && !val && dados[input.id]) return;
         dados[input.id] = val;
     });
 
@@ -114,13 +112,14 @@ function atualizarTudo() {
  */
 function getClassesAtivas(dados) {
     const classes = [];
-    const containers = document.querySelectorAll('.class-row');
+    const container = document.getElementById('classes-container');
 
-    if (containers.length > 0) {
-        containers.forEach(row => {
+    if (container) {
+        container.querySelectorAll('.class-row').forEach(row => {
             const name = row.querySelector('[id^="class_name_"]')?.value;
             const lvl = parseInt(row.querySelector('[id^="class_lvl_"]')?.value) || 0;
-            if (name) classes.push({ name, lvl });
+            const sub = row.querySelector('[id^="class_sub_"]')?.value || "";
+            if (name) classes.push({ name, lvl, sub });
         });
     } else {
         Object.keys(dados).forEach(key => {
@@ -226,7 +225,7 @@ function aplicarBonusVisuais(bonusItens) {
 function atualizarBarras(bonusItens = {}) {
     const stats = [
         { atual: 'pv_atual', max: 'pv_max', bar: 'bar-pv' },
-        { atual: 'pm_atual', max: 'pm_max', bar: 'bar-pm' }
+        { atual: 'pm_atual', max: 'pm_max', bar: 'bar-pm' },
     ];
 
     const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
@@ -250,6 +249,17 @@ function atualizarBarras(bonusItens = {}) {
         if (barEl) {
             const porcentagem = Math.min(100, Math.max(0, (current / maxTotal) * 100));
             barEl.style.width = porcentagem + "%";
+        }
+
+        // Lógica para barras temporárias
+        const elTemp = document.getElementById(`${s.atual.replace('_atual', '_temp')}`);
+        const temp = elTemp ? (parseInt(elTemp.value) || 0) : (parseInt(dados[`${s.atual.replace('_atual', '_temp')}`]) || 0);
+        const tempBarEl = document.getElementById(`${s.bar}-temp`);
+        const tempBarControlsEl = tempBarEl ? tempBarEl.closest('.temp-bar-controls') : null;
+
+        if (tempBarEl && tempBarControlsEl) {
+            const tempPorcentagem = Math.min(100, Math.max(0, (temp / maxTotal) * 100));
+            tempBarEl.style.width = tempPorcentagem + "%";
         }
     });
 }
@@ -369,11 +379,6 @@ function aplicarPericiasPorClasseEngine(dados) {
     const trainedSkills = new Set();
     const classes = getClassesAtivas(dados);
     const racaKey = document.getElementById("raca")?.value || dados.raca || "nenhuma";
-
-    classes.forEach(c => {
-        const data = (typeof CLASSES_DATA !== 'undefined') ? CLASSES_DATA[c.name] : null;
-        if (data && data.skills) data.skills.forEach(sk => trainedSkills.add(sk.toLowerCase().replace(/\s/g, '_')));
-    });
 
     const racaData = (typeof RACAS_DATA !== 'undefined') ? RACAS_DATA[racaKey] : null;
     if (racaData && racaData.skills) racaData.skills.forEach(sk => trainedSkills.add(sk.toLowerCase().replace(/\s/g, '_')));
@@ -586,7 +591,7 @@ function realizarBackupAutomatico() {
     if (!dadosBase) return;
 
     const historicoBase = localStorage.getItem(HISTORY_KEY) || "[]";
-    
+
     const pacoteBackup = {
         dados: JSON.parse(dadosBase),
         historico: JSON.parse(historicoBase),
@@ -615,7 +620,7 @@ function restaurarBackupFicha() {
         if (pacote.dados) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(pacote.dados));
             if (pacote.historico) localStorage.setItem(HISTORY_KEY, JSON.stringify(pacote.historico));
-            
+
             showNotification(`Backup de ${pacote.backupEm} restaurado!`, "success");
             setTimeout(() => location.reload(), 1200);
         }

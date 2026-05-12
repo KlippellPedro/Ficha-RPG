@@ -134,6 +134,7 @@ function verificarTipoItem(index) {
         const syncData = {
             id: index,
             nome: nome,
+            atk_tipo: document.getElementById(`inv_atk_tipo_${index}`)?.value || "Corpo-a-Corpo",
             tipo: document.getElementById(`inv_tipo_${index}`)?.value || "",
             dano: formatBonus(document.getElementById(`inv_dano_${index}`)?.value || "", b.dano),
             alcance: formatBonus(document.getElementById(`inv_alcance_${index}`)?.value || "", b.alcance),
@@ -172,7 +173,7 @@ function verificarTipoItem(index) {
 
                 // Salva ou atualiza os campos no localStorage
                 dados[`atk_nome_${atkId}`] = syncData.nome;
-                dados[`atk_tipo_${atkId}`] = mapping[syncData.tipo] || "Outro";
+                dados[`atk_tipo_${atkId}`] = syncData.atk_tipo || mapping[syncData.tipo] || "Outro";
                 dados[`atk_teste_${atkId}`] = syncData.teste || (syncData.attr_mod !== "nenhum" ? syncData.attr_mod : "");
                 dados[`atk_dano_${atkId}`] = syncData.dano;
                 dados[`atk_tipo_dano_${atkId}`] = syncData.tipo_dano;
@@ -254,7 +255,7 @@ function removerItemUI(index) {
     atualizarTudo();
 }
 
-function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "outros", raridade = "comum", tipo = "simples_uma_mao", idIndex = null, equipado = false, attr_mod = "nenhum", val_mod = 0, alcance = "toque", dano = "", defesa_bonus = 0, efeito = "", cabo = "{}", base = "{}", defesa_penalidade = 0, modificacoes = "{}", critico = "", tipo_dano = "", teste = "") {
+function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "outros", raridade = "comum", tipo = "simples_uma_mao", idIndex = null, equipado = false, attr_mod = "nenhum", val_mod = 0, alcance = "toque", dano = "", defesa_bonus = 0, efeito = "", cabo = "{}", base = "{}", defesa_penalidade = 0, modificacoes = "{}", critico = "", tipo_dano = "", teste = "", atk_tipo = "Corpo-a-Corpo") {
     const container = document.getElementById('items-container');
     if (!container) return;
 
@@ -299,6 +300,7 @@ function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "o
             <input type="hidden" id="inv_mods_item_${index}" class="save-input" value="${escapedMods}">
             <input type="hidden" id="inv_defesa_bonus_${index}" class="save-input" value="${defesa_bonus || 0}">
             <input type="hidden" id="inv_defesa_penalidade_${index}" class="save-input" value="${defesa_penalidade || 0}">
+            <input type="hidden" id="inv_atk_tipo_${index}" class="save-input" value="${atk_tipo}">
             <input type="hidden" id="inv_efeito_${index}" class="save-input" value="${efeito || ''}">
             <input type="hidden" id="inv_attr_${index}" class="save-input" value="${attr_mod || 'nenhum'}">
             <input type="hidden" id="inv_mod_${index}" class="save-input" value="${val_mod || 0}">

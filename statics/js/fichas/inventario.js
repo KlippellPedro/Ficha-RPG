@@ -45,6 +45,15 @@ const OPTIONS_RARIDADE = [
     { v: "mitico", t: "Mítico" },
     { v: "especial", t: "Relíquia" }
 ];
+
+const OPTIONS_ATK_TIPO = [
+    { v: "Corpo-a-Corpo", t: "Corpo-a-Corpo" },
+    { v: "À Distância", t: "À Distância" },
+    { v: "Arremesso", t: "Arremesso" },
+    { v: "Magia", t: "Magia" },
+    { v: "Outro", t: "Outro" }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
     const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
@@ -80,7 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 salvo[`inv_mods_item_${id}`] || "{}",
                 salvo[`inv_critico_${id}`] || "",
                 salvo[`inv_tipo_dano_${id}`] || "",
-                salvo[`inv_teste_${id}`] || ""
+                salvo[`inv_teste_${id}`] || "",
+                salvo[`inv_atk_tipo_${id}`] || "Corpo-a-Corpo"
             );
             atualizarEstiloBonus(id);
             atualizarEstiloRaridade(id); // Garante que a raridade visual seja aplicada no carregamento

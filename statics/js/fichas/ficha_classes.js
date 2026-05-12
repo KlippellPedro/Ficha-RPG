@@ -13,6 +13,12 @@ function handleClassChange(selectEl) {
             return;
         }
     }
+    // Se mudar para cientista e já for nível 5+, abre o modal
+    const index = selectEl.id.split('_').pop();
+    const lvl = parseInt(document.getElementById(`class_lvl_${index}`)?.value) || 0;
+    if (value === 'cientista' && lvl >= 5) {
+        abrirModalCientistaSubclasse(index);
+    }
     atualizarEstiloClasse(selectEl);
     atualizarTudo();
 }
@@ -63,14 +69,20 @@ function atualizarEstiloClasse(selectEl) {
     }
 }
 
-function adicionarClasseUI(nome = "", lvl = 0, idIndex = null) {
+let currentCientistaIndex = null; // New global variable for Cientista modal
+
+function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
     const container = document.getElementById('classes-container');
     if (!container) return;
     const index = idIndex !== null ? idIndex : Date.now();
 
-    const options = Object.keys(CLASSES_DATA).map(key =>
-        `<option value="${key}" ${nome === key ? 'selected' : ''}>${CLASSES_DATA[key].nome}</option>`
-    ).join('');
+    const options = Object.keys(CLASSES_DATA).map(key => {
+        let label = CLASSES_DATA[key].nome;
+        if (key === 'cientista' && sub && lvl >= 5) {
+            label = `Cientista (${sub.charAt(0).toUpperCase() + sub.slice(1)})`;
+        }
+        return `<option value="${key}" ${nome === key ? 'selected' : ''}>${label}</option>`;
+    }).join('');
 
     let rowClasses = 'class-row';
     if (CLASSES_DATA[nome]?.isSpecial) rowClasses += ' special-class-row';
@@ -89,10 +101,64 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null) {
                 ${options}
             </select>
         </div>
+        <input type="hidden" id="class_sub_${index}" class="save-input" value="${sub}">
         <div class="input-group">
             <label>Lvl</label>
             <input type="number" id="class_lvl_${index}" class="save-input header-input" value="${lvl}" min="0" ${maxAttr} />
         </div>
-        <button type="button" class="btn-remove-class" onclick="this.closest('.class-row').remove(); atualizarTudo();">×</button>`;
+        <button type="button" class="btn-remove-class" onclick="removerClasseUI(this)">×</button>`;
     container.appendChild(row);
+}
+
+function removerClasseUI(btn) {
+    const row = btn.closest('.class-row');
+    const nameSelect = row.querySelector('[id^="class_name_"]');
+    const index = nameSelect?.id.split('_').pop();
+
+    if (index) {
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        delete dados[`class_name_${index}`];
+        delete dados[`class_lvl_${index}`];
+        delete dados[`class_sub_${index}`];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    }
+
+    row.remove();
+    atualizarTudo();
+}
+
+// New functions for Cientista subclass modal
+function abrirModalCientistaSubclasse(index) {
+    currentCientistaIndex = index;
+    const modal = document.getElementById('modal-cientista-subclasse');
+    if (modal) modal.style.display = 'flex';
+}
+
+function fecharModalCientistaSubclasse() {
+    const modal = document.getElementById('modal-cientista-subclasse');
+    if (modal) modal.style.display = 'none';
+    currentCientistaIndex = null;
+}
+
+function escolherSubclasseCientista(index, subclasse) {
+    if (index === null) return;
+
+    const subInput = document.getElementById(`class_sub_${index}`);
+    const nameSel = document.getElementById(`class_name_${index}`);
+
+    if (subInput && nameSel) {
+        subInput.value = subclasse;
+        formatarNomeClasseCientista(nameSel, subclasse);
+    }
+
+    fecharModalCientistaSubclasse();
+    atualizarTudo();
+}
+
+function formatarNomeClasseCientista(selectEl, subclass) {
+    const option = selectEl.querySelector('option[value="cientista"]');
+    if (option) {
+        const subTitle = subclass ? ` (${subclass.charAt(0).toUpperCase() + subclass.slice(1)})` : "";
+        option.textContent = `Cientista${subTitle}`;
+    }
 }

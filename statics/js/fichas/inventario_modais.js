@@ -18,6 +18,7 @@ function abrirModalItem(index) {
     const modVal = document.getElementById(`inv_mod_${index}`).value;
     const critico = document.getElementById(`inv_critico_${index}`)?.value || "";
     const tipoDano = document.getElementById(`inv_tipo_dano_${index}`)?.value || "";
+    const atkTipo = document.getElementById(`inv_atk_tipo_${index}`)?.value || "Corpo-a-Corpo";
     const teste = document.getElementById(`inv_teste_${index}`)?.value || "";
     const bonusDef = parseInt(document.getElementById(`inv_defesa_bonus_${index}`).value) || 0;
     const penalidadeDef = parseInt(document.getElementById(`inv_defesa_penalidade_${index}`)?.value) || 0;
@@ -81,6 +82,10 @@ function abrirModalItem(index) {
                     <option value="simples_duas_maos">Simples duas mãos</option>
                     <option value="marcial_uma_mao">Marcial uma mão</option>
                     <option value="marcial_duas_maos">Marcial duas mãos</option>
+                </select></div>
+            <div class="input-group"><label>Categoria de Ataque</label>
+                <select id="modal_atk_tipo" class="inv-input">
+                    ${OPTIONS_ATK_TIPO.map(opt => `<option value="${opt.v}" ${atkTipo === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
                 </select></div>
             <div class="input-group"><label>Teste (Perícia ou Atributo)</label><input type="text" id="modal_teste" class="inv-input" value="${teste}" placeholder="Ex: Luta ou Força"></div>
             <div class="input-group"><label>Dano</label><input type="text" id="modal_dano" class="inv-input" value="${document.getElementById(`inv_dano_${index}`).value}"></div>
@@ -340,6 +345,7 @@ function salvarDetalhesItem() {
         document.getElementById(`inv_attr_${idx}`).value = document.getElementById('modal_attr').value;
         document.getElementById(`inv_mod_${idx}`).value = document.getElementById('modal_mod').value;
         if (document.getElementById('modal_tipo')) document.getElementById(`inv_tipo_${idx}`).value = document.getElementById('modal_tipo').value;
+        if (document.getElementById('modal_atk_tipo')) document.getElementById(`inv_atk_tipo_${idx}`).value = document.getElementById('modal_atk_tipo').value;
         if (document.getElementById('modal_teste')) document.getElementById(`inv_teste_${idx}`).value = document.getElementById('modal_teste').value;
         if (document.getElementById('modal_dano')) document.getElementById(`inv_dano_${idx}`).value = document.getElementById('modal_dano').value;
         if (document.getElementById('modal_critico')) document.getElementById(`inv_critico_${idx}`).value = document.getElementById('modal_critico').value;
