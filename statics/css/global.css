@@ -1,0 +1,120 @@
+:root {
+  --bg-main: #09090b; /* Preto neutro profundo */
+  --bg-card: #18181b; /* Cinza zinco escuro */
+  --bg-input: #27272a; /* Cinza zinco médio */
+  --primary: #ff4444; /* Vermelho Supremacia do Protesto */
+  --primary-hover: #ff6666; /* Vermelho mais vibrante no hover */
+  --text-main: #f4f4f5; /* Branco acinzentado */
+  --text-muted: #a1a1aa; /* Texto secundário neutro */
+  --danger: #ff4444;
+  --info: #ff4444;
+  --border-color: #3f3f46; /* Bordas neutras */
+  --transition-speed: 0.3s;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  scrollbar-color: var(--primary) var(--bg-main);
+}
+
+/* Remove as setas (spinners) de todos os inputs numéricos */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Melhoria no scrollbar para navegadores Webkit */
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  cursor: pointer;
+  background: var(--primary);
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background var(--transition-speed);
+}
+
+button:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
+}
+
+button.secundario {
+  background: #555;
+  color: white;
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+  color: var(--primary);
+  letter-spacing: 2px;
+}
+/* Global Notification */
+#global-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(30, 30, 35, 0.95);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  z-index: 3000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left: 5px solid;
+}
+
+#global-notification.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#global-notification.info { border-color: #3b82f6; } /* Azul */
+#global-notification.success { border-color: #4ade80; } /* Verde */
+#global-notification.error { border-color: #ff4444; } /* Vermelho */
+#global-notification.warning { border-color: #f59e0b; } /* Laranja */
+
+#global-notification .icon {
+  font-size: 1.2rem;
+}
+
+#global-notification .message {
+  font-size: 0.95rem;
+}

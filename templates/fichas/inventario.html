@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supremacia do Protesto - Inventário</title>
+    <link rel="stylesheet" href="../../statics/css/global.css" />
+    <link rel="stylesheet" href="../../statics/css/menu.css" />
+    <link rel="stylesheet" href="../../statics/css/fichas/inventario.css" />
+    <script src="../../statics/js/fichas/classes_data.js"></script>
+    <script src="../../statics/js/fichas/racas_data.js"></script>
+    <script src="../../statics/js/global.js"></script>
+    <script src="../../statics/js/menu.js"></script>
+    <script src="../../statics/js/fichas/inventario.js"></script>
+    <script src="../../statics/js/fichas/inventario_ui.js"></script>
+    <script src="../../statics/js/fichas/inventario_modais.js"></script>
+    <script src="../../statics/js/fichas/inventario_carga.js"></script>
+  </head>
+  <body>
+    <nav class="top-menu">
+      <div class="menu-links"></div>
+    </nav>
+
+    <!-- Global Notification Area -->
+    <div id="global-notification">
+      <span class="icon"></span>
+      <span class="message"></span>
+    </div>
+
+    <div class="container">
+      <header class="inventory-container">
+        <h1 class="inventory-title">Mochila & Equipamentos</h1>
+
+        <div class="weight-stats">
+          <div class="weight-card current">
+            <span class="weight-label">Carga Atual</span>
+            <span id="display-carga-atual" class="weight-value">0.0</span> <small>kg</small>
+          </div>
+          <div class="weight-card">
+            <span class="weight-label">Capacidade Máxima</span>
+            <span id="display-carga-max" class="weight-value">0.0</span> <small>kg</small>
+          </div>
+          <div id="weight-warning" class="weight-warning-msg" style="display: none">
+            ⚠️ Penalidade: Excesso de peso detectado! Movimentação reduzida.
+          </div>
+          <div class="weight-bar-container">
+            <div id="weight-bar-inner"></div>
+          </div>
+        </div>
+
+        <div class="inventory-list">
+          <div class="filter-bar">
+            <div class="filter-group">
+              <select id="filter-category" class="inv-input filter-input-red" onchange="filtrarItens()">
+                <option value="todos">Todos os Itens</option>
+                <option value="armas">Armas</option>
+                <option value="armaduras">Armaduras</option>
+                <option value="consumiveis">Consumíveis</option>
+                <option value="outros">Outros</option>
+              </select>
+            </div>
+            <div class="search-group">
+              <input type="text" id="search-item" class="inv-input" placeholder="🔍 Pesquisar no inventário..." oninput="filtrarItens()" />
+            </div>
+          </div>
+          <div class="inv-header">
+            <span title="Equipado">Eqp.</span>
+            <span>Item</span>
+            <span>Categoria</span>
+            <span>Info</span>
+            <span title="Excluir">X</span>
+          </div>
+          <div id="items-container">
+            <!-- Itens inseridos dinamicamente -->
+          </div>
+          <button type="button" class="btn-add-item" onclick="adicionarItemUI()">+ Adicionar Novo Item</button>
+          <button type="button" class="btn-clear-inventory" onclick="limparInventario()">Limpar Inventário</button>
+        </div>
+      </header>
+    </div>
+
+    <!-- Modal para Edição Ampliada de Descrição -->
+    <div id="modal-desc" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title" class="modal-title-red">Descrição do Item</h3>
+          <button type="button" class="btn-remove-class btn-close-modal" onclick="fecharModalDescricao()">×</button>
+        </div>
+        <div class="modal-body" id="modal-body-content">
+          <!-- Conteúdo gerado dinamicamente pelo abrirModalItem no inventario.js -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-save-modal" onclick="salvarDetalhesItem()">Salvar e Fechar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Detalhes do Material (Centro/Base da Arma) -->
+    <div id="modal-material-details" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-material-title" style="color: #ff4444; margin: 0">Detalhes do Material</h3>
+          <button type="button" class="btn-remove-class" onclick="fecharModalMaterial()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <label>Nome do Material</label>
+            <input type="text" id="modal_material_nome" class="inv-input" placeholder="Ex: Palo Santo, Pérola Celestial..." />
+          </div>
+          <div id="material-attributes-container">
+            <!-- Linhas de bônus serão injetadas aqui -->
+          </div>
+          <button type="button" class="btn-add-class" onclick="adicionarAtributoMaterial()">+ Adicionar Atributo</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-save-modal" onclick="salvarDetalhesMaterial()">Salvar Material</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

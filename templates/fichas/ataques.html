@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ataques - Supremacia do Protesto</title>
+    <link rel="stylesheet" href="../../statics/css/global.css" />
+    <link rel="stylesheet" href="../../statics/css/menu.css" />
+    <link rel="stylesheet" href="../../statics/css/fichas/inventario.css" />
+    <link rel="stylesheet" href="../../statics/css/fichas/habilidades.css" />
+    <link rel="stylesheet" href="../../statics/css/fichas/ataque.css" />
+    <script src="../../statics/js/fichas/classes_data.js"></script>
+    <script src="../../statics/js/fichas/racas_data.js"></script>
+    <script src="../../statics/js/global.js"></script>
+    <script src="../../statics/js/menu.js"></script>
+    <script src="../../statics/js/fichas/ataque.js"></script>
+  </head>
+  <body>
+    <nav class="top-menu">
+      <div class="menu-links"></div>
+    </nav>
+
+    <div id="global-notification">
+      <span class="icon"></span>
+      <span class="message"></span>
+    </div>
+
+    <div class="container">
+      <header>
+        <h1>ATAQUES</h1>
+      </header>
+
+      <div class="filter-bar">
+        <div class="search-group">
+          <input type="text" id="search-ataque" class="inv-input" placeholder="🔍 Pesquisar arma ou ataque..." oninput="filtrarAtaques()" />
+        </div>
+        <select id="filter-ataque-tipo" class="inv-input" style="max-width: 180px" onchange="filtrarAtaques()">
+          <option value="todos">Todos os Tipos</option>
+          <option value="Corpo-a-Corpo">Corpo-a-Corpo</option>
+          <option value="À Distância">À Distância</option>
+          <option value="Arremesso">Arremesso</option>
+          <option value="Magia">Magia</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <button type="button" class="btn-open-desc" onclick="resetarFiltrosAtaque()" title="Limpar Filtros">🔄</button>
+      </div>
+
+      <div
+        id="ataques-counter"
+        style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; padding-left: 5px"
+      >
+        Ataques visíveis: 0
+      </div>
+
+      <div class="inv-header atk-header-grid">
+        <span>Nome</span>
+        <span>Teste</span>
+        <span>Dano</span>
+        <span>Tipo</span>
+        <span>Crítico</span>
+        <span>Alcance</span>
+        <span>Info</span>
+        <span>Dup</span>
+        <span>X</span>
+      </div>
+
+      <section id="ataques-container" class="inventory-list">
+        <!-- Injetado via JS -->
+      </section>
+
+      <button type="button" class="btn-add-card" onclick="adicionarAtaqueUI()">+ Registrar Novo Ataque</button>
+      <button type="button" class="btn-clear-inventory" onclick="limparAtaques()">Limpar Todos os Ataques</button>
+    </div>
+
+    <!-- Modal de Detalhes do Ataque -->
+    <div id="modal-atk" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-atk-title" style="color: #ff4444; margin: 0">Detalhes do Ataque</h3>
+          <button type="button" class="btn-remove-class" onclick="fecharModalAtk()">×</button>
+        </div>
+        <div class="modal-body" id="modal-atk-body"></div>
+        <div class="modal-footer"></div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+/* Estilos para a Landing Page (Boas-vindas) */
+.container {
+  background: var(--bg-card);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6);
+  width: 90%;
+  max-width: 600px;
+  border: 1px solid var(--border-color);
+  margin: 150px auto 40px auto;
+  border-top: 4px solid var(--primary);
+}
+
+.welcome-container {
+  text-align: center;
+  min-height: auto;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.welcome-container p {
+  font-size: 1.2rem;
+  margin: 20px 0 40px;
+  color: var(--text-main);
+}
+
+.btn-large {
+  padding: 15px 40px;
+  font-size: 1.25rem;
+}

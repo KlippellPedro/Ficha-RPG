@@ -1,0 +1,65 @@
+/* Estilos Gerais para Modais da Ficha */
+.modal-overlay {
+  display: none; /* Controlado via JS (flex/none) */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content-box {
+  background: var(--bg-card);
+  border: 2px solid #ff4444;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(255, 68, 68, 0.2);
+}
+
+.modal-title {
+  color: #ff4444;
+  margin-bottom: 15px;
+}
+
+.modal-text {
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Opções de Seleção (Poderes) */
+.modal-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+}
+
+.selection-option {
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s;
+}
+
+.selection-option:hover {
+  background: rgba(255, 68, 68, 0.05);
+  border-color: #ff4444;
+}
+
+/* Botões Específicos */
+.btn-modal-close { margin-top: 20px; background: #555; width: 100%; }
+.btn-modal-confirm { width: 100%; }
+
+.btn-status-pos { background: #1e3a8a; border: 1px solid #3b82f6; width: 100%; }
+.btn-status-neg { background: #450a0a; border: 1px solid #991b1b; width: 100%; }

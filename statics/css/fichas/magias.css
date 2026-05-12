@@ -1,0 +1,44 @@
+/* Definição das colunas para Magias */
+.mag-header-grid,
+.mag-row-grid {
+  display: grid; /* Removido !important */
+  grid-template-columns: 2fr 130px 90px 160px 50px 60px 50px 40px; /* Removido !important */
+}
+
+/* Cores por Círculo/Nível */
+.mag-nivel-1 {
+  color: #ffffff !important;
+}
+.mag-nivel-2 {
+  color: #4ade80 !important;
+  text-shadow: 0 0 5px rgba(74, 222, 128, 0.3);
+  font-weight: bold;
+}
+.mag-nivel-3 {
+  color: #3b82f6 !important;
+  text-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+  font-weight: bold;
+}
+.mag-nivel-4 {
+  color: #f59e0b !important;
+  text-shadow: 0 0 5px rgba(245, 158, 11, 0.3);
+  font-weight: bold;
+}
+.mag-nivel-extra {
+  color: #ff4444 !important;
+  font-weight: bold;
+}
+
+/* Estilização das opções dentro do seletor */
+select.inv-input option[value="1"] {
+  color: #ffffff;
+}
+select.inv-input option[value="2"] {
+  color: #4ade80;
+}
+select.inv-input option[value="3"] {
+  color: #3b82f6;
+}
+select.inv-input option[value="4"] {
+  color: #f59e0b;
+}

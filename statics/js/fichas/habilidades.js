@@ -1,0 +1,317 @@
+/**
+ * Lógica para gerenciar a lista dinâmica de habilidades
+ */
+
+let habSendoEditadaIdx = null;
+
+function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "") {
+    const container = document.getElementById('habilidades-container');
+    if (!container) return;
+
+    const index = idIndex !== null ? idIndex : Date.now(); // Usa timestamp para ID único
+
+    const row = document.createElement('div');
+    row.className = 'item-row hab-row-grid';
+    row.dataset.index = index;
+
+    row.innerHTML = `
+        <input type="text" id="hab_nome_${index}" class="save-input inv-input" placeholder="Nome" value="${nome}">
+        <select id="hab_tipo_${index}" class="save-input inv-input">
+            <option value="Ativa" ${tipo === 'Ativa' ? 'selected' : ''}>Ativa</option>
+            <option value="Passiva" ${tipo === 'Passiva' ? 'selected' : ''}>Passiva</option>
+            <option value="Reação" ${tipo === 'Reação' ? 'selected' : ''}>Reação</option>
+            <option value="Outro" ${tipo === 'Outro' ? 'selected' : ''}>Outro</option>
+        </select>
+        <div style="display:flex; gap:5px;">
+            <input type="text" id="hab_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
+            <select id="hab_tipo_custo_${index}" class="save-input inv-input" style="width:60px;">
+                <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
+                <option value="PV" ${tipoCusto === 'PV' ? 'selected' : ''}>PV</option>
+                <option value="Outro" ${tipoCusto === 'Outro' ? 'selected' : ''}>Outro</option>
+            </select>
+        </div>
+        
+        <button type="button" class="btn-open-desc" onclick="abrirModalHab('${index}')">🔍</button>
+        <button type="button" class="btn-use-skill" onclick="usarHabilidade('${index}')">Usar</button>
+        <button type="button" class="btn-open-desc" onclick="duplicarHabilidade('${index}')" title="Duplicar">📋</button>
+        <button type="button" class="btn-remove-class" onclick="removerHabilidade(this)">×</button>
+
+        <div style="display:none">
+            <!-- Campos ocultos para detalhes -->
+            <textarea id="hab_desc_${index}" class="save-input">${desc}</textarea>
+            <input type="hidden" id="hab_duracao_${index}" class="save-input" value="${duracao}">
+            <input type="hidden" id="hab_alcance_${index}" class="save-input" value="${alcance}">
+            <input type="hidden" id="hab_acao_${index}" class="save-input" value="${acao}">
+        </div>
+    `;
+
+    container.appendChild(row);
+    // Salva imediatamente para persistir o item recém-adicionado
+    if (idIndex === null) {
+        atualizarTudo();
+        filtrarHabilidades();
+    }
+}
+
+function abrirModalHab(index) {
+    habSendoEditadaIdx = index;
+    const nome = document.getElementById(`hab_nome_${index}`).value;
+    const tipo = document.getElementById(`hab_tipo_${index}`).value;
+    // Lê os valores diretamente dos inputs da linha para garantir que estejam atualizados
+    const custo = document.getElementById(`hab_custo_${index}`).value;
+    const tipoCusto = document.getElementById(`hab_tipo_custo_${index}`).value;
+    const desc = document.getElementById(`hab_desc_${index}`).value;
+    const duracao = document.getElementById(`hab_duracao_${index}`).value;
+    const alcance = document.getElementById(`hab_alcance_${index}`).value;
+    const acao = document.getElementById(`hab_acao_${index}`).value;
+
+    document.getElementById('modal-hab-title').innerText = `Detalhes: ${nome || "Habilidade"}`;
+
+    const body = document.getElementById('modal-hab-body');
+    body.innerHTML = `
+        <div class="grid-2-cols">
+            <div class="input-group"><label>Tipo</label>
+                <select id="modal_hab_tipo" class="inv-input">
+                    <option value="Ativa" ${tipo === 'Ativa' ? 'selected' : ''}>Ativa</option>
+                    <option value="Passiva" ${tipo === 'Passiva' ? 'selected' : ''}>Passiva</option>
+                    <option value="Reação" ${tipo === 'Reação' ? 'selected' : ''}>Reação</option>
+                    <option value="Outro" ${tipo === 'Outro' ? 'selected' : ''}>Outro</option>
+                </select>
+            </div>
+            <div class="input-group"><label>Custo</label>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="modal_hab_custo" class="inv-input" value="${custo}" style="flex:1;">
+                    <select id="modal_hab_tipo_custo" class="inv-input" style="width:80px;">
+                        <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
+                        <option value="PV" ${tipoCusto === 'PV' ? 'selected' : ''}>PV</option>
+                        <option value="Outro" ${tipoCusto === 'Outro' ? 'selected' : ''}>Outro</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="grid-2-cols">
+            <div class="input-group">
+                <label>Duração</label>
+                <input type="text" id="modal_hab_duracao" class="inv-input" value="${duracao}">
+            </div>
+            <div class="input-group">
+                <label>Alcance</label>
+                <input type="text" id="modal_hab_alcance" class="inv-input" value="${alcance}">
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Ação</label>
+            <input type="text" id="modal_hab_acao" class="inv-input" value="${acao}">
+        </div>
+        <div class="input-group">
+            <label>Descrição e Efeito</label>
+            <textarea id="modal_hab_desc" class="inv-input" style="min-height: 200px">${desc}</textarea>
+        </div>
+        <div class="modal-footer" style="justify-content: space-between;">
+            <button type="button" class="btn-use-skill" onclick="usarHabilidade('${index}')">Usar Habilidade</button>
+            <button type="button" class="btn-save-modal" onclick="salvarDetalhesHab()">Salvar e Fechar</button>
+        </div>
+    `;
+
+    document.getElementById('modal-hab').style.display = 'flex';
+}
+
+function fecharModalHab() {
+    document.getElementById('modal-hab').style.display = 'none';
+    habSendoEditadaIdx = null;
+}
+
+function salvarDetalhesHab() {
+    if (habSendoEditadaIdx !== null) {
+        const idx = habSendoEditadaIdx;
+        document.getElementById(`hab_tipo_${idx}`).value = document.getElementById('modal_hab_tipo').value;
+        document.getElementById(`hab_custo_${idx}`).value = document.getElementById('modal_hab_custo').value;
+        document.getElementById(`hab_tipo_custo_${idx}`).value = document.getElementById('modal_hab_tipo_custo').value;
+        document.getElementById(`hab_desc_${idx}`).value = document.getElementById('modal_hab_desc').value;
+        document.getElementById(`hab_duracao_${idx}`).value = document.getElementById('modal_hab_duracao').value;
+        document.getElementById(`hab_alcance_${idx}`).value = document.getElementById('modal_hab_alcance').value;
+        document.getElementById(`hab_acao_${idx}`).value = document.getElementById('modal_hab_acao').value;
+
+        fecharModalHab();
+        atualizarTudo(); // Atualiza a ficha para refletir as mudanças
+        filtrarHabilidades();
+    }
+}
+
+/**
+ * Função para "usar" uma habilidade, subtraindo o custo em PM da mana atual.
+ */
+function usarHabilidade(index) {
+    const custoStr = document.getElementById(`hab_custo_${index}`).value.trim();
+    const tipoCusto = document.getElementById(`hab_tipo_custo_${index}`).value;
+
+    if (!custoStr || custoStr === "0") {
+        showNotification("Esta habilidade não possui um custo numérico definido.", 'warning');
+        return;
+    }
+
+    const custo = parseInt(custoStr);
+    if (isNaN(custo) || custo <= 0) {
+        showNotification("Custo inválido. Por favor, insira um número positivo.", 'warning');
+        return;
+    }
+
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    if (tipoCusto === "PM") {
+        let recursoAtual = parseInt(dados.pm_atual) || 0;
+        let recursoMax = parseInt(dados.pm_max) || 0;
+        if (recursoAtual < custo) return showNotification(`Mana insuficiente! Você tem ${recursoAtual} PM, mas precisa de ${custo} PM.`, 'error');
+
+        recursoAtual -= custo;
+        dados.pm_atual = recursoAtual;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        registrarHistorico(document.getElementById(`hab_nome_${index}`).value || "Habilidade", custo, tipoCusto);
+        showNotification(`Habilidade usada! ${custo} PM subtraídos. Mana atual: ${recursoAtual}/${recursoMax}.`, 'success');
+        atualizarTudo();
+    } else if (tipoCusto === "PV") {
+        let recursoAtual = parseInt(dados.pv_atual) || 0;
+        let recursoMax = parseInt(dados.pv_max) || 0;
+        if (recursoAtual < custo) return showNotification(`Vida insuficiente! Você tem ${recursoAtual} PV, mas precisa de ${custo} PV.`, 'error');
+
+        recursoAtual -= custo;
+        dados.pv_atual = recursoAtual;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        registrarHistorico(document.getElementById(`hab_nome_${index}`).value || "Habilidade", custo, tipoCusto);
+        showNotification(`Habilidade usada! ${custo} PV subtraídos. Vida atual: ${recursoAtual}/${recursoMax}.`, 'success');
+        atualizarTudo();
+    } else if (tipoCusto === "Outro") {
+        showNotification(`Habilidade custa ${custo} de um recurso "Outro". Gerencie isso manualmente.`, 'info');
+        atualizarTudo(); // Apenas para garantir que a UI seja atualizada
+    }
+    // Não é necessário chamar atualizarEstiloCustoHabilidade(index) aqui, pois atualizarTudo() já fará isso globalmente.
+}
+
+/**
+ * Cria uma cópia da habilidade existente
+ */
+function duplicarHabilidade(index) {
+    const nome = document.getElementById(`hab_nome_${index}`).value;
+    const tipo = document.getElementById(`hab_tipo_${index}`).value;
+    const custo = document.getElementById(`hab_custo_${index}`).value;
+    const tipoCusto = document.getElementById(`hab_tipo_custo_${index}`).value;
+    const desc = document.getElementById(`hab_desc_${index}`).value;
+    const duracao = document.getElementById(`hab_duracao_${index}`).value;
+    const alcance = document.getElementById(`hab_alcance_${index}`).value;
+    const acao = document.getElementById(`hab_acao_${index}`).value;
+
+    adicionarHabilidadeUI(nome + " (Cópia)", tipo, custo, tipoCusto, desc, null, duracao, alcance, acao);
+}
+
+function removerHabilidade(btn) {
+    const row = btn.closest('.item-row');
+    if (!row) return;
+    const index = row.dataset.index;
+
+    // Remove do localStorage as chaves específicas desta habilidade
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    delete dados[`hab_nome_${index}`];
+    delete dados[`hab_tipo_${index}`];
+    delete dados[`hab_custo_${index}`];
+    delete dados[`hab_desc_${index}`];
+    delete dados[`hab_tipo_custo_${index}`];
+    delete dados[`hab_duracao_${index}`];
+    delete dados[`hab_alcance_${index}`];
+    delete dados[`hab_acao_${index}`];
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    row.remove();
+    atualizarTudo();
+    filtrarHabilidades();
+}
+
+function limparHabilidades() {
+    if (!confirm("Tem certeza que deseja apagar TODAS as habilidades? Esta ação não pode ser desfeita.")) {
+        return;
+    }
+
+    const container = document.getElementById('habilidades-container');
+    if (container) {
+        container.innerHTML = '';
+    }
+
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    Object.keys(dados).forEach(key => {
+        if (key.startsWith('hab_')) delete dados[key];
+    });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    atualizarTudo();
+    filtrarHabilidades();
+}
+
+/**
+ * Reseta todos os campos de busca e filtros para o estado inicial
+ */
+function resetarFiltrosHabilidades() {
+    document.getElementById('search-habilidade').value = '';
+    document.getElementById('filter-habilidade-tipo').value = 'todos';
+    filtrarHabilidades();
+    showNotification("Filtro limpo", "info", 2000);
+}
+
+/**
+ * Filtra os cards de habilidade com base no texto de pesquisa
+ */
+function filtrarHabilidades() {
+    const termo = document.getElementById('search-habilidade').value.toLowerCase();
+    const filtroTipo = document.getElementById('filter-habilidade-tipo').value;
+    const rows = document.querySelectorAll('#habilidades-container .item-row'); // Seleciona apenas as linhas de habilidade
+    let contador = 0;
+
+    rows.forEach(row => {
+        const index = row.dataset.index;
+        const nome = document.getElementById(`hab_nome_${index}`)?.value.toLowerCase() || "";
+        const tipo = document.getElementById(`hab_tipo_${index}`)?.value || "";
+
+        const matchesNome = nome.includes(termo);
+        const matchesTipo = filtroTipo === 'todos' || tipo === filtroTipo;
+        const matches = matchesNome && matchesTipo;
+
+        row.style.display = matches ? 'grid' : 'none';
+        if (matches) contador++;
+    });
+
+    const counterEl = document.getElementById('habilidades-counter');
+    if (counterEl) {
+        counterEl.innerText = `Habilidades visíveis: ${contador}`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    let salvo = null;
+    try {
+        salvo = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    } catch (e) { }
+
+    if (salvo) {
+        // Encontra todos os índices únicos baseados nos nomes salvos
+        const indices = Object.keys(salvo)
+            .filter(k => k.startsWith('hab_nome_'))
+            .map(k => k.replace('hab_nome_', ''));
+
+        if (indices.length > 0) {
+            indices.sort((a, b) => parseInt(a) - parseInt(b)).forEach(idx => {
+                adicionarHabilidadeUI(
+                    salvo[`hab_nome_${idx}`] || "",      // 1. nome
+                    salvo[`hab_tipo_${idx}`] || "Ativa", // 2. tipo
+                    salvo[`hab_custo_${idx}`] || "",     // 3. custo
+                    salvo[`hab_tipo_custo_${idx}`] || "PM", // 4. tipoCusto
+                    salvo[`hab_desc_${idx}`] || "",      // 5. desc
+                    parseInt(idx),                       // 6. idIndex
+                    salvo[`hab_duracao_${idx}`] || "",   // 7. duracao
+                    salvo[`hab_alcance_${idx}`] || "",   // 8. alcance
+                    salvo[`hab_acao_${idx}`] || ""       // 9. acao
+                );
+            });
+        }
+    }
+    // Chama atualizarTudo() uma única vez após carregar todos os elementos dinâmicos
+    atualizarTudo();
+    filtrarHabilidades();
+});

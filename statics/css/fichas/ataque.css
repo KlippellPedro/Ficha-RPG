@@ -1,0 +1,29 @@
+/* Estrutura da Página de Ataques */
+.container {
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6);
+  width: 95%;
+  max-width: 1450px; /* Largura maior para acomodar todas as colunas confortavelmente */
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  border: 1px solid var(--border-color);
+  margin: 110px auto 40px auto; /* Afasta do menu superior fixo */
+  box-sizing: border-box;
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Definição das colunas para Ataques */
+.atk-header-grid,
+.atk-row-grid {
+  display: grid;
+  grid-template-columns: 2fr 100px 100px 100px 100px 100px 50px 50px 40px;
+}
+
+/* Destaque para armas não equipadas */
+.item-row.weapon-not-equipped {
+  background: rgba(255, 68, 68, 0.08);
+  border-right: 4px solid #ff4444;
+}

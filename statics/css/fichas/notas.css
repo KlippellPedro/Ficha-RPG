@@ -1,0 +1,53 @@
+/* Definição das colunas para Notas */
+.nota-header-grid,
+.nota-row-grid {
+  display: grid !important;
+  grid-template-columns: 35px 2fr 1fr 50px 50px 40px !important;
+}
+
+/* Estilo do botão de favorito */
+.btn-fav {
+  background: transparent;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition:
+    transform 0.2s,
+    color 0.2s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-fav.active {
+  color: #f59e0b; /* Âmbar/Dourado */
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+  transform: scale(1.1);
+}
+
+/* Estilos para os campos flexíveis no modal */
+.custom-field-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.custom-field-row .inv-input {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.section-divider {
+  margin: 20px 0 10px 0;
+  border-bottom: 1px dashed rgba(255, 68, 68, 0.3);
+  padding-bottom: 5px;
+  color: #ff4444;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
