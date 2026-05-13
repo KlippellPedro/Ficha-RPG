@@ -113,25 +113,45 @@ function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", trainin
     container.appendChild(row);
 }
 
-function atualizarPericias(nivel, mods, bonusItens = {}) {
+function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}) {
     document.querySelectorAll(".skill-row").forEach(row => {
         const skillSlug = row.querySelector(".skill-bonus")?.id.replace('skill_bonus_', '');
+        if (!skillSlug) return;
+
         const training = document.getElementById(`skill_train_${skillSlug}`)?.value;
         const selectedAttr = document.getElementById(`skill_attr_${skillSlug}`)?.value;
         const bonus = parseInt(row.querySelector(".skill-bonus")?.value) || 0;
-        const manualAdv = parseInt(document.getElementById(`skill_adv_${skillSlug}`)?.value) || 0;
-        const itemAdv = bonusItens[`adv_${skillSlug}`] || 0;
+
+        const advInput = document.getElementById(`skill_adv_${skillSlug}`);
+        const itemAdv = (bonusItens[`adv_${skillSlug}`] || 0) + (bonusItens['adv_todas'] || 0);
+
+        // Reverte o bônus do valor que veio do DOM para obter a BASE
+        let valorNaTelaAdv = parseInt(advInput?.value) || 0;
+        let manualAdv = valorNaTelaAdv - itemAdv;
+
+        // Se o usuário estiver editando o campo V, define a nova base
+        if (advInput && advInput === document.activeElement) {
+            let valorDigitado = parseInt(advInput.value) || 0;
+            manualAdv = valorDigitado - itemAdv;
+        }
+
         const totalAdv = manualAdv + itemAdv;
 
+        if (advInput && advInput !== document.activeElement) {
+            advInput.value = totalAdv;
+        }
+
+        // Salva sempre a BASE no objeto global
+        dadosObj[`skill_adv_${skillSlug}`] = manualAdv;
+
         const attrMod = mods[selectedAttr] || 0;
-        const itemSkillBonus = bonusItens[skillSlug] || 0;
+        const itemSkillBonus = (bonusItens[skillSlug] || 0) + (bonusItens['todas'] || 0);
 
         // Remove todas as classes de destaque e adiciona a classe correspondente ao treino atual
         row.classList.remove('treinado', 'profissional', 'mestre', 'anciao');
         if (training !== 'nenhum') row.classList.add(training);
 
         // Destaque visual para o campo de vantagem se houver valor
-        const advInput = document.getElementById(`skill_adv_${skillSlug}`);
         if (totalAdv > 0) advInput?.classList.add('has-advantage');
         else advInput?.classList.remove('has-advantage');
         if (advInput) advInput.title = itemAdv > 0 ? `Bônus de Item: +${itemAdv} Vantagens` : "Vantagens (Dados extras)";

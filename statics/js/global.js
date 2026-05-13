@@ -2,6 +2,43 @@ const STORAGE_KEY = "ficha_rpg_dados";
 const HISTORY_KEY = "ficha_rpg_historico";
 const BACKUP_KEY = "ficha_rpg_backup";
 
+window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
+    ficha: [
+        { v: "nenhum", t: "-" }, { v: "forca", t: "FOR" }, { v: "destreza", t: "DES" },
+        { v: "constituicao", t: "CON" }, { v: "inteligencia", t: "INT" }, { v: "sabedoria", t: "SAB" },
+        { v: "carisma", t: "CAR" }, { v: "aura", t: "AUR" }, { v: "pv_max", t: "Vida Máx" },
+        { v: "pm_max", t: "Mana Máx" }, { v: "defesa", t: "Defesa" }, { v: "movimentacao", t: "Movimento" },
+        { v: "sanidade", t: "Sanidade" }, { v: "status_info", t: "Status" }
+    ],
+    pericia: [
+        { v: "todas", t: "TODAS AS PERÍCIAS" },
+        { v: "acrobacia", t: "Acrobacia" }, { v: "adestramento", t: "Adestramento" },
+        { v: "atuação", t: "Atuação" }, { v: "bloquear", t: "Bloquear" },
+        { v: "conhecimento", t: "Conhecimento" }, { v: "corrompimento", t: "Corrompimento" },
+        { v: "cura", t: "Cura" }, { v: "diplomacia", t: "Diplomacia" },
+        { v: "enganação", t: "Enganação" }, { v: "fortitude", t: "Fortitude" },
+        { v: "furtividade", t: "Furtividade" }, { v: "guerra", t: "Guerra" },
+        { v: "iniciativa", t: "Iniciativa" }, { v: "intimidação", t: "Intimidação" },
+        { v: "investigação", t: "Investigação" }, { v: "luta", t: "Luta" },
+        { v: "manipulação", t: "Manipulação" }, { v: "misticismo", t: "Misticismo" },
+        { v: "percepção", t: "Percepção" }, { v: "pilotagem", t: "Pilotagem" },
+        { v: "pontaria", t: "Pontaria" }, { v: "reflexos", t: "Reflexos" },
+        { v: "religião", t: "Religião" }, { v: "sobrevivência", t: "Sobrevivência" },
+        { v: "vontade", t: "Vontade" }
+    ],
+    arma: [
+        { v: "dano", t: "Dano" },
+        { v: "critico", t: "Crítico" },
+        { v: "alcance", t: "Alcance" },
+        { v: "tipo_dano", t: "Tipo de Dano" }
+    ],
+    vantagem: [
+        { v: "nenhum", t: "-" },
+        { v: "todas", t: "TODAS AS PERÍCIAS" },
+        { v: "acrobacia", t: "Acrobacia" }, { v: "adestramento", t: "Adestramento" }, { v: "atuação", t: "Atuação" }, { v: "bloquear", t: "Bloquear" }, { v: "conhecimento", t: "Conhecimento" }, { v: "corrompimento", t: "Corrompimento" }, { v: "cura", t: "Cura" }, { v: "diplomacia", t: "Diplomacia" }, { v: "enganação", t: "Enganação" }, { v: "fortitude", t: "Fortitude" }, { v: "furtividade", t: "Furtividade" }, { v: "guerra", t: "Guerra" }, { v: "iniciativa", t: "Iniciativa" }, { v: "intimidação", t: "Intimidação" }, { v: "investigação", t: "Investigação" }, { v: "luta", t: "Luta" }, { v: "manipulação", t: "Manipulação" }, { v: "misticismo", t: "Misticismo" }, { v: "percepção", t: "Percepção" }, { v: "pilotagem", t: "Pilotagem" }, { v: "pontaria", t: "Pontaria" }, { v: "reflexos", t: "Reflexos" }, { v: "religião", t: "Religião" }, { v: "sobrevivência", t: "Sobrevivência" }, { v: "vontade", t: "Vontade" }
+    ]
+};
+
 /**
  * Core Engine - Sincroniza dados e dispara atualizações de UI se existirem na página
  */
@@ -47,10 +84,37 @@ function atualizarTudo() {
                 const mods = JSON.parse(dados[key]);
                 mods.forEach(m => {
                     if (m.attr && m.attr !== 'nenhum') {
-                        bonusItens[m.attr] = (bonusItens[m.attr] || 0) + (parseInt(m.mod) || 0);
+                        if (m.isAdv) {
+                            const val = parseInt(m.mod);
+                            if (!isNaN(val)) bonusItens[`adv_${m.attr}`] = (bonusItens[`adv_${m.attr}`] || 0) + val;
+                        } else {
+                            const val = parseInt(m.mod);
+                            if (!isNaN(val)) bonusItens[m.attr] = (bonusItens[m.attr] || 0) + val;
+                        }
                     }
                 });
             } catch (e) { console.error("Erro ao processar modificações do poder:", key); }
+        }
+
+        // Bônus vindos de Modificações dinâmicas de Habilidades (JSON) - Apenas se for Passiva
+        if (key.startsWith('hab_mods_') && typeof dados[key] === 'string' && dados[key].startsWith('[')) {
+            const id = key.replace('hab_mods_', '');
+            if (dados[`hab_tipo_${id}`] === 'Passiva') {
+                try {
+                    const mods = JSON.parse(dados[key]);
+                    mods.forEach(m => {
+                        if (m.attr && m.attr !== 'nenhum') {
+                            if (m.isAdv) {
+                                const val = parseInt(m.mod);
+                                if (!isNaN(val)) bonusItens[`adv_${m.attr}`] = (bonusItens[`adv_${m.attr}`] || 0) + val;
+                            } else {
+                                const val = parseInt(m.mod);
+                                if (!isNaN(val)) bonusItens[m.attr] = (bonusItens[m.attr] || 0) + val;
+                            }
+                        }
+                    });
+                } catch (e) { console.error("Erro ao processar modificações da habilidade:", key); }
+            }
         }
     });
 
@@ -131,7 +195,7 @@ function atualizarTudo() {
     if (typeof verificarExtraVampiro === 'function') verificarExtraVampiro(dados); // Nova chamada para verificar campos de Vampiro
     if (typeof verificarExtraEspirito === 'function') verificarExtraEspirito(dados); // Nova chamada para verificar campos de Espírito
     if (typeof verificarExtraMortoVivo === 'function') verificarExtraMortoVivo(dados); // Nova chamada para verificar campos de Morto-Vivo
-    if (typeof atualizarPericias === 'function') atualizarPericias(nivelTotal, infoAttr.mods, bonusItens);
+    if (typeof atualizarPericias === 'function') atualizarPericias(nivelTotal, infoAttr.mods, bonusItens, dados);
     if (typeof atualizarAtaques === 'function') atualizarAtaques(nivelTotal, infoAttr.mods, bonusItens);
     if (typeof atualizarRacaUI === 'function') atualizarRacaUI(racaKey); // Nova chamada para atualizar campos de raça
     if (typeof atualizarCarga === 'function') atualizarCarga(infoAttr, dados);
@@ -381,11 +445,14 @@ function engineCalcularAtributos(dadosObj, bonusItens = {}, racaKey) {
             const totalBonus = (bonusItens[input.id] || 0) + (bonusRaca[input.id] || 0) + (bonusClasses[input.id] || 0);
             const modBonus = (modBonusRaca[input.id] || 0);
 
-            // Buscamos o valor BASE (pontos investidos) salvo no localStorage
-            let base = parseInt(dadosObj[input.id]);
-            if (isNaN(base)) base = 10;
+            // Buscamos o valor que está no input (que pode ser o TOTAL)
+            let valorNaTela = parseInt(input.value) || 10;
 
-            // Se o usuário está digitando neste campo agora, atualizamos a BASE
+            // Calculamos a BASE revertendo os bônus conhecidos
+            // Isso evita o loop de feedback onde o bônus é somado ao total repetidamente
+            let base = valorNaTela - totalBonus;
+
+            // Se o usuário está digitando ativamente, recalculamos a base pelo novo valor
             if (input === document.activeElement) {
                 let valorDigitado = parseInt(input.value) || 0;
                 // Consideramos que o usuário está editando o TOTAL, então calculamos a base inversa

@@ -287,8 +287,15 @@ function abrirModalBuffsPoder(index) {
 
     container.innerHTML = '';
 
+    // CONFIGURAÇÃO DO MODAL COMPARTILHADO
+    const title = document.getElementById('modal-pod-buffs-title');
+    if (title) title.innerText = "Buffs de Poder Passivo";
+
+    const btnSalvar = modal.querySelector('.btn-save-modal');
+    if (btnSalvar) btnSalvar.setAttribute('onclick', 'salvarBuffsPoder()');
+
     if (modsData.length > 0) {
-        modsData.forEach(m => adicionarLinhaBuffPoder(m.attr, m.mod));
+        modsData.forEach(m => adicionarLinhaBuffPoder(m.attr, m.mod, m.isAdv));
     } else {
         adicionarLinhaBuffPoder();
     }
@@ -302,31 +309,52 @@ function fecharModalBuffPod() {
     currentPodModEditIdx = null;
 }
 
-function adicionarLinhaBuffPoder(attr = 'nenhum', mod = 0) {
+function adicionarLinhaBuffPoder(attr = 'nenhum', mod = 0, isAdv = false) {
     const container = document.getElementById('pod-buffs-container');
     if (!container) return;
 
+    // Usa as opções globais definidas no inventário ou um fallback local
+    const optionsCat = window.OPTIONS_CATEGORIZADAS || {};
+
+    // Determina a categoria inicial
+    let catInicial = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && optionsCat.pericia) {
+        if (optionsCat.pericia.some(o => o.v === attr)) catInicial = 'pericia';
+        else if (optionsCat.arma && optionsCat.arma.some(o => o.v === attr)) catInicial = 'arma';
+    }
+
     const row = document.createElement('div');
     row.className = 'material-attr-row';
-    row.style = 'display: flex; gap: 10px; margin-bottom: 10px;';
-
-    // Reutiliza a lista de atributos do inventário se disponível, senão usa fallback
-    const options = (typeof OPTIONS_ATTR !== 'undefined') ? OPTIONS_ATTR : [
-        { v: 'nenhum', t: '-' },
-        { v: 'pv_max', t: 'Vida Máx' },
-        { v: 'pm_max', t: 'Mana Máx' },
-        { v: 'forca', t: 'FOR' }, { v: 'destreza', t: 'DES' }, { v: 'constituicao', t: 'CON' },
-        { v: 'inteligencia', t: 'INT' }, { v: 'sabedoria', t: 'SAB' }, { v: 'carisma', t: 'CAR' }, { v: 'aura', t: 'AUR' }
-    ];
+    row.style = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
 
     row.innerHTML = `
-        <select class="inv-input pod-buff-attr" style="flex: 2;">
-            ${options.map(opt => `<option value="${opt.v}" ${opt.v === attr ? 'selected' : ''}>${opt.t}</option>`).join('')}
+        <select class="inv-input pod-cat-select" style="flex: 1; border-color: #555;">
+            <option value="ficha" ${catInicial === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia" ${catInicial === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma" ${catInicial === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="vantagem" ${catInicial === 'vantagem' ? 'selected' : ''}>Vantagem</option>
         </select>
-        <input type="number" class="inv-input pod-buff-val" style="flex: 1;" value="${mod}">
+
+        <select class="inv-input pod-buff-attr" style="flex: 1.5;"></select>
+
+        <input type="text" class="inv-input pod-buff-val" style="flex: 0.8;" value="${mod}" placeholder="Val">
+
         <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
     `;
+
     container.appendChild(row);
+
+    const selectCat = row.querySelector('.pod-cat-select');
+    const selectAttr = row.querySelector('.pod-buff-attr');
+
+    const atualizarSubOpcoes = (valSelecionado = 'nenhum') => {
+        const cat = selectCat.value;
+        const opcoes = (window.OPTIONS_CATEGORIZADAS && window.OPTIONS_CATEGORIZADAS[cat]) ? window.OPTIONS_CATEGORIZADAS[cat] : [];
+        selectAttr.innerHTML = opcoes.map(opt => `<option value="${opt.v}" ${opt.v === valSelecionado ? 'selected' : ''}>${opt.t}</option>`).join('');
+    };
+
+    selectCat.addEventListener('change', () => atualizarSubOpcoes());
+    atualizarSubOpcoes(attr);
 }
 
 function salvarBuffsPoder() {
@@ -335,10 +363,16 @@ function salvarBuffsPoder() {
     const modsArr = [];
 
     rows.forEach(row => {
-        const attr = row.querySelector('.pod-buff-attr')?.value;
-        const mod = parseInt(row.querySelector('.pod-buff-val')?.value) || 0;
+        const cat = row.querySelector('.pod-cat-select').value;
+        const attr = row.querySelector('.pod-buff-attr').value;
+        const modRaw = row.querySelector('.pod-buff-val').value;
+
+        // Se for tipo de dano, salva como texto, senão como número
+        const mod = attr === 'tipo_dano' ? modRaw : (parseInt(modRaw) || 0);
+        const isAdv = (cat === 'vantagem');
+
         if (attr && attr !== 'nenhum') {
-            modsArr.push({ attr, mod });
+            modsArr.push({ attr, mod, isAdv });
         }
     });
 

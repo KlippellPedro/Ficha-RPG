@@ -188,9 +188,14 @@ function abrirModalMaterial(itemIndex, fieldName) {
     document.getElementById('modal-material-title').innerText = `Detalhes do ${fieldName === 'cabo' ? 'Centro' : 'Base'}`;
     const container = document.getElementById('material-attributes-container');
     // Preenche os atributos do material
-    if (materialData.attributes && Array.isArray(materialData.attributes)) materialData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod));
-    else if (materialData.attr) adicionarAtributoMaterial(materialData.attr, materialData.mod); // Compatibilidade com formato antigo de um único atributo
+    if (materialData.attributes && Array.isArray(materialData.attributes)) materialData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod, '', a.isAdv));
+    else if (materialData.attr) adicionarAtributoMaterial(materialData.attr, materialData.mod, '', materialData.isAdv); // Compatibilidade com formato antigo de um único atributo
     else adicionarAtributoMaterial(); // Adiciona uma linha vazia se não houver atributos
+
+    // Ajusta o texto do botão de salvar
+    const btnSave = document.querySelector('#modal-material-details .btn-save-modal');
+    if (btnSave) btnSave.innerText = fieldName === 'cabo' ? 'Salvar Centro' : 'Salvar Base';
+
     document.getElementById('modal-material-details').style.display = 'flex';
 }
 
@@ -220,8 +225,12 @@ function abrirModalModificacoesItem(itemIndex) {
 
     document.getElementById('modal-material-title').innerText = "Modificações Simples e Marciais";
     const container = document.getElementById('material-attributes-container');
-    if (modsData.attributes && Array.isArray(modsData.attributes)) modsData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod, a.nome));
+    if (modsData.attributes && Array.isArray(modsData.attributes)) modsData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod, a.nome, a.isAdv));
     else adicionarAtributoMaterial();
+
+    // Ajusta o texto do botão de salvar
+    const btnSave = document.querySelector('#modal-material-details .btn-save-modal');
+    if (btnSave) btnSave.innerText = 'Salvar Modificações';
 
     document.getElementById('modal-material-details').style.display = 'flex';
 }
@@ -233,8 +242,10 @@ function salvarDetalhesModificacoesItem() {
     rows.forEach(row => {
         const nome = row.querySelector('.material-name-input')?.value || "";
         const attr = row.querySelector('.material-attr-select').value;
-        const mod = parseInt(row.querySelector('.material-mod-input').value) || 0;
-        const isAdv = row.querySelector('.material-adv-check')?.checked || false;
+        const cat = row.querySelector('.material-cat-select').value;
+        const modRaw = row.querySelector('.material-mod-input').value;
+        const mod = attr === 'tipo_dano' ? modRaw : (parseInt(modRaw) || 0);
+        const isAdv = (cat === 'vantagem');
         if (attr !== 'nenhum') attributes.push({ nome, attr, mod, isAdv });
     });
     const modsJson = JSON.stringify({ attributes });
@@ -270,8 +281,12 @@ function abrirModalRaridadeItem(itemIndex) {
 
     document.getElementById('modal-material-title').innerText = "Raridade & Buffs";
     const container = document.getElementById('material-attributes-container');
-    if (rarityData.attributes && Array.isArray(rarityData.attributes)) rarityData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod));
+    if (rarityData.attributes && Array.isArray(rarityData.attributes)) rarityData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod, '', a.isAdv));
     else adicionarAtributoMaterial();
+
+    // Ajusta o texto do botão de salvar
+    const btnSave = document.querySelector('#modal-material-details .btn-save-modal');
+    if (btnSave) btnSave.innerText = 'Salvar Raridade';
 
     document.getElementById('modal-material-details').style.display = 'flex';
 }
@@ -283,8 +298,10 @@ function salvarDetalhesRaridadeItem() {
     const attributes = [];
     rows.forEach(row => {
         const attr = row.querySelector('.material-attr-select').value;
-        const mod = parseInt(row.querySelector('.material-mod-input').value) || 0;
-        const isAdv = row.querySelector('.material-adv-check')?.checked || false;
+        const cat = row.querySelector('.material-cat-select').value;
+        const modRaw = row.querySelector('.material-mod-input').value;
+        const mod = attr === 'tipo_dano' ? modRaw : (parseInt(modRaw) || 0);
+        const isAdv = (cat === 'vantagem');
         if (attr !== 'nenhum') attributes.push({ attr, mod, isAdv });
     });
     const rarityJson = JSON.stringify({ raridade, attributes });
@@ -299,30 +316,59 @@ function salvarDetalhesRaridadeItem() {
     atualizarEstiloRaridade(idx);
 }
 
+function atualizarSubOpcoesBuff(selectCat, selectAttr, valorSelecionado = 'nenhum') {
+    const categoria = selectCat.value;
+    const opcoes = (window.OPTIONS_CATEGORIZADAS && window.OPTIONS_CATEGORIZADAS[categoria]) ? window.OPTIONS_CATEGORIZADAS[categoria] : [];
+
+    selectAttr.innerHTML = opcoes.map(opt => `<option value="${opt.v}" ${opt.v === valorSelecionado ? 'selected' : ''}>${opt.t}</option>`).join('');
+}
+
 function adicionarAtributoMaterial(attr = 'nenhum', mod = 0, nome = '', isAdv = false) {
     const container = document.getElementById('material-attributes-container');
     if (!container) return;
+
+    // Determina a categoria inicial baseada no atributo existente
+    let catInicial = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && window.OPTIONS_CATEGORIZADAS) {
+        if (window.OPTIONS_CATEGORIZADAS.pericia.some(o => o.v === attr)) {
+            catInicial = 'pericia';
+        } else if (window.OPTIONS_CATEGORIZADAS.arma.some(o => o.v === attr)) {
+            catInicial = 'arma';
+        }
+    }
+
     const row = document.createElement('div');
     row.className = 'material-attr-row';
-    row.style.display = 'flex';
-    row.style.gap = '12px';
-    row.style.marginBottom = '10px';
-    row.style.alignItems = 'center';
+    row.style = 'display: flex; gap: 8px; margin-bottom: 10px; align-items: center;';
 
     const showName = currentMaterialEditField === 'mods_item';
 
     row.innerHTML = `
-        ${showName ? `<input type="text" class="inv-input material-name-input" style="flex:2" placeholder="Nome (Ex: Certeira)" value="${nome}">` : ''}
-        <select class="inv-input material-attr-select" style="flex:2">${OPTIONS_ATTR.map(opt => `<option value="${opt.v}">${opt.t}</option>`).join('')}</select>
-        <input type="number" class="inv-input material-mod-input" style="flex:1" value="${mod}">
-        <div class="input-group" style="flex-direction:row; align-items:center; gap:3px;">
-            <label style="font-size:0.6rem">Vant?</label>
-            <input type="checkbox" class="material-adv-check" ${isAdv ? 'checked' : ''}>
-        </div>
+        ${showName ? `<input type="text" class="inv-input material-name-input" style="flex:1.5" placeholder="Nome" value="${nome}">` : ''}
+        
+        <select class="inv-input material-cat-select" style="flex:1; border-color: #555;">
+            <option value="ficha" ${catInicial === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia" ${catInicial === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma" ${catInicial === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="vantagem" ${catInicial === 'vantagem' ? 'selected' : ''}>Vantagem</option>
+        </select>
+
+        <select class="inv-input material-attr-select" style="flex:1.5"></select>
+
+        <input type="text" class="inv-input material-mod-input" style="flex:0.8" value="${mod}" placeholder="Val">
+
         <button type="button" class="btn-remove-class" onclick="this.closest('.material-attr-row').remove()">×</button>
     `;
+
     container.appendChild(row);
-    row.querySelector('.material-attr-select').value = attr;
+
+    const selectCat = row.querySelector('.material-cat-select');
+    const selectAttr = row.querySelector('.material-attr-select');
+
+    selectCat.addEventListener('change', () => atualizarSubOpcoesBuff(selectCat, selectAttr));
+
+    // Inicializa as opções do segundo select reagindo à categoria
+    atualizarSubOpcoesBuff(selectCat, selectAttr, attr);
 }
 
 function salvarDetalhesMaterial() {
@@ -340,8 +386,10 @@ function salvarDetalhesMaterial() {
         const attributes = [];
         rows.forEach(row => {
             const attr = row.querySelector('.material-attr-select').value;
-            const mod = parseInt(row.querySelector('.material-mod-input').value) || 0;
-            const isAdv = row.querySelector('.material-adv-check')?.checked || false;
+            const cat = row.querySelector('.material-cat-select').value;
+            const modRaw = row.querySelector('.material-mod-input').value;
+            const mod = attr === 'tipo_dano' ? modRaw : (parseInt(modRaw) || 0);
+            const isAdv = (cat === 'vantagem');
             if (attr !== 'nenhum') attributes.push({ attr, mod, isAdv });
         });
         const materialJson = JSON.stringify({ nome, attributes });

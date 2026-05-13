@@ -3,6 +3,7 @@
  */
 
 let habSendoEditadaIdx = null;
+let currentHabModEditIdx = null;
 
 /**
  * Gera as opções de classe baseadas nas classes que o personagem possui
@@ -36,7 +37,7 @@ function atualizarFiltroHabilidadesUI() {
     filterSelect.innerHTML = `<option value="todos">Todas as Fontes</option>` + getOpcoesClassesHab(valorAtual);
 }
 
-function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "") {
+function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "", mods = "[]") {
     const container = document.getElementById('habilidades-container');
     if (!container) return;
 
@@ -49,7 +50,7 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
     row.innerHTML = `
         <input type="text" id="hab_nome_${index}" class="save-input inv-input" placeholder="Nome" value="${nome}">
         <select id="hab_classe_${index}" class="save-input inv-input" onchange="atualizarTudo()">
-            ${getOpcoesClassesHab(classe || tipo)} 
+            ${getOpcoesClassesHab(classe)} 
         </select>
         <div style="display:flex; gap:5px;">
             <input type="text" id="hab_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
@@ -72,6 +73,7 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
             <input type="hidden" id="hab_duracao_${index}" class="save-input" value="${duracao}">
             <input type="hidden" id="hab_alcance_${index}" class="save-input" value="${alcance}">
             <input type="hidden" id="hab_acao_${index}" class="save-input" value="${acao}">
+            <input type="hidden" id="hab_mods_${index}" class="save-input" value='${mods}'>
         </div>
     `;
 
@@ -89,12 +91,12 @@ function abrirModalHab(index) {
     const tipo = document.getElementById(`hab_tipo_${index}`)?.value || "Ativa";
     const classe = document.getElementById(`hab_classe_${index}`).value;
     // Lê os valores diretamente dos inputs da linha para garantir que estejam atualizados
-    const custo = document.getElementById(`hab_custo_${index}`).value;
-    const tipoCusto = document.getElementById(`hab_tipo_custo_${index}`).value;
-    const desc = document.getElementById(`hab_desc_${index}`).value;
-    const duracao = document.getElementById(`hab_duracao_${index}`).value;
-    const alcance = document.getElementById(`hab_alcance_${index}`).value;
-    const acao = document.getElementById(`hab_acao_${index}`).value;
+    const custo = document.getElementById(`hab_custo_${index}`)?.value || "";
+    const tipoCusto = document.getElementById(`hab_tipo_custo_${index}`)?.value || "PM";
+    const desc = document.getElementById(`hab_desc_${index}`)?.value || "";
+    const duracao = document.getElementById(`hab_duracao_${index}`)?.value || "";
+    const alcance = document.getElementById(`hab_alcance_${index}`)?.value || "";
+    const acao = document.getElementById(`hab_acao_${index}`)?.value || "";
 
     // DEBUG: Verifique os valores lidos dos campos ocultos
     console.warn(`[DEBUG Habilidades] Lendo para modal - Duração: "${duracao}", Alcance: "${alcance}", Ação: "${acao}" para index: ${index}`);
@@ -107,13 +109,13 @@ function abrirModalHab(index) {
     body.innerHTML = `
         <div class="grid-2-cols">
             <div class="input-group">
-                <label>Classe Vinculada</label>
+                <label>Origem</label>
                 <select id="modal_hab_classe" class="inv-input">
                     ${getOpcoesClassesHab(classe)}
                 </select>
             </div>
-            <div class="input-group"><label>Tipo de Efeito (Ativa/Passiva)</label>
-                <select id="modal_hab_tipo" class="inv-input">
+            <div class="input-group"><label>Tipo de Efeito</label>
+                <select id="modal_hab_tipo" class="inv-input" onchange="document.getElementById('hab-buff-btn-container').style.display = this.value === 'Passiva' ? 'block' : 'none';">
                     <option value="Ativa" ${tipo === 'Ativa' ? 'selected' : ''}>Ativa</option>
                     <option value="Passiva" ${tipo === 'Passiva' ? 'selected' : ''}>Passiva</option>
                     <option value="Reação" ${tipo === 'Reação' ? 'selected' : ''}>Reação</option>
@@ -145,6 +147,12 @@ function abrirModalHab(index) {
             <label>Ação</label>
             <input type="text" id="modal_hab_acao" class="inv-input" value="${acao}">
         </div>
+
+        <div class="input-group" id="hab-buff-btn-container" style="display: ${tipo === 'Passiva' ? 'block' : 'none'}">
+            <label>Configurações de Buff</label>
+            <button type="button" class="btn-save-modal" style="width:100%; background: #4ade80; color: #000; border: 1px solid #166534;" onclick="abrirModalBuffsHab('${index}')">Definir Buffs</button>
+        </div>
+
         <div class="input-group">
             <label>Descrição e Efeito</label>
             <textarea id="modal_hab_desc" class="inv-input" style="min-height: 200px">${desc}</textarea>
@@ -249,28 +257,121 @@ function duplicarHabilidade(index) {
     const duracao = document.getElementById(`hab_duracao_${index}`).value;
     const alcance = document.getElementById(`hab_alcance_${index}`).value;
     const acao = document.getElementById(`hab_acao_${index}`).value;
+    const mods = document.getElementById(`hab_mods_${index}`)?.value || "[]";
 
-    adicionarHabilidadeUI(nome + " (Cópia)", tipo, custo, tipoCusto, desc, null, duracao, alcance, acao, classe);
+    adicionarHabilidadeUI(nome + " (Cópia)", tipo, custo, tipoCusto, desc, null, duracao, alcance, acao, classe, mods);
+}
+
+/**
+ * Abre o modal de Buffs para Habilidades
+ */
+function abrirModalBuffsHab(index) {
+    currentHabModEditIdx = index;
+    let modsData = [];
+    try {
+        const rawVal = document.getElementById(`hab_mods_${index}`).value;
+        modsData = JSON.parse(rawVal || "[]");
+    } catch (e) {
+        modsData = [];
+    }
+
+    const modal = document.getElementById('modal-pod-buffs');
+    const container = document.getElementById('pod-buffs-container');
+
+    if (!modal || !container) return;
+
+    container.innerHTML = '';
+    if (modsData.length > 0) {
+        modsData.forEach(m => adicionarLinhaBuffHab(m.attr, m.mod, m.isAdv));
+    } else {
+        adicionarLinhaBuffHab();
+    }
+
+    // Ajusta o título e a função de salvamento do modal reutilizado
+    const title = document.getElementById('modal-pod-buffs-title');
+    if (title) title.innerText = "Buffs de Habilidade (Passiva)";
+
+    const btnSalvar = modal.querySelector('.btn-save-modal');
+    if (btnSalvar) btnSalvar.setAttribute('onclick', 'salvarBuffsHab()');
+
+    modal.style.display = 'flex';
+}
+
+function fecharModalBuffHab() {
+    const modal = document.getElementById('modal-pod-buffs');
+    if (modal) modal.style.display = 'none';
+    currentHabModEditIdx = null;
+}
+
+function adicionarLinhaBuffHab(attr = 'nenhum', mod = 0, isAdv = false) {
+    const container = document.getElementById('pod-buffs-container');
+    if (!container) return;
+
+    const optionsCat = window.OPTIONS_CATEGORIZADAS || {};
+    let catInicial = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && optionsCat.pericia) {
+        if (optionsCat.pericia.some(o => o.v === attr)) catInicial = 'pericia';
+        else if (optionsCat.arma && optionsCat.arma.some(o => o.v === attr)) catInicial = 'arma';
+    }
+
+    const row = document.createElement('div');
+    row.className = 'material-attr-row';
+    row.style = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+    row.innerHTML = `
+        <select class="inv-input pod-cat-select" style="flex: 1; border-color: #555;">
+            <option value="ficha" ${catInicial === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia" ${catInicial === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma" ${catInicial === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="vantagem" ${catInicial === 'vantagem' ? 'selected' : ''}>Vantagem</option>
+        </select>
+        <select class="inv-input pod-buff-attr" style="flex: 1.5;"></select>
+        <input type="text" class="inv-input pod-buff-val" style="flex: 0.8;" value="${mod}" placeholder="Val">
+        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+    `;
+
+    container.appendChild(row);
+    const selectCat = row.querySelector('.pod-cat-select');
+    const selectAttr = row.querySelector('.pod-buff-attr');
+
+    const atualizarSub = (val = 'nenhum') => {
+        const cat = selectCat.value;
+        const opcoes = optionsCat[cat] || [];
+        selectAttr.innerHTML = opcoes.map(opt => `<option value="${opt.v}" ${opt.v === val ? 'selected' : ''}>${opt.t}</option>`).join('');
+    };
+
+    selectCat.addEventListener('change', () => atualizarSub());
+    atualizarSub(attr);
+}
+
+function salvarBuffsHab() {
+    if (currentHabModEditIdx === null) return;
+    const rows = document.querySelectorAll('#pod-buffs-container .material-attr-row');
+    const modsArr = [];
+    rows.forEach(row => {
+        const cat = row.querySelector('.pod-cat-select').value;
+        const attr = row.querySelector('.pod-buff-attr').value;
+        const modRaw = row.querySelector('.pod-buff-val').value;
+        const mod = attr === 'tipo_dano' ? modRaw : (parseInt(modRaw) || 0);
+        const isAdv = (cat === 'vantagem');
+        if (attr && attr !== 'nenhum') modsArr.push({ attr, mod, isAdv });
+    });
+    document.getElementById(`hab_mods_${currentHabModEditIdx}`).value = JSON.stringify(modsArr);
+    fecharModalBuffHab();
+    atualizarTudo();
 }
 
 function removerHabilidade(btn) {
     const row = btn.closest('.item-row');
     if (!row) return;
+
     const index = row.dataset.index;
 
-    // Remove do localStorage as chaves específicas desta habilidade
+    // 1. Limpeza robusta de todas as chaves associadas a este ID no banco de dados
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    delete dados[`hab_nome_${index}`];
-    delete dados[`hab_tipo_${index}`];
-    delete dados[`hab_classe_${index}`];
-    delete dados[`hab_custo_${index}`];
-    delete dados[`hab_desc_${index}`];
-    delete dados[`hab_tipo_custo_${index}`];
-    delete dados[`hab_duracao_${index}`];
-    delete dados[`hab_alcance_${index}`];
-    delete dados[`hab_acao_${index}`];
-
+    Object.keys(dados).forEach(k => { if (k.endsWith(`_${index}`) && k.startsWith('hab_')) delete dados[k]; });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+
+    // 2. Remove da interface e sincroniza o estado global
     row.remove();
     atualizarTudo();
     filtrarHabilidades();
@@ -365,7 +466,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     salvo[`hab_duracao_${idx}`] || "",      // 7. duracao
                     salvo[`hab_alcance_${idx}`] || "",      // 8. alcance
                     salvo[`hab_acao_${idx}`] || "",         // 9. acao
-                    salvo[`hab_classe_${idx}`] || ""        // 10. classe
+                    salvo[`hab_classe_${idx}`] || "",       // 10. classe
+                    salvo[`hab_mods_${idx}`] || "[]"        // 11. mods
                 );
             });
         }

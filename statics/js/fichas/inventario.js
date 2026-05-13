@@ -14,6 +14,7 @@ const OPTIONS_ATTR = [
     { v: "pm_max", t: "Mana Máx" }, { v: "defesa", t: "Defesa" }, { v: "movimentacao", t: "Movimento" },
     { v: "sanidade", t: "Sanidade" }, { v: "status_info", t: "Status" },
     { v: "dano", t: "Arma: Dano" }, { v: "critico", t: "Arma: Crítico" }, { v: "alcance", t: "Arma: Alcance" },
+    { v: "todas", t: "P: TODAS as Perícias" },
     { v: "acrobacia", t: "P: Acrobacia" }, { v: "adestramento", t: "P: Adestramento" },
     { v: "atuação", t: "P: Atuação" }, { v: "bloquear", t: "P: Bloquear" },
     { v: "conhecimento", t: "P: Conhecimento" }, { v: "corrompimento", t: "P: Corrompimento" },
