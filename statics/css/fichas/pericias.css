@@ -32,7 +32,7 @@ h1 {
 
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); /* Aumentado para acomodar o botão de excluir sem esmagar */
+  grid-template-columns: repeat(auto-fill, minmax(540px, 1fr)); /* Aumentado para comportar o novo campo de vantagem */
   gap: 20px;
   padding: 10px;
 }
@@ -45,7 +45,8 @@ h1 {
   flex-direction: row; /* Força horizontal */
   flex-wrap: nowrap; /* Impede que os itens pulem para a linha de baixo */
   align-items: center;
-  padding: 12px;
+  padding: 10px 15px;
+  gap: 12px; /* Espaçamento padrão entre elementos */
   transition:
     transform 0.2s,
     border-color 0.2s;
@@ -69,7 +70,6 @@ h1 {
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  margin-right: 15px;
 }
 
 .skill-total {
@@ -87,7 +87,7 @@ h1 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 100px; /* Garante que o nome não suma */
+  min-width: 120px;
 }
 
 .skill-attr-selector {
@@ -98,10 +98,10 @@ h1 {
   font-weight: bold;
   padding: 3px 5px;
   border-radius: 4px;
-  margin-right: 15px;
   cursor: pointer;
   outline: none;
   transition: 0.2s;
+  flex-shrink: 0;
 }
 
 .skill-attr-selector:hover {
@@ -114,13 +114,14 @@ h1 {
   background: #1a1a1d;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
-  margin-right: 8px;
   font-size: 0.8rem;
   padding: 6px;
   border-radius: 4px;
   outline: none;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
+  width: 115px;
 }
 
 /* Cores baseadas no valor selecionado (via classes injetadas no row) */
@@ -161,6 +162,64 @@ h1 {
   text-align: center;
   font-weight: bold;
   flex-shrink: 0; /* Impede que o input de bônus diminua */
+}
+/* Container das vantagens (Dados extras) */
+.skill-adv-container {
+  display: flex;
+  align-items: center;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 4px;
+  padding: 0 8px;
+  height: 32px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.adv-label {
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #f59e0b;
+  margin-right: 4px;
+  user-select: none;
+}
+
+.skill-adv {
+  width: 28px !important;
+  background: transparent !important;
+  border: none !important;
+  color: white !important;
+  font-weight: bold;
+  text-align: center;
+  padding: 0 !important;
+  outline: none;
+}
+
+/* Destaque visual quando houver 1 ou mais vantagens */
+.skill-adv-container:has(.has-advantage) {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+  animation: advantage-glow 3s infinite ease-in-out;
+}
+
+.skill-adv.has-advantage {
+  color: #f59e0b !important;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+@keyframes advantage-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); }
+  50% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); border-color: #f59e0b; }
+}
+
+/* Remove as setinhas padrão do input de número para manter o visual limpo */
+.skill-bonus::-webkit-inner-spin-button,
+.skill-bonus::-webkit-outer-spin-button,
+.skill-adv::-webkit-inner-spin-button,
+.skill-adv::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Indicadores de Nível de Treinamento */

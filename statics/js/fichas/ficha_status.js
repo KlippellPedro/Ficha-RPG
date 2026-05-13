@@ -4,10 +4,9 @@
 function atualizarDefesa(mods, dadosObj, bonusItens = {}) {
     const modDes = mods['destreza'] || 0;
     const armadura = parseInt(document.getElementById("defesa_armadura")?.value || 0);
-    const penalidade = parseInt(document.getElementById("defesa_penalidade")?.value || 0);
     const outros = parseInt(document.getElementById("defesa_outros")?.value || 0);
     const itemBonus = bonusItens['defesa'] || 0;
-    const total = 10 + modDes + armadura + outros + itemBonus - penalidade;
+    const total = 10 + modDes + armadura + outros + itemBonus;
     const inputDef = document.getElementById("defesa");
     if (inputDef) inputDef.value = total;
 }
@@ -99,7 +98,8 @@ function escolherStatus(valor) {
 
 function atualizarMovimento(mods, dados, bonusItens = {}) {
     const modDes = mods['destreza'] || 0;
-    const total = (modDes * 3) + (bonusItens['movimentacao'] || 0);
+    const penalidadeManual = parseInt(document.getElementById("defesa_penalidade")?.value || 0);
+    const total = (modDes * 3) + (bonusItens['movimentacao'] || 0) - penalidadeManual;
     const racaKey = document.getElementById("raca")?.value || "nenhuma";
     const isVamp = racaKey === "vampiro" || (racaKey === "hibrido" && (dados.hibrido_raca_1 === "vampiro" || dados.hibrido_raca_2 === "vampiro"));
     const formaMorcego = document.getElementById("vampiro_forma_morcego")?.checked || dados.vampiro_forma_morcego;

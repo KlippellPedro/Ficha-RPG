@@ -4,7 +4,39 @@
 
 let podSendoEditadoIdx = null;
 
-function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "") {
+/**
+ * Gera as opções de classe baseadas nas classes que o personagem possui
+ */
+function getOpcoesClassesPod(valorSelecionado = "") {
+    const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    const classes = getClassesAtivas(dados);
+    let opcoes = `<option value="Geral" ${valorSelecionado === 'Geral' || !valorSelecionado ? 'selected' : ''}>Geral</option>`;
+    opcoes += `<option value="Raça" ${valorSelecionado === 'Raça' ? 'selected' : ''}>Raça</option>`;
+    opcoes += `<option value="Povo" ${valorSelecionado === 'Povo' ? 'selected' : ''}>Povo</option>`;
+    opcoes += `<option value="Outro" ${valorSelecionado === 'Outro' ? 'selected' : ''}>Outro</option>`;
+
+    classes.forEach(c => {
+        const nomeFormatado = c.name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        const valor = c.sub ? `${c.name}_${c.sub}` : c.name;
+        const label = c.sub ? `${nomeFormatado} (${c.sub})` : nomeFormatado;
+        opcoes += `<option value="${valor}" ${valorSelecionado === valor ? 'selected' : ''}>${label}</option>`;
+    });
+
+    return opcoes;
+}
+
+/**
+ * Atualiza as opções do select de filtro para baterem com as classes e origens disponíveis
+ */
+function atualizarFiltroPoderesUI() {
+    const filterSelect = document.getElementById('filter-poder-tipo');
+    if (!filterSelect) return;
+
+    const valorAtual = filterSelect.value;
+    filterSelect.innerHTML = `<option value="todos">Todas as Classes/Origens</option>` + getOpcoesClassesPod(valorAtual);
+}
+
+function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "") {
     const container = document.getElementById('poderes-container');
     if (!container) return;
 
@@ -16,11 +48,8 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
 
     row.innerHTML = `
         <input type="text" id="poder_nome_${index}" class="save-input inv-input" placeholder="Nome do Poder" value="${nome}">
-        <select id="poder_tipo_${index}" class="save-input inv-input">
-            <option value="Poder de Classe" ${tipo === 'Poder de Classe' ? 'selected' : ''}>Classe</option>
-            <option value="Poder de Povo" ${tipo === 'Poder de Povo' ? 'selected' : ''}>Povo</option>
-            <option value="Poder de Raça" ${tipo === 'Poder de Raça' ? 'selected' : ''}>Raça</option>
-            <option value="Outro" ${tipo === 'Outro' ? 'selected' : ''}>Outro</option>
+        <select id="poder_classe_${index}" class="save-input inv-input" onchange="atualizarTudo()">
+            ${getOpcoesClassesPod(classe || tipo)} 
         </select>
         <div style="display:flex; gap:5px;">
             <input type="text" id="poder_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
@@ -37,6 +66,7 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
         <button type="button" class="btn-remove-class" onclick="removerPoder(this)">×</button>
 
         <div style="display:none">
+            <input type="hidden" id="poder_tipo_${index}" class="save-input" value="${tipo}">
             <textarea id="poder_desc_${index}" class="save-input">${desc}</textarea>
             <input type="hidden" id="poder_duracao_${index}" class="save-input" value="${duracao}">
             <input type="hidden" id="poder_alcance_${index}" class="save-input" value="${alcance}">
@@ -54,7 +84,8 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
 function abrirModalPod(index) {
     podSendoEditadoIdx = index;
     const nome = document.getElementById(`poder_nome_${index}`).value;
-    const tipo = document.getElementById(`poder_tipo_${index}`).value;
+    const tipo = document.getElementById(`poder_tipo_${index}`)?.value || "Poder de Classe";
+    const classe = document.getElementById(`poder_classe_${index}`).value;
     // Lê os valores diretamente dos inputs da linha para garantir que estejam atualizados
     const custo = document.getElementById(`poder_custo_${index}`).value;
     const tipoCusto = document.getElementById(`poder_tipo_custo_${index}`).value;
@@ -69,7 +100,13 @@ function abrirModalPod(index) {
     body.innerHTML = `
         <div class="grid-2-cols">
             <div class="input-group">
-                <label>Tipo de Poder</label>
+                <label>Classe Vinculada</label>
+                <select id="modal_pod_classe" class="inv-input">
+                    ${getOpcoesClassesPod(classe)}
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Tipo de Poder (Fonte)</label>
                 <select id="modal_pod_tipo" class="inv-input">
                     <option value="Poder de Classe" ${tipo === 'Poder de Classe' ? 'selected' : ''}>Poder de Classe</option>
                     <option value="Poder de Povo" ${tipo === 'Poder de Povo' ? 'selected' : ''}>Poder de Povo</option>
@@ -115,7 +152,8 @@ function fecharModalPod() {
 function salvarDetalhesPod() {
     if (podSendoEditadoIdx !== null) {
         const idx = podSendoEditadoIdx;
-        document.getElementById(`poder_tipo_${idx}`).value = document.getElementById('modal_pod_tipo').value;
+        document.getElementById(`poder_classe_${idx}`).value = document.getElementById('modal_pod_classe').value;
+        if (document.getElementById(`poder_tipo_${idx}`)) document.getElementById(`poder_tipo_${idx}`).value = document.getElementById('modal_pod_tipo').value;
         document.getElementById(`poder_custo_${idx}`).value = document.getElementById('modal_pod_custo').value;
         document.getElementById(`poder_tipo_custo_${idx}`).value = document.getElementById('modal_pod_tipo_custo').value;
         document.getElementById(`poder_desc_${idx}`).value = document.getElementById('modal_pod_desc').value;
@@ -166,14 +204,15 @@ function usarPoder(index) {
 
 function duplicarPoder(index) {
     const n = document.getElementById(`poder_nome_${index}`).value;
-    const t = document.getElementById(`poder_tipo_${index}`).value;
+    const t = document.getElementById(`poder_tipo_${index}`)?.value || "Poder de Classe";
+    const cl = document.getElementById(`poder_classe_${index}`).value;
     const c = document.getElementById(`poder_custo_${index}`).value;
     const tc = document.getElementById(`poder_tipo_custo_${index}`).value;
     const d = document.getElementById(`poder_desc_${index}`).value;
     const du = document.getElementById(`poder_duracao_${index}`).value;
     const al = document.getElementById(`poder_alcance_${index}`).value;
     const ac = document.getElementById(`poder_acao_${index}`).value;
-    adicionarPoderUI(n + " (Cópia)", t, c, tc, d, null, du, al, ac);
+    adicionarPoderUI(n + " (Cópia)", t, c, tc, d, null, du, al, ac, cl);
 }
 
 function limparPoderes() {
@@ -201,6 +240,7 @@ function limparPoderes() {
  */
 function resetarFiltrosPoderes() {
     document.getElementById('search-poder').value = '';
+    if (document.getElementById('filter-poder-classe')) document.getElementById('filter-poder-classe').value = '';
     document.getElementById('filter-poder-tipo').value = 'todos';
     filtrarPoderes();
     showNotification("Filtro limpo", "info", 2000);
@@ -212,17 +252,19 @@ function resetarFiltrosPoderes() {
 function filtrarPoderes() {
     const termo = document.getElementById('search-poder').value.toLowerCase();
     const filtroTipo = document.getElementById('filter-poder-tipo').value;
+    const filtroTipoLower = filtroTipo.toLowerCase();
+    const filtroClasse = document.getElementById('filter-poder-classe')?.value.toLowerCase() || "";
     const rows = document.querySelectorAll('#poderes-container .item-row');
     let contador = 0;
 
     rows.forEach(row => {
         const index = row.dataset.index;
         const nome = document.getElementById(`poder_nome_${index}`)?.value.toLowerCase() || "";
-        const tipo = document.getElementById(`poder_tipo_${index}`)?.value || "";
+        const classe = document.getElementById(`poder_classe_${index}`)?.value.toLowerCase() || "geral";
 
         const matchesNome = nome.includes(termo);
-        const matchesTipo = filtroTipo === 'todos' || tipo === filtroTipo;
-        const matches = matchesNome && matchesTipo;
+        const matchesClasse = filtroTipo === 'todos' || classe === filtroTipoLower || classe.includes(filtroClasse);
+        const matches = matchesNome && matchesClasse;
 
         row.style.display = matches ? 'grid' : 'none';
         if (matches) contador++;
@@ -242,6 +284,7 @@ function removerPoder(btn) {
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
     delete dados[`poder_nome_${index}`];
     delete dados[`poder_tipo_${index}`];
+    delete dados[`poder_classe_${index}`];
     delete dados[`poder_custo_${index}`];
     delete dados[`poder_desc_${index}`];
     delete dados[`poder_tipo_custo_${index}`];
@@ -273,10 +316,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 parseInt(idx),                       // 6. idIndex
                 salvo[`poder_duracao_${idx}`] || "", // 7. duracao
                 salvo[`poder_alcance_${idx}`] || "", // 8. alcance
-                salvo[`poder_acao_${idx}`] || ""     // 9. acao
+                salvo[`poder_acao_${idx}`] || "",    // 9. acao
+                salvo[`poder_classe_${idx}`] || ""   // 10. classe
             );
         });
     }
+
+    // Atualiza o dropdown de filtros para as classes/origens
+    atualizarFiltroPoderesUI();
+
     // Chama atualizarTudo() uma única vez após carregar todos os elementos dinâmicos
     atualizarTudo();
     filtrarPoderes();

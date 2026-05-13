@@ -38,6 +38,7 @@ function renderPericias() {
         const savedAttr = salvo[`skill_attr_${slug}`] || p.attr;
         const savedTrain = salvo[`skill_train_${slug}`] || "nenhum";
         const savedBonus = salvo[`skill_bonus_${slug}`] || 0;
+        const savedAdv = salvo[`skill_adv_${slug}`] || 0;
 
         return `
         <div class="skill-row">
@@ -60,6 +61,11 @@ function renderPericias() {
             </select>
             
             <input type="number" id="skill_bonus_${slug}" class="save-input skill-bonus" value="${savedBonus}" oninput="atualizarTudo()" />
+
+            <div class="skill-adv-container" title="Vantagens (Dados extras)">
+                <span class="adv-label">V</span>
+                <input type="number" id="skill_adv_${slug}" class="save-input skill-adv" value="${savedAdv}" min="0" oninput="atualizarTudo()" />
+            </div>
         </div>
     `}).join('');
 }
@@ -67,7 +73,7 @@ function renderPericias() {
 /**
  * Adiciona uma nova linha de Ofício dinamicamente.
  */
-function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", training = "nenhum", bonus = 0, idIndex = null) {
+function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", training = "nenhum", bonus = 0, adv = 0, idIndex = null) {
     const container = document.getElementById('skills-container');
     if (!container) return;
 
@@ -96,6 +102,12 @@ function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", trainin
         </select>
         
         <input type="number" id="skill_bonus_${index}" class="save-input skill-bonus" value="${bonus}" oninput="atualizarTudo()" />
+
+        <div class="skill-adv-container" title="Vantagens (Dados extras)">
+            <span class="adv-label">V</span>
+            <input type="number" id="skill_adv_${index}" class="save-input skill-adv" value="${adv}" min="0" oninput="atualizarTudo()" />
+        </div>
+
         <button type="button" class="btn-remove-skill" onclick="this.closest('.skill-row').remove(); atualizarTudo();" title="Remover Perícia">×</button>
     `;
     container.appendChild(row);
@@ -107,12 +119,22 @@ function atualizarPericias(nivel, mods, bonusItens = {}) {
         const training = document.getElementById(`skill_train_${skillSlug}`)?.value;
         const selectedAttr = document.getElementById(`skill_attr_${skillSlug}`)?.value;
         const bonus = parseInt(row.querySelector(".skill-bonus")?.value) || 0;
+        const manualAdv = parseInt(document.getElementById(`skill_adv_${skillSlug}`)?.value) || 0;
+        const itemAdv = bonusItens[`adv_${skillSlug}`] || 0;
+        const totalAdv = manualAdv + itemAdv;
+
         const attrMod = mods[selectedAttr] || 0;
         const itemSkillBonus = bonusItens[skillSlug] || 0;
 
         // Remove todas as classes de destaque e adiciona a classe correspondente ao treino atual
         row.classList.remove('treinado', 'profissional', 'mestre', 'anciao');
         if (training !== 'nenhum') row.classList.add(training);
+
+        // Destaque visual para o campo de vantagem se houver valor
+        const advInput = document.getElementById(`skill_adv_${skillSlug}`);
+        if (totalAdv > 0) advInput?.classList.add('has-advantage');
+        else advInput?.classList.remove('has-advantage');
+        if (advInput) advInput.title = itemAdv > 0 ? `Bônus de Item: +${itemAdv} Vantagens` : "Vantagens (Dados extras)";
 
         const tBonus = {
             'nenhum': 0,
@@ -152,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
             salvo[`skill_attr_${id}`],
             salvo[`skill_train_${id}`],
             salvo[`skill_bonus_${id}`],
+            salvo[`skill_adv_${id}`] || 0,
             id
         );
     });

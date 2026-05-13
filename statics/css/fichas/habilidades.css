@@ -138,9 +138,9 @@
 /* Definição das colunas para Habilidades e Poderes */
 .hab-header-grid,
 .hab-row-grid {
-  /* Nome | Tipo | Custo+Recurso | Info | Usar | Dup | X */
+  /* Nome | Classe | Custo+Recurso | Info | Usar | Dup | X */
   display: grid; /* Removido !important */
-  grid-template-columns: 2fr 110px 160px 50px 60px 50px 40px; /* Removido !important */
+  grid-template-columns: 2fr 160px 180px 50px 70px 50px 40px;
 }
 
 .pod-header-grid,

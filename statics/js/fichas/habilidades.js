@@ -4,7 +4,39 @@
 
 let habSendoEditadaIdx = null;
 
-function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "") {
+/**
+ * Gera as opções de classe baseadas nas classes que o personagem possui
+ */
+function getOpcoesClassesHab(valorSelecionado = "") {
+    const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    const classes = getClassesAtivas(dados);
+    let opcoes = `<option value="Geral" ${valorSelecionado === 'Geral' || !valorSelecionado ? 'selected' : ''}>Geral</option>`;
+    opcoes += `<option value="Raça" ${valorSelecionado === 'Raça' ? 'selected' : ''}>Raça</option>`;
+    opcoes += `<option value="Povo" ${valorSelecionado === 'Povo' ? 'selected' : ''}>Povo</option>`;
+    opcoes += `<option value="Outro" ${valorSelecionado === 'Outro' ? 'selected' : ''}>Outro</option>`;
+
+    classes.forEach(c => {
+        const nomeFormatado = c.name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        const valor = c.sub ? `${c.name}_${c.sub}` : c.name;
+        const label = c.sub ? `${nomeFormatado} (${c.sub})` : nomeFormatado;
+        opcoes += `<option value="${valor}" ${valorSelecionado === valor ? 'selected' : ''}>${label}</option>`;
+    });
+
+    return opcoes;
+}
+
+/**
+ * Atualiza as opções do select de filtro para baterem com as classes e origens disponíveis
+ */
+function atualizarFiltroHabilidadesUI() {
+    const filterSelect = document.getElementById('filter-habilidade-tipo');
+    if (!filterSelect) return;
+
+    const valorAtual = filterSelect.value;
+    filterSelect.innerHTML = `<option value="todos">Todas as Classes/Origens</option>` + getOpcoesClassesHab(valorAtual);
+}
+
+function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "") {
     const container = document.getElementById('habilidades-container');
     if (!container) return;
 
@@ -16,11 +48,8 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
 
     row.innerHTML = `
         <input type="text" id="hab_nome_${index}" class="save-input inv-input" placeholder="Nome" value="${nome}">
-        <select id="hab_tipo_${index}" class="save-input inv-input">
-            <option value="Ativa" ${tipo === 'Ativa' ? 'selected' : ''}>Ativa</option>
-            <option value="Passiva" ${tipo === 'Passiva' ? 'selected' : ''}>Passiva</option>
-            <option value="Reação" ${tipo === 'Reação' ? 'selected' : ''}>Reação</option>
-            <option value="Outro" ${tipo === 'Outro' ? 'selected' : ''}>Outro</option>
+        <select id="hab_classe_${index}" class="save-input inv-input" onchange="atualizarTudo()">
+            ${getOpcoesClassesHab(classe || tipo)} 
         </select>
         <div style="display:flex; gap:5px;">
             <input type="text" id="hab_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
@@ -39,6 +68,7 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
         <div style="display:none">
             <!-- Campos ocultos para detalhes -->
             <textarea id="hab_desc_${index}" class="save-input">${desc}</textarea>
+            <input type="hidden" id="hab_tipo_${index}" class="save-input" value="${tipo}">
             <input type="hidden" id="hab_duracao_${index}" class="save-input" value="${duracao}">
             <input type="hidden" id="hab_alcance_${index}" class="save-input" value="${alcance}">
             <input type="hidden" id="hab_acao_${index}" class="save-input" value="${acao}">
@@ -56,7 +86,8 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
 function abrirModalHab(index) {
     habSendoEditadaIdx = index;
     const nome = document.getElementById(`hab_nome_${index}`).value;
-    const tipo = document.getElementById(`hab_tipo_${index}`).value;
+    const tipo = document.getElementById(`hab_tipo_${index}`)?.value || "Ativa";
+    const classe = document.getElementById(`hab_classe_${index}`).value;
     // Lê os valores diretamente dos inputs da linha para garantir que estejam atualizados
     const custo = document.getElementById(`hab_custo_${index}`).value;
     const tipoCusto = document.getElementById(`hab_tipo_custo_${index}`).value;
@@ -70,7 +101,13 @@ function abrirModalHab(index) {
     const body = document.getElementById('modal-hab-body');
     body.innerHTML = `
         <div class="grid-2-cols">
-            <div class="input-group"><label>Tipo</label>
+            <div class="input-group">
+                <label>Classe Vinculada</label>
+                <select id="modal_hab_classe" class="inv-input">
+                    ${getOpcoesClassesHab(classe)}
+                </select>
+            </div>
+            <div class="input-group"><label>Tipo de Efeito (Ativa/Passiva)</label>
                 <select id="modal_hab_tipo" class="inv-input">
                     <option value="Ativa" ${tipo === 'Ativa' ? 'selected' : ''}>Ativa</option>
                     <option value="Passiva" ${tipo === 'Passiva' ? 'selected' : ''}>Passiva</option>
@@ -124,7 +161,8 @@ function fecharModalHab() {
 function salvarDetalhesHab() {
     if (habSendoEditadaIdx !== null) {
         const idx = habSendoEditadaIdx;
-        document.getElementById(`hab_tipo_${idx}`).value = document.getElementById('modal_hab_tipo').value;
+        document.getElementById(`hab_classe_${idx}`).value = document.getElementById('modal_hab_classe').value;
+        if (document.getElementById(`hab_tipo_${idx}`)) document.getElementById(`hab_tipo_${idx}`).value = document.getElementById('modal_hab_tipo').value;
         document.getElementById(`hab_custo_${idx}`).value = document.getElementById('modal_hab_custo').value;
         document.getElementById(`hab_tipo_custo_${idx}`).value = document.getElementById('modal_hab_tipo_custo').value;
         document.getElementById(`hab_desc_${idx}`).value = document.getElementById('modal_hab_desc').value;
@@ -192,7 +230,8 @@ function usarHabilidade(index) {
  */
 function duplicarHabilidade(index) {
     const nome = document.getElementById(`hab_nome_${index}`).value;
-    const tipo = document.getElementById(`hab_tipo_${index}`).value;
+    const tipo = document.getElementById(`hab_tipo_${index}`)?.value || "Ativa";
+    const classe = document.getElementById(`hab_classe_${index}`).value;
     const custo = document.getElementById(`hab_custo_${index}`).value;
     const tipoCusto = document.getElementById(`hab_tipo_custo_${index}`).value;
     const desc = document.getElementById(`hab_desc_${index}`).value;
@@ -200,7 +239,7 @@ function duplicarHabilidade(index) {
     const alcance = document.getElementById(`hab_alcance_${index}`).value;
     const acao = document.getElementById(`hab_acao_${index}`).value;
 
-    adicionarHabilidadeUI(nome + " (Cópia)", tipo, custo, tipoCusto, desc, null, duracao, alcance, acao);
+    adicionarHabilidadeUI(nome + " (Cópia)", tipo, custo, tipoCusto, desc, null, duracao, alcance, acao, classe);
 }
 
 function removerHabilidade(btn) {
@@ -212,6 +251,7 @@ function removerHabilidade(btn) {
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
     delete dados[`hab_nome_${index}`];
     delete dados[`hab_tipo_${index}`];
+    delete dados[`hab_classe_${index}`];
     delete dados[`hab_custo_${index}`];
     delete dados[`hab_desc_${index}`];
     delete dados[`hab_tipo_custo_${index}`];
@@ -250,6 +290,7 @@ function limparHabilidades() {
  */
 function resetarFiltrosHabilidades() {
     document.getElementById('search-habilidade').value = '';
+    if (document.getElementById('filter-habilidade-classe')) document.getElementById('filter-habilidade-classe').value = '';
     document.getElementById('filter-habilidade-tipo').value = 'todos';
     filtrarHabilidades();
     showNotification("Filtro limpo", "info", 2000);
@@ -261,17 +302,19 @@ function resetarFiltrosHabilidades() {
 function filtrarHabilidades() {
     const termo = document.getElementById('search-habilidade').value.toLowerCase();
     const filtroTipo = document.getElementById('filter-habilidade-tipo').value;
+    const filtroTipoLower = filtroTipo.toLowerCase();
+    const filtroClasse = document.getElementById('filter-habilidade-classe')?.value.toLowerCase() || "";
     const rows = document.querySelectorAll('#habilidades-container .item-row'); // Seleciona apenas as linhas de habilidade
     let contador = 0;
 
     rows.forEach(row => {
         const index = row.dataset.index;
         const nome = document.getElementById(`hab_nome_${index}`)?.value.toLowerCase() || "";
-        const tipo = document.getElementById(`hab_tipo_${index}`)?.value || "";
+        const classe = document.getElementById(`hab_classe_${index}`)?.value.toLowerCase() || "geral";
 
         const matchesNome = nome.includes(termo);
-        const matchesTipo = filtroTipo === 'todos' || tipo === filtroTipo;
-        const matches = matchesNome && matchesTipo;
+        const matchesClasse = filtroTipo === 'todos' || classe === filtroTipoLower || classe.includes(filtroClasse);
+        const matches = matchesNome && matchesClasse;
 
         row.style.display = matches ? 'grid' : 'none';
         if (matches) contador++;
@@ -306,11 +349,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     parseInt(idx),                       // 6. idIndex
                     salvo[`hab_duracao_${idx}`] || "",   // 7. duracao
                     salvo[`hab_alcance_${idx}`] || "",   // 8. alcance
-                    salvo[`hab_acao_${idx}`] || ""       // 9. acao
+                    salvo[`hab_acao_${idx}`] || "",      // 9. acao
+                    salvo[`hab_classe_${idx}`] || ""     // 10. classe
                 );
             });
         }
     }
+
+    // Atualiza o dropdown de filtros para remover o antigo "Ativa/Passiva" e colocar as classes/origens
+    atualizarFiltroHabilidadesUI();
+
     // Chama atualizarTudo() uma única vez após carregar todos os elementos dinâmicos
     atualizarTudo();
     filtrarHabilidades();

@@ -155,9 +155,11 @@
 }
 
 .item-row.equipped-row {
-  background: rgba(255, 68, 68, 0.08);
+  background: linear-gradient(90deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 68, 68, 0.02) 100%);
   border-left: 4px solid #ff4444;
-  box-shadow: inset 5px 0 15px rgba(255, 68, 68, 0.1);
+  box-shadow: 
+    inset 5px 0 15px rgba(255, 68, 68, 0.05),
+    0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Esconde campos detalhados na lista principal para manter o Clean */
@@ -297,7 +299,7 @@
 .grid-2-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 20px; /* Mais espaço entre colunas */
 }
 
 .weight-warning-msg {
@@ -365,7 +367,7 @@
   box-shadow: 0 0 30px rgba(255, 68, 68, 0.3);
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 25px; /* Maior separação entre os blocos principais */
 }
 
 .modal-header {
@@ -379,7 +381,7 @@
 .modal-body {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 25px; /* Maior separação entre as linhas de inputs */
   margin-top: 10px;
   max-height: 70vh;
   overflow-y: auto;
@@ -483,12 +485,17 @@ select.inv-input option {
 }
 .rarity-epico {
   color: #a855f7;
+  text-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
 }
 .rarity-mitico {
   color: #f59e0b;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
 }
 .rarity-especial {
   color: #00faee;
+  text-shadow: 0 0 15px rgba(0, 250, 238, 0.6), 0 0 5px rgba(255, 255, 255, 0.3);
+  font-weight: 900;
+  letter-spacing: 0.5px;
 }
 
 @keyframes fadeIn {

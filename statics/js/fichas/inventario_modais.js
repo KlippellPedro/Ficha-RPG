@@ -40,61 +40,76 @@ function abrirModalItem(index) {
     document.getElementById('modal-title').innerText = `Detalhes: ${nome || "Novo Item"}`;
 
     const body = document.getElementById('modal-body-content');
+
+    // Parte Superior: Descrição, Peso, Qtd e Atributo Fixo
     let htmlExtra = `
-        <div class="input-group"><label>Descrição</label><textarea id="modal_desc" class="inv-input" style="min-height:80px">${desc}</textarea></div>
-        <div class="grid-2-cols">
-            <div class="input-group"><label>Peso (kg)</label><input type="number" step="0.1" id="modal_peso" class="inv-input" value="${peso}"></div>
-            <div class="input-group"><label>Quantidade</label><input type="number" id="modal_qtd" class="inv-input" value="${qtd}"></div>
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px;">
+            <div class="input-group">
+                <label>Descrição</label>
+                <textarea id="modal_desc" class="inv-input" style="min-height: 110px; resize: vertical;">${desc}</textarea>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="grid-2-cols">
+                    <div class="input-group"><label>Peso (kg)</label><input type="number" step="0.1" id="modal_peso" class="inv-input" value="${peso}"></div>
+                    <div class="input-group"><label>Qtd</label><input type="number" id="modal_qtd" class="inv-input" value="${qtd}"></div>
+                </div>
+                <div class="input-group">
+                    <label>Bônus de Atributo Fixo</label>
+                    <div style="display: flex; gap: 5px;">
+                        <select id="modal_attr" class="inv-input" style="flex: 2;">${OPTIONS_ATTR.map(opt => `<option value="${opt.v}">${opt.t}</option>`).join('')}</select>
+                        <input type="number" id="modal_mod" class="inv-input" style="flex: 1;" value="${modVal}">
+                    </div>
+                </div>
+            </div>
         </div>
     `;
 
-    if (['armas', 'armaduras', 'consumiveis', 'itens'].includes(cat)) {
+    // Modificações e Raridade
+    if (['armas', 'armaduras', 'consumiveis', 'itens', 'outros'].includes(cat)) {
+        let raroData = {};
+        try { raroData = JSON.parse(raroRaw && raroRaw.startsWith('{') ? raroRaw : '{}'); } catch (e) { }
+        const rValue = raroData.raridade || (raroRaw && !raroRaw.startsWith('{') ? raroRaw : 'comum');
+        const rarityText = OPTIONS_RARIDADE.find(r => r.v === rValue)?.t || "Comum";
+
         htmlExtra += `
-            <div class="input-group">
-                <label>Modificações (Simples/Marciais)</label>
-                <button type="button" class="btn-material-edit" onclick="abrirModalModificacoesItem('${index}')">Definir Modificações</button>
+            <div class="grid-2-cols" style="gap: 25px;">
+                <div class="input-group"><label>Modificações</label><button type="button" class="btn-material-edit" onclick="abrirModalModificacoesItem('${index}')">Definir Modificações</button></div>
+                <div class="input-group"><label>Raridade & Buffs</label><button type="button" class="btn-material-edit" onclick="abrirModalRaridadeItem('${index}')">${rarityText}</button></div>
             </div>
         `;
-    }
-
-    if (cat !== 'armas') {
-        htmlExtra += `<div class="input-group"><label>Raridade</label><select id="modal_raro" class="inv-input">${OPTIONS_RARIDADE.map(r => `<option value="${r.v}">${r.t}</option>`).join('')}</select></div>`;
     } else {
-        let raroData = {};
-        try { raroData = JSON.parse(raroRaw.startsWith('{') ? raroRaw : '{}'); } catch (e) { }
-        const rarityText = OPTIONS_RARIDADE.find(r => r.v === raroData.raridade)?.t || "Comum";
-        htmlExtra += `<div class="input-group"><label>Raridade & Buffs</label><button type="button" class="btn-material-edit" onclick="abrirModalRaridadeArma('${index}')">${rarityText}</button></div>`;
+        htmlExtra += `<div class="input-group"><label>Raridade</label><select id="modal_raro" class="inv-input">${OPTIONS_RARIDADE.map(r => `<option value="${r.v}" ${r.v === raroRaw ? 'selected' : ''}>${r.t}</option>`).join('')}</select></div>`;
     }
-
-    htmlExtra += `
-            <div class="input-group"><label>Bônus de Atributo</label>
-            <div style="display:flex; gap:5px">
-                <select id="modal_attr" class="inv-input" style="flex:2">${OPTIONS_ATTR.map(opt => `<option value="${opt.v}">${opt.t}</option>`).join('')}</select>
-                <input type="number" id="modal_mod" class="inv-input" style="flex:1" value="${modVal}">
-            </div>
-        </div>`;
 
     if (cat === 'armas') {
         htmlExtra += `
-            <div class="input-group"><label>Tipo de Arma</label>
-                <select id="modal_tipo" class="inv-input">
-                    <option value="simples_uma_mao">Simples uma mão</option>
-                    <option value="simples_duas_maos">Simples duas mãos</option>
-                    <option value="marcial_uma_mao">Marcial uma mão</option>
-                    <option value="marcial_duas_maos">Marcial duas mãos</option>
-                </select></div>
-            <div class="input-group"><label>Categoria de Ataque</label>
-                <select id="modal_atk_tipo" class="inv-input">
-                    ${OPTIONS_ATK_TIPO.map(opt => `<option value="${opt.v}" ${atkTipo === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
-                </select></div>
-            <div class="input-group"><label>Teste (Perícia ou Atributo)</label><input type="text" id="modal_teste" class="inv-input" value="${teste}" placeholder="Ex: Luta ou Força"></div>
-            <div class="input-group"><label>Dano</label><input type="text" id="modal_dano" class="inv-input" value="${document.getElementById(`inv_dano_${index}`).value}"></div>
-            <div class="grid-2-cols">
-                <div class="input-group"><label>Crítico</label><input type="text" id="modal_critico" class="inv-input" value="${critico}" placeholder="Ex: 19/x3"></div>
-                <div class="input-group"><label>Tipo de Dano</label><input type="text" id="modal_tipo_dano" class="inv-input" value="${tipoDano}" placeholder="Ex: Cortante"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                <div class="input-group"><label>Tipo de Arma</label>
+                    <select id="modal_tipo" class="inv-input">
+                        <option value="simples_uma_mao">Simples uma mão</option>
+                        <option value="simples_duas_maos">Simples duas mãos</option>
+                        <option value="marcial_uma_mao">Marcial uma mão</option>
+                        <option value="marcial_duas_maos">Marcial duas mãos</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>Categoria de Ataque</label>
+                    <select id="modal_atk_tipo" class="inv-input">
+                        ${OPTIONS_ATK_TIPO.map(opt => `<option value="${opt.v}" ${atkTipo === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
+                    </select>
+                </div>
             </div>
-            <div class="input-group"><label>Alcance</label><select id="modal_alcance" class="inv-input">${OPTIONS_ALCANCE.map(opt => `<option value="${opt.v}">${opt.t}</option>`).join('')}</select></div>
-            <div class="grid-2-cols">
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px;">
+                <div class="input-group"><label>Teste (Perícia ou Atributo)</label><input type="text" id="modal_teste" class="inv-input" value="${teste}" placeholder="Ex: Luta ou Força"></div>
+                <div class="input-group"><label>Alcance</label><select id="modal_alcance" class="inv-input">${OPTIONS_ALCANCE.map(opt => `<option value="${opt.v}">${opt.t}</option>`).join('')}</select></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 25px;">
+                <div class="input-group"><label>Dano Base</label><input type="text" id="modal_dano" class="inv-input" value="${document.getElementById(`inv_dano_${index}`).value}"></div>
+                <div class="input-group"><label>Tipo de Dano</label><input type="text" id="modal_tipo_dano" class="inv-input" value="${tipoDano}" placeholder="Ex: Cortante"></div>
+                <div class="input-group"><label>Crítico</label><input type="text" id="modal_critico" class="inv-input" value="${critico}" placeholder="Ex: 19/x3"></div>
+            </div>
+
+            <div class="grid-2-cols" style="gap: 25px;">
                 <div class="input-group"><label>Centro</label><button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'cabo')">${caboData.nome || 'Definir Centro'}</button></div>
                 <div class="input-group"><label>Base</label><button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'base')">${baseData.nome || 'Definir Base'}</button></div>
             </div>
@@ -109,7 +124,7 @@ function abrirModalItem(index) {
                     <option value="escudo_simples_duas_maos">Escudo Simples duas mãos</option>
                     <option value="escudo_marcial_uma_mao">Escudo Marcial uma mão</option>
                 </select></div>
-            <div class="grid-2-cols">
+            <div class="grid-2-cols" style="gap: 25px;">
                 <div class="input-group">
                     <label>Bônus de Defesa</label>
                     <input type="text" id="modal_defesa_bonus" class="inv-input"
@@ -117,7 +132,7 @@ function abrirModalItem(index) {
                         oninput="this.value = '+' + this.value.replace(/[^0-9]/g, '')">
                 </div>
                 <div class="input-group">
-                    <label>Penalidade</label>
+                    <label>Penalidade (Movimento)</label>
                     <input type="text" id="modal_defesa_penalidade" class="inv-input"
                         value="${penalidadeDef > 0 ? '-' : (penalidadeDef < 0 ? '' : '-')}${penalidadeDef}"
                         oninput="this.value = '-' + this.value.replace(/[^0-9]/g, '')">
@@ -125,7 +140,11 @@ function abrirModalItem(index) {
             </div>
         `;
     } else if (cat === 'consumiveis') {
-        htmlExtra += `<div class="input-group"><label>Efeito</label><textarea id="modal_efeito" class="inv-input">${document.getElementById(`inv_efeito_${index}`).value}</textarea></div>`;
+        htmlExtra += `
+            <div class="input-group">
+                <label>Descrição do Efeito</label>
+                <textarea id="modal_efeito" class="inv-input" style="min-height: 120px; resize: vertical;">${document.getElementById(`inv_efeito_${index}`).value}</textarea>
+            </div>`;
     }
 
     body.innerHTML = htmlExtra;
@@ -156,7 +175,7 @@ function abrirModalMaterial(itemIndex, fieldName) {
 
     // Reconstroi o corpo do modal de material (sem raridade de material)
     document.querySelector('#modal-material-details .modal-body').innerHTML = `
-            <div class="input-group">
+        <div class="input-group">
             <label>Nome</label>
             <input type="text" id="modal_material_nome" class="inv-input" placeholder="Ex: Palo Santo, Pérola Celestial..." value="${materialData.nome || ''}" />
         </div>
@@ -215,7 +234,8 @@ function salvarDetalhesModificacoesItem() {
         const nome = row.querySelector('.material-name-input')?.value || "";
         const attr = row.querySelector('.material-attr-select').value;
         const mod = parseInt(row.querySelector('.material-mod-input').value) || 0;
-        if (attr !== 'nenhum') attributes.push({ nome, attr, mod });
+        const isAdv = row.querySelector('.material-adv-check')?.checked || false;
+        if (attr !== 'nenhum') attributes.push({ nome, attr, mod, isAdv });
     });
     const modsJson = JSON.stringify({ attributes });
     document.getElementById(`inv_mods_item_${idx}`).value = modsJson;
@@ -225,30 +245,30 @@ function salvarDetalhesModificacoesItem() {
 }
 
 /**
- * Abre o modal para definir a raridade e buffs de uma arma
+ * Abre o modal para definir a raridade e buffs de um item
  */
-function abrirModalRaridadeArma(itemIndex) {
+function abrirModalRaridadeItem(itemIndex) {
     currentMaterialEditItemIdx = itemIndex;
     currentMaterialEditField = 'raro';
 
     let rarityData = {};
     try {
         const rawVal = document.getElementById(`inv_raro_${itemIndex}`).value;
-        rarityData = JSON.parse(rawVal && rawVal.startsWith('{') ? rawVal : '{}');
+        rarityData = JSON.parse(rawVal && rawVal.startsWith('{') ? rawVal : JSON.stringify({ raridade: rawVal || 'comum', attributes: [] }));
     } catch (e) { }
 
     const rarityOptionsHtml = OPTIONS_RARIDADE.map(r => `<option value="${r.v}" ${rarityData.raridade === r.v ? 'selected' : ''}>${r.t}</option>`).join('');
 
     document.querySelector('#modal-material-details .modal-body').innerHTML = `
         <div class="input-group">
-            <label>Raridade da Arma</label>
+            <label>Raridade do Item</label>
             <select id="modal_arma_raridade" class="inv-input">${rarityOptionsHtml}</select>
         </div>
         <div id="material-attributes-container"></div>
         <button type="button" class="btn-add-class" onclick="adicionarAtributoMaterial()">+ Adicionar Buff de Raridade</button>
     `;
 
-    document.getElementById('modal-material-title').innerText = "Raridade & Buffs da Arma";
+    document.getElementById('modal-material-title').innerText = "Raridade & Buffs";
     const container = document.getElementById('material-attributes-container');
     if (rarityData.attributes && Array.isArray(rarityData.attributes)) rarityData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod));
     else adicionarAtributoMaterial();
@@ -256,7 +276,7 @@ function abrirModalRaridadeArma(itemIndex) {
     document.getElementById('modal-material-details').style.display = 'flex';
 }
 
-function salvarDetalhesRaridadeArma() {
+function salvarDetalhesRaridadeItem() {
     const idx = currentMaterialEditItemIdx;
     const raridade = document.getElementById('modal_arma_raridade').value;
     const rows = document.querySelectorAll('.material-attr-row');
@@ -264,13 +284,14 @@ function salvarDetalhesRaridadeArma() {
     rows.forEach(row => {
         const attr = row.querySelector('.material-attr-select').value;
         const mod = parseInt(row.querySelector('.material-mod-input').value) || 0;
-        if (attr !== 'nenhum') attributes.push({ attr, mod });
+        const isAdv = row.querySelector('.material-adv-check')?.checked || false;
+        if (attr !== 'nenhum') attributes.push({ attr, mod, isAdv });
     });
     const rarityJson = JSON.stringify({ raridade, attributes });
     document.getElementById(`inv_raro_${idx}`).value = rarityJson;
 
     const rarityText = OPTIONS_RARIDADE.find(r => r.v === raridade)?.t || "Comum";
-    const btn = document.querySelector(`#modal-desc button[onclick*="abrirModalRaridadeArma('${idx}')"]`);
+    const btn = document.querySelector(`#modal-desc button[onclick*="abrirModalRaridadeItem('${idx}')"]`);
     if (btn) btn.innerText = rarityText;
 
     fecharModalMaterial();
@@ -278,13 +299,13 @@ function salvarDetalhesRaridadeArma() {
     atualizarEstiloRaridade(idx);
 }
 
-function adicionarAtributoMaterial(attr = 'nenhum', mod = 0, nome = '') {
+function adicionarAtributoMaterial(attr = 'nenhum', mod = 0, nome = '', isAdv = false) {
     const container = document.getElementById('material-attributes-container');
     if (!container) return;
     const row = document.createElement('div');
     row.className = 'material-attr-row';
     row.style.display = 'flex';
-    row.style.gap = '5px';
+    row.style.gap = '12px';
     row.style.marginBottom = '10px';
     row.style.alignItems = 'center';
 
@@ -294,6 +315,10 @@ function adicionarAtributoMaterial(attr = 'nenhum', mod = 0, nome = '') {
         ${showName ? `<input type="text" class="inv-input material-name-input" style="flex:2" placeholder="Nome (Ex: Certeira)" value="${nome}">` : ''}
         <select class="inv-input material-attr-select" style="flex:2">${OPTIONS_ATTR.map(opt => `<option value="${opt.v}">${opt.t}</option>`).join('')}</select>
         <input type="number" class="inv-input material-mod-input" style="flex:1" value="${mod}">
+        <div class="input-group" style="flex-direction:row; align-items:center; gap:3px;">
+            <label style="font-size:0.6rem">Vant?</label>
+            <input type="checkbox" class="material-adv-check" ${isAdv ? 'checked' : ''}>
+        </div>
         <button type="button" class="btn-remove-class" onclick="this.closest('.material-attr-row').remove()">×</button>
     `;
     container.appendChild(row);
@@ -306,7 +331,7 @@ function salvarDetalhesMaterial() {
     }
 
     if (currentMaterialEditField === 'raro') {
-        return salvarDetalhesRaridadeArma();
+        return salvarDetalhesRaridadeItem();
     }
 
     if (currentMaterialEditItemIdx !== null && currentMaterialEditField !== null) {
@@ -316,7 +341,8 @@ function salvarDetalhesMaterial() {
         rows.forEach(row => {
             const attr = row.querySelector('.material-attr-select').value;
             const mod = parseInt(row.querySelector('.material-mod-input').value) || 0;
-            if (attr !== 'nenhum') attributes.push({ attr, mod });
+            const isAdv = row.querySelector('.material-adv-check')?.checked || false;
+            if (attr !== 'nenhum') attributes.push({ attr, mod, isAdv });
         });
         const materialJson = JSON.stringify({ nome, attributes });
         document.getElementById(`inv_${currentMaterialEditField}_${currentMaterialEditItemIdx}`).value = materialJson;
@@ -337,8 +363,7 @@ function salvarDetalhesItem() {
         document.getElementById(`inv_qtd_${idx}`).value = document.getElementById('modal_qtd').value;
 
         const categoria = document.getElementById(`inv_cat_${idx}`).value;
-        // A raridade de armas é derivada, não pode ser definida diretamente pelo modal
-        if (categoria !== 'armas') {
+        if (document.getElementById('modal_raro')) {
             document.getElementById(`inv_raro_${idx}`).value = document.getElementById('modal_raro').value;
         }
 

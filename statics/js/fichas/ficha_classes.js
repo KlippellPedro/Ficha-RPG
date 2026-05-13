@@ -26,12 +26,27 @@ function handleClassChange(selectEl) {
 function confirmarClasseUnica() {
     if (!pendingUniqueSelect) return;
     const targetRow = pendingUniqueSelect.closest('.class-row');
+    
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
     document.querySelectorAll('.class-row').forEach(row => {
         if (row !== targetRow) {
+            const nameSelect = row.querySelector('[id^="class_name_"]');
+            const index = nameSelect?.id.split('_').pop();
+            
+            if (index) {
+                delete dados[`class_name_${index}`];
+                delete dados[`class_lvl_${index}`];
+                delete dados[`class_sub_${index}`];
+            }
+
             if (typeof criarEfeitoFumaca === 'function') criarEfeitoFumaca(row);
             row.remove();
         }
     });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+
     atualizarEstiloClasse(pendingUniqueSelect);
     document.getElementById('modal-unique-class').style.display = 'none';
     pendingUniqueSelect = null;

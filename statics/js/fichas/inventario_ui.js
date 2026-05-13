@@ -10,12 +10,23 @@ function atualizarEstiloRaridade(index) {
         return rank === -1 ? 0 : rank; // Default to 0 (comum) if not found
     }
 
-    const select = document.getElementById(`inv_raro_${index}`);
+    const raroInput = document.getElementById(`inv_raro_${index}`);
     const nomeInput = document.getElementById(`inv_nome_${index}`);
     const catSelect = document.getElementById(`inv_cat_${index}`);
-    if (!select || !nomeInput || !catSelect) return;
+    if (!raroInput || !nomeInput || !catSelect) return;
 
-    let effectiveRarity = select.value; // Começa com a raridade do próprio item
+    const raroRaw = raroInput.value;
+    let itemRarity = 'comum';
+
+    try {
+        if (raroRaw && raroRaw.startsWith('{')) {
+            itemRarity = JSON.parse(raroRaw).raridade || 'comum';
+        } else {
+            itemRarity = raroRaw || 'comum';
+        }
+    } catch (e) { }
+
+    let effectiveRarity = itemRarity;
 
     // Se for uma arma, calcula a raridade efetiva a partir das partes
     if (catSelect.value === 'armas') {
@@ -43,17 +54,13 @@ function atualizarEstiloRaridade(index) {
         effectiveRarity = RARITY_ORDER[maxRank];
     }
 
-    const raridade = select.value;
     const classesRaridade = ['rarity-comum', 'rarity-incomum', 'rarity-raro', 'rarity-epico', 'rarity-mitico', 'rarity-especial'];
 
-    select.classList.remove(...classesRaridade);
+    raroInput.classList.remove(...classesRaridade);
     nomeInput.classList.remove(...classesRaridade);
 
-    select.classList.add(`rarity-${effectiveRarity}`);
+    raroInput.classList.add(`rarity-${effectiveRarity}`);
     nomeInput.classList.add(`rarity-${effectiveRarity}`);
-
-    // Atualiza o input oculto de raridade com a raridade efetiva calculada
-    document.getElementById(`inv_raro_${index}`).value = effectiveRarity;
 }
 
 function filtrarItens() {
@@ -113,7 +120,7 @@ function verificarTipoItem(index) {
         const lowerNome = nome.trim().toLowerCase();
 
         // Cálculo de bônus acumulados do item (Dano, Crítico, Alcance)
-        let b = { dano: 0, critico: 0, alcance: 0 };
+        let b = { dano: 0, critico: 0, alcance: 0, tipo_dano: "" };
         const sources = [`inv_cabo_${index}`, `inv_base_${index}`, `inv_mods_item_${index}`, `inv_raro_${index}`];
         let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
@@ -124,12 +131,14 @@ function verificarTipoItem(index) {
                     const parsed = JSON.parse(raw);
                     (parsed.attributes || []).forEach(attr => {
                         if (b.hasOwnProperty(attr.attr)) b[attr.attr] += parseInt(attr.mod) || 0;
+                        if (attr.attr === 'tipo_dano' && attr.mod) b.tipo_dano = attr.mod;
                     });
                 } catch (e) { }
             }
         });
 
         const formatBonus = (val, bonus) => (bonus !== 0 && val) ? `${val}${bonus > 0 ? '+' : ''}${bonus}` : val;
+        const baseTipoDano = document.getElementById(`inv_tipo_dano_${index}`)?.value || "";
 
         const syncData = {
             id: index,
@@ -141,7 +150,7 @@ function verificarTipoItem(index) {
             attr_mod: document.getElementById(`inv_attr_${index}`)?.value || "nenhum",
             desc: document.getElementById(`inv_desc_${index}`)?.value || "",
             critico: formatBonus(document.getElementById(`inv_critico_${index}`)?.value || "", b.critico),
-            tipo_dano: document.getElementById(`inv_tipo_dano_${index}`)?.value || "",
+            tipo_dano: b.tipo_dano || baseTipoDano,
             teste: document.getElementById(`inv_teste_${index}`)?.value || ""
         };
 

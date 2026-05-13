@@ -157,7 +157,8 @@ function calcularBonusItens(dados) {
             if (categoria === 'armaduras') {
                 const defBonus = parseInt(dados[`inv_defesa_bonus_${id}`]) || 0;
                 const defPenalty = parseInt(dados[`inv_defesa_penalidade_${id}`]) || 0;
-                totais['defesa'] = (totais['defesa'] || 0) + defBonus - defPenalty;
+                totais['defesa'] = (totais['defesa'] || 0) + defBonus;
+                totais['movimentacao'] = (totais['movimentacao'] || 0) - defPenalty;
             }
 
             // 3. Bônus de materiais (Centro e Base) para Armas equipadas
@@ -173,7 +174,11 @@ function calcularBonusItens(dados) {
                             }
                             attrs.forEach(a => {
                                 if (a.attr && a.attr !== 'nenhum') {
-                                    totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
+                                    if (a.isAdv) {
+                                        totais[`adv_${a.attr}`] = (totais[`adv_${a.attr}`] || 0) + (parseInt(a.mod) || 0);
+                                    } else {
+                                        totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
+                                    }
                                 }
                             });
                         } catch (e) { console.error(`Erro no material ${field} do item ${id}`); }
@@ -189,11 +194,34 @@ function calcularBonusItens(dados) {
                     if (modsData.attributes && Array.isArray(modsData.attributes)) {
                         modsData.attributes.forEach(a => {
                             if (a.attr && a.attr !== 'nenhum') {
-                                totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
+                                if (a.isAdv) {
+                                    totais[`adv_${a.attr}`] = (totais[`adv_${a.attr}`] || 0) + (parseInt(a.mod) || 0);
+                                } else {
+                                    totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
+                                }
                             }
                         });
                     }
                 } catch (e) { console.error(`Erro nas modificações do item ${id}`); }
+            }
+
+            // 5. Bônus de Raridade e Buffs Mágicos (Para todos os itens)
+            const raroRaw = dados[`inv_raro_${id}`];
+            if (raroRaw && typeof raroRaw === 'string' && raroRaw.startsWith('{')) {
+                try {
+                    const raroData = JSON.parse(raroRaw);
+                    if (raroData.attributes && Array.isArray(raroData.attributes)) {
+                        raroData.attributes.forEach(a => {
+                            if (a.attr && a.attr !== 'nenhum') {
+                                if (a.isAdv) {
+                                    totais[`adv_${a.attr}`] = (totais[`adv_${a.attr}`] || 0) + (parseInt(a.mod) || 0);
+                                } else {
+                                    totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
+                                }
+                            }
+                        });
+                    }
+                } catch (e) { console.error(`Erro nos buffs de raridade do item ${id}`); }
             }
         }
     });
