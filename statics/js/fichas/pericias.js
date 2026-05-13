@@ -44,6 +44,7 @@ function renderPericias() {
         <div class="skill-row">
             <div class="skill-total-box">
                 <span class="skill-total">+0</span>
+                <button type="button" class="btn-calc-ajuda pericia-help-btn" onclick="mostrarAjudaSkill('${slug}')" title="Ver detalhes do cálculo">?</button>
             </div>
             
             <span class="skill-name static-skill-name">${p.nome}</span>
@@ -85,6 +86,7 @@ function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", trainin
     row.innerHTML = `
         <div class="skill-total-box">
             <span class="skill-total">+0</span>
+            <button type="button" class="btn-calc-ajuda pericia-help-btn" onclick="mostrarAjudaSkill('${index}')" title="Ver detalhes do cálculo">?</button>
         </div>
         
         <input type="text" id="skill_name_${index}" class="save-input skill-name-input" value="${nome}" placeholder="Nome do Ofício" />
@@ -113,7 +115,7 @@ function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", trainin
     container.appendChild(row);
 }
 
-function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}) {
+function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}, breakdown = null) {
     document.querySelectorAll(".skill-row").forEach(row => {
         const skillSlug = row.querySelector(".skill-bonus")?.id.replace('skill_bonus_', '');
         if (!skillSlug) return;
@@ -125,14 +127,14 @@ function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}) {
         const advInput = document.getElementById(`skill_adv_${skillSlug}`);
         const itemAdv = (bonusItens[`adv_${skillSlug}`] || 0) + (bonusItens['adv_todas'] || 0);
 
-        // Reverte o bônus do valor que veio do DOM para obter a BASE
-        let valorNaTelaAdv = parseInt(advInput?.value) || 0;
-        let manualAdv = valorNaTelaAdv - itemAdv;
-
-        // Se o usuário estiver editando o campo V, define a nova base
+        let manualAdv;
         if (advInput && advInput === document.activeElement) {
-            let valorDigitado = parseInt(advInput.value) || 0;
-            manualAdv = valorDigitado - itemAdv;
+            // Editando: calcula nova base manual subtraindo bônus de itens
+            manualAdv = (parseInt(advInput.value) || 0) - itemAdv;
+        } else {
+            // Não editando: recupera a base manual pura que está nos dados salvos
+            const storedAdv = parseInt(dadosObj[`skill_adv_${skillSlug}`]);
+            manualAdv = !isNaN(storedAdv) ? storedAdv : 0;
         }
 
         const totalAdv = manualAdv + itemAdv;
@@ -144,6 +146,22 @@ function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}) {
         // Salva sempre a BASE no objeto global
         dadosObj[`skill_adv_${skillSlug}`] = manualAdv;
 
+        // Tooltip de Vantagens (V)
+        if (advInput) {
+            let advDetails = [];
+            if (manualAdv !== 0) advDetails.push(`Base: ${manualAdv}`);
+            if (breakdown) {
+                const sources = [
+                    ...(breakdown.itens[`adv_${skillSlug}`] || []),
+                    ...(breakdown.itens['adv_todas'] || []),
+                    ...(breakdown.poderes[`adv_${skillSlug}`] || []),
+                    ...(breakdown.habilidades[`adv_${skillSlug}`] || [])
+                ];
+                sources.forEach(s => advDetails.push(s));
+            }
+            advInput.title = advDetails.length > 0 ? `Total V: ${totalAdv} (${advDetails.join(' | ')})` : "Vantagens (Dados extras)";
+        }
+
         const attrMod = mods[selectedAttr] || 0;
         const itemSkillBonus = (bonusItens[skillSlug] || 0) + (bonusItens['todas'] || 0);
 
@@ -154,7 +172,6 @@ function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}) {
         // Destaque visual para o campo de vantagem se houver valor
         if (totalAdv > 0) advInput?.classList.add('has-advantage');
         else advInput?.classList.remove('has-advantage');
-        if (advInput) advInput.title = itemAdv > 0 ? `Bônus de Item: +${itemAdv} Vantagens` : "Vantagens (Dados extras)";
 
         const tBonus = {
             'nenhum': 0,
@@ -166,8 +183,30 @@ function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}) {
 
         const total = tBonus + attrMod + bonus + itemSkillBonus;
         const display = row.querySelector(".skill-total");
+
+        // Tooltip do Total da Perícia
+        let details = [];
+        // Exibe Atributo e Treino sempre, para garantir que o cálculo fique transparente
+        details.push(`${selectedAttr.toUpperCase().substring(0, 3)} (Mod): ${attrMod >= 0 ? '+' : ''}${attrMod}`);
+        details.push(`Treino: +${tBonus}`);
+
+        if (bonus !== 0) details.push(`Manual: ${bonus >= 0 ? '+' : ''}${bonus}`);
+
+        if (breakdown) {
+            const skillSources = [
+                ...(breakdown.itens[skillSlug] || []),
+                ...(breakdown.itens['todas'] || []),
+                ...(breakdown.poderes[skillSlug] || []),
+                ...(breakdown.poderes['todas'] || []),
+                ...(breakdown.habilidades[skillSlug] || []),
+                ...(breakdown.habilidades['todas'] || [])
+            ];
+            skillSources.forEach(s => details.push(s));
+        }
+
         if (display) {
             display.innerText = (total >= 0 ? "+" : "") + total;
+            display.title = `Total: ${total} (${details.join(' | ')})`;
             if (itemSkillBonus > 0) display.style.color = '#4ade80';
             else if (itemSkillBonus < 0) display.style.color = '#ff5f5f';
             else display.style.color = '#ff4444';
@@ -201,3 +240,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (typeof atualizarTudo === 'function') atualizarTudo();
 });
+
+/**
+ * Abre o modal de ajuda detalhando o cálculo da perícia e os valores de treinamento
+ */
+function mostrarAjudaSkill(skillSlug) {
+    const bonusInput = document.getElementById(`skill_bonus_${skillSlug}`);
+    const display = bonusInput?.closest('.skill-row')?.querySelector('.skill-total');
+
+    if (!display) return;
+
+    const modal = document.getElementById('modal-calc-ajuda');
+    const title = document.getElementById('modal-calc-ajuda-title');
+    const body = document.getElementById('modal-calc-ajuda-body');
+
+    if (!modal || !title || !body) {
+        alert("Erro Crítico: O Modal de Ajuda não foi encontrado no HTML desta página. Verifique se você copiou o bloco de código do modal para o final do seu arquivo .html");
+        return;
+    }
+
+    const row = display.closest('.skill-row');
+    const skillName = row.querySelector('.skill-name')?.textContent || row.querySelector('.skill-name-input')?.value || "Perícia";
+    title.innerText = `Cálculo: ${skillName}`;
+
+    const fullTitle = display.title || "";
+    const breakdownPart = fullTitle.includes('(') ? fullTitle.substring(fullTitle.indexOf('(') + 1, fullTitle.lastIndexOf(')')) : "Detalhes não encontrados.";
+    const items = breakdownPart.split(' | ');
+
+    // Pega o nível atual para mostrar a tabela de treino dinâmica
+    const nivel = parseInt(document.getElementById('nivel')?.value) || 1;
+
+    const formulaHtml = `
+        <div style="margin-bottom: 12px; background: rgba(255,68,68,0.1); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,68,68,0.3); font-size: 0.8rem; color: #ff4444; text-align: center;">
+            <strong>Fórmula:</strong> Atributo + Treino + Itens/Poderes + Manual
+        </div>
+    `;
+
+    const treinoTabela = `
+        <div style="margin-top: 15px; border-top: 1px dashed rgba(255,68,68,0.3); padding-top: 10px;">
+            <label style="color: #ff4444; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Referência de Treino (Nível ${nivel}):</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; font-size: 0.8rem; color: #bbb;">
+                <span>• Nenhum: <strong>+0</strong></span>
+                <span>• Treinado: <strong>+${Math.floor(nivel / 2)}</strong> (lvl/2)</span>
+                <span>• Profissional: <strong>+${Math.floor(nivel / 2) + 4}</strong> (lvl/2 +4)</span>
+                <span>• Mestre: <strong>+${nivel + 4}</strong> (lvl +4)</span>
+                <span>• Ancião: <strong>+${nivel + 6}</strong> (lvl +6)</span>
+            </div>
+        </div>
+    `;
+
+    body.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+            ${formulaHtml}
+            ${items.map(item => `<div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 3px solid #ff4444; font-size: 0.85rem;">${item}</div>`).join('')}
+            ${treinoTabela}
+            <div style="margin-top: 10px; padding: 12px; background: rgba(255,68,68,0.1); border-radius: 4px; color: #ff4444; font-weight: bold; font-size: 1.1rem; text-align: center;">Total: ${display.innerText}</div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+}

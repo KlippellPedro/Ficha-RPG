@@ -106,6 +106,7 @@
         <section class="attributes-section-header">
           <div class="atributos-grid">
             <div class="attribute-card">
+              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('forca')">?</button>
               <div class="attr-label-box">
                 <label for="forca" title="Força">FOR</label>
                 <input type="number" id="forca" class="attr-input" value="10" oninput="atualizarTudo()" />
@@ -113,6 +114,7 @@
               <div class="modificador" id="modForca">+0</div>
             </div>
             <div class="attribute-card">
+              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('destreza')">?</button>
               <div class="attr-label-box">
                 <label for="destreza" title="Destreza">DES</label>
                 <input type="number" id="destreza" class="attr-input" value="10" oninput="atualizarTudo()" />
@@ -120,6 +122,7 @@
               <div class="modificador" id="modDestreza">+0</div>
             </div>
             <div class="attribute-card">
+              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('constituicao')">?</button>
               <div class="attr-label-box">
                 <label for="constituicao" title="Constituição">CON</label>
                 <input type="number" id="constituicao" class="attr-input" value="10" oninput="atualizarTudo()" />
@@ -127,6 +130,7 @@
               <div class="modificador" id="modConstituicao">+0</div>
             </div>
             <div class="attribute-card">
+              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('inteligencia')">?</button>
               <div class="attr-label-box">
                 <label for="inteligencia" title="Inteligência">INT</label>
                 <input type="number" id="inteligencia" class="attr-input" value="10" oninput="atualizarTudo()" />
@@ -134,6 +138,7 @@
               <div class="modificador" id="modInteligencia">+0</div>
             </div>
             <div class="attribute-card">
+              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('sabedoria')">?</button>
               <div class="attr-label-box">
                 <label for="sabedoria" title="Sabedoria">SAB</label>
                 <input type="number" id="sabedoria" class="attr-input" value="10" oninput="atualizarTudo()" />
@@ -141,6 +146,7 @@
               <div class="modificador" id="modSabedoria">+0</div>
             </div>
             <div class="attribute-card">
+              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('carisma')">?</button>
               <div class="attr-label-box">
                 <label for="carisma" title="Carisma">CAR</label>
                 <input type="number" id="carisma" class="attr-input" value="10" oninput="atualizarTudo()" />
@@ -148,6 +154,7 @@
               <div class="modificador" id="modCarisma">+0</div>
             </div>
             <div class="attribute-card">
+              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('aura')">?</button>
               <div class="attr-label-box">
                 <label for="aura" title="Aura">AUR</label>
                 <input type="number" id="aura" class="attr-input" value="10" oninput="atualizarTudo()" />
@@ -165,7 +172,10 @@
           <div class="stats-container">
             <!-- Barra de Vida -->
             <div id="pv-stat-group" class="stat-group">
-              <div class="stat-labels"><label>VIDA (P.V.)</label></div>
+              <div class="stat-labels">
+                <label>VIDA (P.V.)</label>
+                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculo('vida')" title="Ver cálculo de Vida">?</button>
+              </div>
               <div class="bar-controls">
                 <button type="button" class="btn-qty" onclick="alterarValor('pv_atual', -1)">-</button>
                 <div class="bar-outer">
@@ -191,7 +201,10 @@
             </div>
             <!-- Barra de Mana -->
             <div id="pm-stat-group" class="stat-group">
-              <div class="stat-labels"><label>MANA (P.M.)</label></div>
+              <div class="stat-labels">
+                <label>MANA (P.M.)</label>
+                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculo('mana')" title="Ver cálculo de Mana">?</button>
+              </div>
               <div class="bar-controls">
                 <button type="button" class="btn-qty" onclick="alterarValor('pm_atual', -1)">-</button>
                 <div class="bar-outer">
@@ -230,8 +243,16 @@
         <section class="combat-header-row">
           <!-- Coluna 1: Sistema de Defesa -->
           <div class="combat-col">
-            <div class="input-group">
+            <div class="input-group" style="position: relative">
               <label>Defesa</label>
+              <button
+                type="button"
+                class="btn-calc-ajuda"
+                onclick="mostrarAjudaCalculoGenerico('defesa')"
+                style="position: absolute; right: 0; top: 0"
+              >
+                ?
+              </button>
               <input type="number" id="defesa" class="save-input header-input" value="10" readonly />
             </div>
             <div class="input-group">
@@ -250,16 +271,40 @@
 
           <!-- Coluna 2: Status Variados -->
           <div class="combat-col">
-            <div class="input-group">
+            <div class="input-group" style="position: relative">
               <label>Movimento</label>
+              <button
+                type="button"
+                class="btn-calc-ajuda"
+                onclick="mostrarAjudaCalculoGenerico('movimentacao')"
+                style="position: absolute; right: 0; top: 0"
+              >
+                ?
+              </button>
               <input type="number" id="movimentacao" class="save-input header-input" value="0" />
             </div>
-            <div class="input-group">
+            <div class="input-group" style="position: relative">
               <label>Sanidade</label>
+              <button
+                type="button"
+                class="btn-calc-ajuda"
+                onclick="mostrarAjudaCalculoGenerico('sanidade')"
+                style="position: absolute; right: 0; top: 0"
+              >
+                ?
+              </button>
               <input type="text" id="sanidade" class="save-input header-input" value="100%" />
             </div>
-            <div class="input-group">
+            <div class="input-group" style="position: relative">
               <label>Status</label>
+              <button
+                type="button"
+                class="btn-calc-ajuda"
+                onclick="mostrarAjudaCalculoGenerico('status_info')"
+                style="position: absolute; right: 0; top: 0"
+              >
+                ?
+              </button>
               <input type="hidden" id="status_inicial_definido" class="save-input" value="false" />
               <input type="text" id="status_info" class="save-input header-input" placeholder="+1 ou -1" />
             </div>
@@ -658,6 +703,22 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
           </button>
           <button type="button" class="btn-save-modal" style="padding: 8px 20px" onclick="salvarBuffsPoder()">Salvar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal de Ajuda de Cálculo (Genérico) -->
+    <div id="modal-calc-ajuda" class="modal-overlay">
+      <div class="modal-content-box" style="max-width: 450px; border-color: #ff4444">
+        <h2 id="modal-calc-ajuda-title" class="modal-title" style="color: #ff4444">Cálculo de Status</h2>
+        <div id="modal-calc-ajuda-body" class="modal-body" style="margin-top: 15px"></div>
+        <button
+          type="button"
+          class="btn-modal-close"
+          style="width: 100%; margin-top: 20px"
+          onclick="document.getElementById('modal-calc-ajuda').style.display = 'none'"
+        >
+          Entendi
+        </button>
       </div>
     </div>
   </body>

@@ -57,6 +57,10 @@ function atualizarTudo() {
     // 1. Coleta dados de todos os inputs marcados para salvamento PRIMEIRO
     const inputsParaSalvar = document.querySelectorAll(".save-input");
     inputsParaSalvar.forEach(input => {
+        // Ignora campos de atributo e vantagens de perícia na coleta bruta.
+        // Eles possuem lógica própria de Base vs Total nos motores específicos.
+        if (input.classList.contains('attr-input') || input.classList.contains('skill-adv')) return;
+
         const val = input.type === "checkbox" ? input.checked : input.value;
         dados[input.id] = val;
     });
@@ -71,26 +75,31 @@ function atualizarTudo() {
     dados.nivel = nivelTotal;
     if (document.getElementById("nivel")) document.getElementById("nivel").value = nivelTotal;
 
-    const bonusItens = calcularBonusItens(dados);
+    const resultadoItens = calcularBonusItens(dados);
+    const bonusItensPuros = resultadoItens.totals;
+    const bonusPoderes = {};
+    const bonusHabilidades = {};
+    const fontesPoderes = {}; // { forca: ["Poder X (+2)"] }
+    const fontesHabilidades = {};
 
     // Soma bônus vindos de Poderes (Buffs passivos)
     Object.keys(dados).forEach(key => {
-        if (key.startsWith('poder_pv_bonus_')) bonusItens['pv_max'] = (bonusItens['pv_max'] || 0) + (parseInt(dados[key]) || 0);
-        if (key.startsWith('poder_pm_bonus_')) bonusItens['pm_max'] = (bonusItens['pm_max'] || 0) + (parseInt(dados[key]) || 0);
+        if (key.startsWith('poder_pv_bonus_')) bonusPoderes['pv_max'] = (bonusPoderes['pv_max'] || 0) + (parseInt(dados[key]) || 0);
+        if (key.startsWith('poder_pm_bonus_')) bonusPoderes['pm_max'] = (bonusPoderes['pm_max'] || 0) + (parseInt(dados[key]) || 0);
 
         // Bônus vindos de Modificações dinâmicas de Poderes (JSON)
         if (key.startsWith('poder_mods_') && typeof dados[key] === 'string' && dados[key].startsWith('[')) {
+            const id = key.replace('poder_mods_', '');
+            const nome = dados[`poder_nome_${id}`] || "Poder";
             try {
                 const mods = JSON.parse(dados[key]);
                 mods.forEach(m => {
-                    if (m.attr && m.attr !== 'nenhum') {
-                        if (m.isAdv) {
-                            const val = parseInt(m.mod);
-                            if (!isNaN(val)) bonusItens[`adv_${m.attr}`] = (bonusItens[`adv_${m.attr}`] || 0) + val;
-                        } else {
-                            const val = parseInt(m.mod);
-                            if (!isNaN(val)) bonusItens[m.attr] = (bonusItens[m.attr] || 0) + val;
-                        }
+                    const val = parseInt(m.mod);
+                    if (!isNaN(val) && m.attr && m.attr !== 'nenhum') {
+                        const target = m.isAdv ? `adv_${m.attr}` : m.attr;
+                        bonusPoderes[target] = (bonusPoderes[target] || 0) + val;
+                        if (!fontesPoderes[target]) fontesPoderes[target] = [];
+                        fontesPoderes[target].push(`${nome} (${val > 0 ? '+' : ''}${val})`);
                     }
                 });
             } catch (e) { console.error("Erro ao processar modificações do poder:", key); }
@@ -99,23 +108,28 @@ function atualizarTudo() {
         // Bônus vindos de Modificações dinâmicas de Habilidades (JSON) - Apenas se for Passiva
         if (key.startsWith('hab_mods_') && typeof dados[key] === 'string' && dados[key].startsWith('[')) {
             const id = key.replace('hab_mods_', '');
+            const nome = dados[`hab_nome_${id}`] || "Habilidade";
             if (dados[`hab_tipo_${id}`] === 'Passiva') {
                 try {
                     const mods = JSON.parse(dados[key]);
                     mods.forEach(m => {
-                        if (m.attr && m.attr !== 'nenhum') {
-                            if (m.isAdv) {
-                                const val = parseInt(m.mod);
-                                if (!isNaN(val)) bonusItens[`adv_${m.attr}`] = (bonusItens[`adv_${m.attr}`] || 0) + val;
-                            } else {
-                                const val = parseInt(m.mod);
-                                if (!isNaN(val)) bonusItens[m.attr] = (bonusItens[m.attr] || 0) + val;
-                            }
+                        const val = parseInt(m.mod);
+                        if (!isNaN(val) && m.attr && m.attr !== 'nenhum') {
+                            const target = m.isAdv ? `adv_${m.attr}` : m.attr;
+                            bonusHabilidades[target] = (bonusHabilidades[target] || 0) + val;
+                            if (!fontesHabilidades[target]) fontesHabilidades[target] = [];
+                            fontesHabilidades[target].push(`${nome} (${val > 0 ? '+' : ''}${val})`);
                         }
                     });
                 } catch (e) { console.error("Erro ao processar modificações da habilidade:", key); }
             }
         }
+    });
+
+    // Consolida tudo em um único objeto de bônus para manter compatibilidade com outras funções
+    const bonusItens = { ...bonusItensPuros };
+    [bonusPoderes, bonusHabilidades].forEach(src => {
+        Object.keys(src).forEach(k => bonusItens[k] = (bonusItens[k] || 0) + src[k]);
     });
 
     // Adiciona bônus manuais para as raças Deus e Escolhido (customizáveis pelo player)
@@ -129,7 +143,13 @@ function atualizarTudo() {
         bonusItens['movimentacao'] = (bonusItens['movimentacao'] || 0) + (parseInt(dados.movimento_extra_raca) || 0);
     }
 
-    const infoAttr = engineCalcularAtributos(dados, bonusItens, racaKey);
+    const breakdown = {
+        itens: resultadoItens.sources,
+        poderes: fontesPoderes,
+        habilidades: fontesHabilidades
+    };
+
+    const infoAttr = engineCalcularAtributos(dados, bonusItens, racaKey, breakdown);
 
     // Calcular status de Mana para Habilidades e Poderes
     const pmAtual = parseInt(dados.pm_atual) || 0;
@@ -179,10 +199,10 @@ function atualizarTudo() {
 
     // 4. Dispara hooks de UI específicos da página (se definidos)
     aplicarPericiasPorClasseEngine(dados);
-    if (typeof atualizarDefesa === 'function') atualizarDefesa(infoAttr.mods, dados, bonusItens);
-    if (typeof atualizarVida === 'function') atualizarVida(infoAttr.mods, dados, bonusItens);
-    if (typeof atualizarMana === 'function') atualizarMana(infoAttr.mods, dados, bonusItens);
-    if (typeof atualizarMovimento === 'function') atualizarMovimento(infoAttr.mods, dados, bonusItens);
+    if (typeof atualizarDefesa === 'function') atualizarDefesa(infoAttr.mods, dados, bonusItens, breakdown);
+    if (typeof atualizarVida === 'function') atualizarVida(infoAttr.mods, dados, bonusItens, breakdown);
+    if (typeof atualizarMana === 'function') atualizarMana(infoAttr.mods, dados, bonusItens, breakdown);
+    if (typeof atualizarMovimento === 'function') atualizarMovimento(infoAttr.mods, dados, bonusItens, breakdown);
     if (typeof verificarStatusInicial === 'function') verificarStatusInicial(infoAttr.mods);
     atualizarBarras(bonusItens);
     if (typeof verificarVisibilidadeClasses === 'function') verificarVisibilidadeClasses();
@@ -195,11 +215,13 @@ function atualizarTudo() {
     if (typeof verificarExtraVampiro === 'function') verificarExtraVampiro(dados); // Nova chamada para verificar campos de Vampiro
     if (typeof verificarExtraEspirito === 'function') verificarExtraEspirito(dados); // Nova chamada para verificar campos de Espírito
     if (typeof verificarExtraMortoVivo === 'function') verificarExtraMortoVivo(dados); // Nova chamada para verificar campos de Morto-Vivo
-    if (typeof atualizarPericias === 'function') atualizarPericias(nivelTotal, infoAttr.mods, bonusItens, dados);
+    if (typeof atualizarPericias === 'function') {
+        atualizarPericias(nivelTotal, infoAttr.mods, bonusItens, dados, breakdown);
+    }
     if (typeof atualizarAtaques === 'function') atualizarAtaques(nivelTotal, infoAttr.mods, bonusItens);
     if (typeof atualizarRacaUI === 'function') atualizarRacaUI(racaKey); // Nova chamada para atualizar campos de raça
     if (typeof atualizarCarga === 'function') atualizarCarga(infoAttr, dados);
-    aplicarBonusVisuais(bonusItens);
+    aplicarBonusVisuais(bonusItens, dados, breakdown);
 
     // 5. Persistência
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
@@ -235,28 +257,37 @@ function getClassesAtivas(dados) {
  */
 function calcularBonusItens(dados) {
     const totais = {};
+    const fontes = {}; // { forca: ["Item A (+2)"] }
+
+    const addBonus = (attr, val, nome) => {
+        if (!attr || attr === 'nenhum' || val === 0) return;
+        totais[attr] = (totais[attr] || 0) + val;
+        if (!fontes[attr]) fontes[attr] = [];
+        fontes[attr].push(`${nome} (${val > 0 ? '+' : ''}${val})`);
+    };
 
     // Aplica bônus de reflexos do Morcego se ativo
     if (dados.vampiro_forma_morcego) {
-        totais['reflexos'] = (totais['reflexos'] || 0) + 6;
+        addBonus('reflexos', 6, 'Forma de Morcego');
     }
 
     Object.keys(dados).forEach(key => {
         if (key.startsWith('inv_eqp_') && dados[key] === true) {
             const id = key.replace('inv_eqp_', '');
+            const nome = dados[`inv_nome_${id}`] || "Item";
 
             // 1. Bônus por atributo manual (Modificador)
             const attr = dados[`inv_attr_${id}`];
             const val = parseInt(dados[`inv_mod_${id}`]) || 0;
-            if (attr && attr !== 'nenhum') totais[attr] = (totais[attr] || 0) + val;
+            addBonus(attr, val, nome);
 
             // 2. Bônus automático de Defesa para Armaduras equipadas
             const categoria = dados[`inv_cat_${id}`];
             if (categoria === 'armaduras') {
                 const defBonus = parseInt(dados[`inv_defesa_bonus_${id}`]) || 0;
                 const defPenalty = parseInt(dados[`inv_defesa_penalidade_${id}`]) || 0;
-                totais['defesa'] = (totais['defesa'] || 0) + defBonus;
-                totais['movimentacao'] = (totais['movimentacao'] || 0) - defPenalty;
+                addBonus('defesa', defBonus, nome);
+                addBonus('movimentacao', -defPenalty, `${nome} (Peso)`);
             }
 
             // 3. Bônus de materiais (Centro e Base) para Armas equipadas
@@ -270,13 +301,12 @@ function calcularBonusItens(dados) {
                             if (material.attr && material.attr !== 'nenhum') {
                                 attrs.push({ attr: material.attr, mod: material.mod });
                             }
+                            const materialNome = material.nome || (field === 'cabo' ? 'Centro' : 'Base');
                             attrs.forEach(a => {
                                 if (a.attr && a.attr !== 'nenhum') {
-                                    if (a.isAdv) {
-                                        totais[`adv_${a.attr}`] = (totais[`adv_${a.attr}`] || 0) + (parseInt(a.mod) || 0);
-                                    } else {
-                                        totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
-                                    }
+                                    const valM = parseInt(a.mod) || 0;
+                                    const attrM = a.isAdv ? `adv_${a.attr}` : a.attr;
+                                    addBonus(attrM, valM, `${nome} (${materialNome})`);
                                 }
                             });
                         } catch (e) { console.error(`Erro no material ${field} do item ${id}`); }
@@ -292,11 +322,9 @@ function calcularBonusItens(dados) {
                     if (modsData.attributes && Array.isArray(modsData.attributes)) {
                         modsData.attributes.forEach(a => {
                             if (a.attr && a.attr !== 'nenhum') {
-                                if (a.isAdv) {
-                                    totais[`adv_${a.attr}`] = (totais[`adv_${a.attr}`] || 0) + (parseInt(a.mod) || 0);
-                                } else {
-                                    totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
-                                }
+                                const valMod = parseInt(a.mod) || 0;
+                                const attrMod = a.isAdv ? `adv_${a.attr}` : a.attr;
+                                addBonus(attrMod, valMod, `${nome} (Mod)`);
                             }
                         });
                     }
@@ -311,11 +339,9 @@ function calcularBonusItens(dados) {
                     if (raroData.attributes && Array.isArray(raroData.attributes)) {
                         raroData.attributes.forEach(a => {
                             if (a.attr && a.attr !== 'nenhum') {
-                                if (a.isAdv) {
-                                    totais[`adv_${a.attr}`] = (totais[`adv_${a.attr}`] || 0) + (parseInt(a.mod) || 0);
-                                } else {
-                                    totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
-                                }
+                                const valR = parseInt(a.mod) || 0;
+                                const attrR = a.isAdv ? `adv_${a.attr}` : a.attr;
+                                addBonus(attrR, valR, `${nome} (Raro)`);
                             }
                         });
                     }
@@ -323,24 +349,41 @@ function calcularBonusItens(dados) {
             }
         }
     });
-    return totais;
+    return { totals: totais, sources: fontes };
 }
 
 /**
  * Aplica bônus de itens em campos simples que não são atributos (ex: Movimentação)
  */
-function aplicarBonusVisuais(bonusItens) {
+function aplicarBonusVisuais(bonusItens, dadosObj, breakdown = null) {
     const campos = ['movimentacao', 'defesa', 'sanidade', 'status_info'];
     campos.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             const bonus = bonusItens[id] || 0;
 
+            // Tooltip detalhado para Sanidade e Status (Defesa e Movimento já possuem tooltips em ficha_status.js)
+            if (id === 'sanidade' || id === 'status_info') {
+                let details = [];
+                let baseValue = dadosObj[id] || (id === 'sanidade' ? "100%" : "0");
+                details.push(`Base: ${baseValue}`);
+                if (bonus !== 0) details.push(`Bônus: ${bonus > 0 ? '+' : ''}${bonus}`);
+
+                if (breakdown) {
+                    const sources = [
+                        ...(breakdown.itens[id] || []),
+                        ...(breakdown.poderes[id] || []),
+                        ...(breakdown.habilidades[id] || [])
+                    ];
+                    sources.forEach(s => details.push(s));
+                }
+                // Define o title no formato padrão que o modal consegue ler
+                el.title = `Total: ${el.value || baseValue} (${details.join(' | ')})`;
+            }
+
             if (bonus > 0) el.style.color = '#4ade80'; // Verde para bônus
             else if (bonus < 0) el.style.color = '#ff5f5f'; // Vermelho para penalidade
-            else el.style.color = (id === 'defesa') ? 'white' : 'white';
-
-            el.title = bonus !== 0 ? `Bônus de Item: ${bonus >= 0 ? '+' : ''}${bonus}` : '';
+            else el.style.color = 'white';
         }
     });
 }
@@ -406,8 +449,9 @@ function calcularNivelTotalEngine(dados) {
 
 /**
  * Motor central de Atributos. Lê da tela ou do storage.
+ * breakdown: { itens: {attr: ["Nome (+val)"]}, poderes: {...}, habilidades: {...} }
  */
-function engineCalcularAtributos(dadosObj, bonusItens = {}, racaKey) {
+function engineCalcularAtributos(dadosObj, bonusItens = {}, racaKey, breakdown = null) {
     const cache = { mods: {}, totals: {} };
     const attrInputs = document.querySelectorAll(".attr-input");
     const attrs = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma", "aura"];
@@ -445,18 +489,15 @@ function engineCalcularAtributos(dadosObj, bonusItens = {}, racaKey) {
             const totalBonus = (bonusItens[input.id] || 0) + (bonusRaca[input.id] || 0) + (bonusClasses[input.id] || 0);
             const modBonus = (modBonusRaca[input.id] || 0);
 
-            // Buscamos o valor que está no input (que pode ser o TOTAL)
-            let valorNaTela = parseInt(input.value) || 10;
-
-            // Calculamos a BASE revertendo os bônus conhecidos
-            // Isso evita o loop de feedback onde o bônus é somado ao total repetidamente
-            let base = valorNaTela - totalBonus;
-
-            // Se o usuário está digitando ativamente, recalculamos a base pelo novo valor
+            let base;
             if (input === document.activeElement) {
-                let valorDigitado = parseInt(input.value) || 0;
-                // Consideramos que o usuário está editando o TOTAL, então calculamos a base inversa
-                base = valorDigitado - totalBonus;
+                // Se o usuário está editando, derivamos a BASE a partir do TOTAL digitado
+                base = (parseInt(input.value) || 0) - totalBonus;
+            } else {
+                // Se não está editando, confiamos no valor BASE que veio do localStorage.
+                // Se o dado não existir (primeira vez), tenta deduzir do valor do input.
+                const storedBase = parseInt(dadosObj[input.id]);
+                base = !isNaN(storedBase) ? storedBase : (parseInt(input.value) || 10) - totalBonus;
             }
 
             const total = base + totalBonus;
@@ -478,8 +519,25 @@ function engineCalcularAtributos(dadosObj, bonusItens = {}, racaKey) {
                 else if (bonus < 0) display.style.color = '#ff5f5f';
                 else display.style.color = '#ff4444';
 
-                // Adiciona um título explicativo ao passar o mouse
-                input.title = `Total: ${total} (Base: ${base}${bonusRaca[input.id] ? ' | Raça: ' + (bonusRaca[input.id] > 0 ? '+' : '') + bonusRaca[input.id] : ''})`;
+                // Constrói string de detalhes para o tooltip (O que está afetando o atributo)
+                let details = [];
+                if (base !== 0) details.push(`Base: ${base}`);
+                if (bonusRaca[input.id]) details.push(`Raça: ${bonusRaca[input.id] > 0 ? '+' : ''}${bonusRaca[input.id]}`);
+                if (bonusClasses[input.id]) details.push(`Classe: ${bonusClasses[input.id] > 0 ? '+' : ''}${bonusClasses[input.id]}`);
+                if (modBonus !== 0) details.push(`Mod. Raça: ${modBonus > 0 ? '+' : ''}${modBonus}`);
+
+                if (breakdown) {
+                    const itms = breakdown.itens[input.id] || [];
+                    const pods = breakdown.poderes[input.id] || [];
+                    const habs = breakdown.habilidades[input.id] || [];
+                    itms.forEach(s => details.push(s));
+                    pods.forEach(s => details.push(s));
+                    habs.forEach(s => details.push(s));
+                } else if (bonusItens[input.id]) {
+                    details.push(`Outros Bônus: ${bonusItens[input.id] > 0 ? '+' : ''}${bonusItens[input.id]}`);
+                }
+
+                input.title = `Total: ${total} (${details.join(' | ')})`;
             }
 
             // Salvamos o valor BASE para não inflar o cálculo no próximo save

@@ -226,7 +226,7 @@
 }
 
 /* Correção de visibilidade para o Modal de Status (Carisma 3+) */
-.modal-overlay h2, 
+.modal-overlay h2,
 .modal-overlay p,
 .modal-overlay label {
   color: white !important;
@@ -313,6 +313,7 @@
   width: 90px; /* Largura levemente maior para melhor equilíbrio */
   align-items: center;
   gap: 12px; /* Espaço interno entre label, input e mod */
+  position: relative;
 }
 
 .attribute-card:hover {
@@ -320,6 +321,13 @@
   border-color: #ff4444;
   box-shadow: -5px 0 15px rgba(255, 68, 68, 0.3);
   background: #1c1c21;
+}
+
+.attr-help-btn {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  z-index: 10;
 }
 
 .attr-label-box {
@@ -388,6 +396,28 @@
   font-weight: bold;
   color: #ff4444;
   font-size: 0.9rem;
+}
+
+.btn-calc-ajuda {
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.4);
+  color: #ff4444;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.btn-calc-ajuda:hover {
+  background: #ff4444;
+  color: white;
 }
 
 .bar-controls {
@@ -652,8 +682,15 @@
 }
 
 @keyframes pulse-status {
-  0%, 100% { filter: brightness(1); transform: scale(1); }
-  50% { filter: brightness(1.3); transform: scale(1.02); }
+  0%,
+  100% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.3);
+    transform: scale(1.02);
+  }
 }
 
 /* Estilo para a mensagem de aviso de Vampiro */
