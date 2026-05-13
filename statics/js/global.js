@@ -143,6 +143,22 @@ function calcularBonusItens(dados) {
         totais['reflexos'] = (totais['reflexos'] || 0) + 6;
     }
 
+    // Bônus de Poderes (Buffs de atributos/perícias sempre ativos)
+    Object.keys(dados).forEach(key => {
+        if (key.startsWith('poder_buffs_')) {
+            try {
+                const buffsData = JSON.parse(dados[key]);
+                if (buffsData.attributes && Array.isArray(buffsData.attributes)) {
+                    buffsData.attributes.forEach(a => {
+                        if (a.attr && a.attr !== 'nenhum') {
+                            totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
+                        }
+                    });
+                }
+            } catch (e) { }
+        }
+    });
+
     Object.keys(dados).forEach(key => {
         if (key.startsWith('inv_eqp_') && dados[key] === true) {
             const id = key.replace('inv_eqp_', '');
