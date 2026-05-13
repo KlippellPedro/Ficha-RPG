@@ -36,7 +36,7 @@ function atualizarFiltroPoderesUI() {
     filterSelect.innerHTML = `<option value="todos">Todas as Classes/Origens</option>` + getOpcoesClassesPod(valorAtual);
 }
 
-function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "", buffs = "{}") {
+function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "") {
     const container = document.getElementById('poderes-container');
     if (!container) return;
 
@@ -71,7 +71,6 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
             <input type="hidden" id="poder_duracao_${index}" class="save-input" value="${duracao}">
             <input type="hidden" id="poder_alcance_${index}" class="save-input" value="${alcance}">
             <input type="hidden" id="poder_acao_${index}" class="save-input" value="${acao}">
-            <input type="hidden" id="poder_buffs_${index}" class="save-input" value='${buffs}'>
         </div>
     `;
 
@@ -94,9 +93,6 @@ function abrirModalPod(index) {
     const duracao = document.getElementById(`poder_duracao_${index}`).value;
     const alcance = document.getElementById(`poder_alcance_${index}`).value;
     const acao = document.getElementById(`poder_acao_${index}`).value;
-    const buffs = document.getElementById(`poder_buffs_${index}`)?.value || "{}";
-    let buffsData = {};
-    try { buffsData = JSON.parse(buffs); } catch (e) { }
 
     document.getElementById('modal-pod-title').innerText = `Detalhes: ${nome || "Poder"}`;
 
@@ -134,17 +130,23 @@ function abrirModalPod(index) {
             <div class="input-group"><label>Duração</label><input type="text" id="modal_pod_duracao" class="inv-input" value="${duracao}"></div>
             <div class="input-group"><label>Alcance</label><input type="text" id="modal_pod_alcance" class="inv-input" value="${alcance}"></div>
         </div>
-        <div class="grid-2-cols">
-            <div class="input-group"><label>Ação</label><input type="text" id="modal_pod_acao" class="inv-input" value="${acao}"></div>
-            <div class="input-group"><label>Buffs e Atributos</label>
-                <button type="button" class="btn-material-edit" onclick="abrirModalBuffsPoder('${index}')">${(buffsData.attributes || []).length > 0 ? buffsData.attributes.length + ' Buff(s) Ativo(s)' : 'Definir Buffs'}</button>
-            </div>
-        </div>
+        <div class="input-group"><label>Ação</label><input type="text" id="modal_pod_acao" class="inv-input" value="${acao}"></div>
+
         <div class="input-group">
             <label>Descrição e Efeito</label>
             <textarea id="modal_pod_desc" class="inv-input" style="min-height: 180px">${desc}</textarea>
+        </div>
     `;
 
+    const modal = document.getElementById('modal-pod');
+    const footer = modal ? modal.querySelector('.modal-footer') : null;
+    if (footer) {
+        footer.style.justifyContent = 'space-between';
+        footer.innerHTML = `
+            <button type="button" class="btn-use-skill" onclick="usarPoder('${index}')">Usar Poder</button>
+            <button type="button" class="btn-save-modal" onclick="salvarDetalhesPod()">Salvar e Fechar</button>
+        `;
+    }
     document.getElementById('modal-pod').style.display = 'flex';
 }
 
@@ -170,29 +172,6 @@ function salvarDetalhesPod() {
     }
 }
 
-function abrirModalBuffsPoder(index) {
-    currentMaterialEditItemIdx = index;
-    currentMaterialEditField = 'poder_buffs';
-
-    let buffsData = {};
-    try {
-        const rawVal = document.getElementById(`poder_buffs_${index}`).value;
-        buffsData = JSON.parse(rawVal && rawVal.startsWith('{') ? rawVal : '{}');
-    } catch (e) { }
-
-    document.querySelector('#modal-material-details .modal-body').innerHTML = `
-        <div id="material-attributes-container"></div>
-        <button type="button" class="btn-add-class" onclick="adicionarAtributoMaterial()">+ Adicionar Buff</button>
-    `;
-
-    document.getElementById('modal-material-title').innerText = "Buffs e Atributos do Poder";
-    if (buffsData.attributes && Array.isArray(buffsData.attributes))
-        buffsData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod));
-    else adicionarAtributoMaterial();
-
-    document.getElementById('modal-material-details').style.display = 'flex';
-}
-
 function usarPoder(index) {
     const custoStr = document.getElementById(`poder_custo_${index}`).value.trim();
     const tipoCusto = document.getElementById(`poder_tipo_custo_${index}`).value;
@@ -200,7 +179,13 @@ function usarPoder(index) {
     if (isNaN(custo) || custo <= 0) return showNotification("Defina um custo numérico válido e positivo.", 'warning');
 
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    const racaKey = dados.raca || "nenhuma";
+    const h1 = dados.hibrido_raca_1 || "";
+    const h2 = dados.hibrido_raca_2 || "";
+    const isCorrompido = racaKey === "corrompido" || (racaKey === "hibrido" && (h1 === "corrompido" || h2 === "corrompido"));
+
     if (tipoCusto === "PM") {
+        if (isCorrompido) return usarPoderCorrompido(index, custo);
         let recursoAtual = parseInt(dados.pm_atual) || 0;
         let recursoMax = parseInt(dados.pm_max) || 0;
         if (recursoAtual < custo) return showNotification(`Mana insuficiente! Você tem ${recursoAtual} PM, mas precisa de ${custo} PM.`, 'error');
@@ -229,6 +214,23 @@ function usarPoder(index) {
     // Não é necessário chamar atualizarEstiloCustoPoder(index) aqui, pois atualizarTudo() já fará isso globalmente.
 }
 
+function usarPoderCorrompido(index, custo) {
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    let recursoAtual = parseInt(dados.pv_atual) || 0;
+
+    if (recursoAtual < custo) {
+        return showNotification(`Vitalidade insuficiente para corrupção!`, 'error');
+    }
+
+    recursoAtual -= custo;
+    dados.pv_atual = recursoAtual;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    registrarHistorico(document.getElementById(`poder_nome_${index}`).value || "Poder", custo, "Corrupção");
+    showNotification(`Poder usado via Corrupção! -${custo} Vitalidade.`, 'success');
+    atualizarTudo();
+    return true;
+}
+
 function duplicarPoder(index) {
     const n = document.getElementById(`poder_nome_${index}`).value;
     const t = document.getElementById(`poder_tipo_${index}`)?.value || "Poder de Classe";
@@ -239,8 +241,7 @@ function duplicarPoder(index) {
     const du = document.getElementById(`poder_duracao_${index}`).value;
     const al = document.getElementById(`poder_alcance_${index}`).value;
     const ac = document.getElementById(`poder_acao_${index}`).value;
-    const b = document.getElementById(`poder_buffs_${index}`)?.value || "{}";
-    adicionarPoderUI(n + " (Cópia)", t, c, tc, d, null, du, al, ac, cl, b);
+    adicionarPoderUI(n + " (Cópia)", t, c, tc, d, null, du, al, ac, cl);
 }
 
 function limparPoderes() {
@@ -319,7 +320,6 @@ function removerPoder(btn) {
     delete dados[`poder_duracao_${index}`];
     delete dados[`poder_alcance_${index}`];
     delete dados[`poder_acao_${index}`];
-    delete dados[`poder_buffs_${index}`];
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     row.remove();
@@ -346,8 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 salvo[`poder_duracao_${idx}`] || "", // 7. duracao
                 salvo[`poder_alcance_${idx}`] || "", // 8. alcance
                 salvo[`poder_acao_${idx}`] || "",    // 9. acao
-                salvo[`poder_classe_${idx}`] || "",  // 10. classe
-                salvo[`poder_buffs_${idx}`] || "{}"  // 11. buffs
+                salvo[`poder_classe_${idx}`] || ""   // 10. classe
             );
         });
     }

@@ -334,22 +334,6 @@ function salvarDetalhesMaterial() {
         return salvarDetalhesRaridadeItem();
     }
 
-    if (currentMaterialEditField === 'poder_buffs') {
-        const idx = currentMaterialEditItemIdx;
-        const rows = document.querySelectorAll('.material-attr-row');
-        const attributes = [];
-        rows.forEach(row => {
-            const attr = row.querySelector('.material-attr-select').value;
-            const mod = parseInt(row.querySelector('.material-mod-input').value) || 0;
-            if (attr !== 'nenhum') attributes.push({ attr, mod });
-        });
-        const buffsJson = JSON.stringify({ attributes });
-        document.getElementById(`poder_buffs_${idx}`).value = buffsJson;
-        fecharModalMaterial();
-        atualizarTudo();
-        return;
-    }
-
     if (currentMaterialEditItemIdx !== null && currentMaterialEditField !== null) {
         const nome = document.getElementById('modal_material_nome').value;
         const rows = document.querySelectorAll('.material-attr-row');

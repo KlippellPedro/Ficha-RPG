@@ -36,11 +36,25 @@ function atualizarTudo() {
     if (document.getElementById("nivel")) document.getElementById("nivel").value = nivelTotal;
 
     const bonusItens = calcularBonusItens(dados);
+
+    // Adiciona bônus manuais para as raças Deus e Escolhido (customizáveis pelo player)
+    const isDeusEscolhido = ["deus", "escolhido"].includes(racaKey) ||
+        (racaKey === "hibrido" && (["deus", "escolhido"].includes(dados.hibrido_raca_1) || ["deus", "escolhido"].includes(dados.hibrido_raca_2)));
+
+    if (isDeusEscolhido) {
+        bonusItens['pv_max'] = (bonusItens['pv_max'] || 0) + (parseInt(dados.pv_extra_raca) || 0);
+        bonusItens['pm_max'] = (bonusItens['pm_max'] || 0) + (parseInt(dados.pm_extra_raca) || 0);
+        bonusItens['defesa'] = (bonusItens['defesa'] || 0) + (parseInt(dados.defesa_extra_raca) || 0);
+        bonusItens['movimentacao'] = (bonusItens['movimentacao'] || 0) + (parseInt(dados.movimento_extra_raca) || 0);
+    }
+
     const infoAttr = engineCalcularAtributos(dados, bonusItens, racaKey);
 
     // Calcular status de Mana para Habilidades e Poderes
     const pmAtual = parseInt(dados.pm_atual) || 0;
     const pvAtual = parseInt(dados.pv_atual) || 0;
+    const isCorrompido = racaKey === "corrompido" || (racaKey === "hibrido" && (dados.hibrido_raca_1 === "corrompido" || dados.hibrido_raca_2 === "corrompido"));
+
     document.querySelectorAll('.item-row').forEach(row => {
         const id = row.dataset.index;
         let prefix = '';
@@ -56,7 +70,8 @@ function atualizarTudo() {
 
             if (!isNaN(custo) && custo > 0) {
                 if (tipoCusto === "PM") {
-                    isOk = (pmAtual >= custo);
+                    if (isCorrompido) isOk = (pvAtual >= custo);
+                    else isOk = (pmAtual >= custo);
                 } else if (tipoCusto === "PV") {
                     isOk = (pvAtual >= custo);
                 }
@@ -90,6 +105,8 @@ function atualizarTudo() {
     if (typeof verificarStatusInicial === 'function') verificarStatusInicial(infoAttr.mods);
     atualizarBarras(bonusItens);
     if (typeof verificarVisibilidadeClasses === 'function') verificarVisibilidadeClasses();
+    if (typeof verificarExtraDeusEscolhido === 'function') verificarExtraDeusEscolhido(dados);
+    if (typeof verificarCorrompido === 'function') verificarCorrompido(dados);
     if (typeof verificarAtributoVampiro === 'function') verificarAtributoVampiro(infoAttr, dados);
     if (typeof verificarAvisoAnimalia === 'function') verificarAvisoAnimalia(dados);
     if (typeof verificarExtraFada === 'function') verificarExtraFada(dados);
@@ -142,22 +159,6 @@ function calcularBonusItens(dados) {
     if (dados.vampiro_forma_morcego) {
         totais['reflexos'] = (totais['reflexos'] || 0) + 6;
     }
-
-    // Bônus de Poderes (Buffs de atributos/perícias sempre ativos)
-    Object.keys(dados).forEach(key => {
-        if (key.startsWith('poder_buffs_')) {
-            try {
-                const buffsData = JSON.parse(dados[key]);
-                if (buffsData.attributes && Array.isArray(buffsData.attributes)) {
-                    buffsData.attributes.forEach(a => {
-                        if (a.attr && a.attr !== 'nenhum') {
-                            totais[a.attr] = (totais[a.attr] || 0) + (parseInt(a.mod) || 0);
-                        }
-                    });
-                }
-            } catch (e) { }
-        }
-    });
 
     Object.keys(dados).forEach(key => {
         if (key.startsWith('inv_eqp_') && dados[key] === true) {

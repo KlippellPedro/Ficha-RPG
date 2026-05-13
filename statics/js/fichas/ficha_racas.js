@@ -163,6 +163,33 @@ function verificarExtraHibrido(dados) { // dados is already passed
     } else if (extraEl) extraEl.style.display = 'none';
 }
 
+function verificarExtraDeusEscolhido(dados) {
+    const racaKey = dados.raca || document.getElementById("raca")?.value || "nenhuma";
+    const h1 = dados.hibrido_raca_1 || "";
+    const h2 = dados.hibrido_raca_2 || "";
+
+    const isSpecialRaca = ["deus", "escolhido"].includes(racaKey) ||
+        (racaKey === "hibrido" && (["deus", "escolhido"].includes(h1) || ["deus", "escolhido"].includes(h2)));
+
+    const extraEl = document.getElementById("deus-escolhido-extra");
+    if (extraEl) extraEl.style.display = isSpecialRaca ? 'block' : 'none';
+}
+
+function verificarCorrompido(dados) {
+    const racaKey = dados.raca || document.getElementById("raca")?.value || "nenhuma";
+    const h1 = dados.hibrido_raca_1 || "";
+    const h2 = dados.hibrido_raca_2 || "";
+    const isCorrompido = racaKey === "corrompido" || (racaKey === "hibrido" && (h1 === "corrompido" || h2 === "corrompido"));
+
+    const pmGroup = document.getElementById("pm-stat-group");
+    const pvLabel = document.querySelector("#pv-stat-group .stat-labels label");
+
+    if (pmGroup) pmGroup.style.display = isCorrompido ? 'none' : 'flex';
+    if (pvLabel) {
+        pvLabel.innerText = isCorrompido ? 'CORRUPÇÃO (VITALIDADE)' : 'VIDA (P.V.)';
+    }
+}
+
 let racaAnteriorUI = null;
 function atualizarRacaUI(racaKey) {
     const data = RACAS_DATA[racaKey];

@@ -170,12 +170,19 @@ function abrirModalMag(index) {
             <div class="input-group"><label>Teste</label><input type="text" id="modal_mag_teste" class="inv-input" value="${vals.teste}" placeholder="Ex: Misticismo"></div>
         </div>
         <div class="input-group"><label>Efeito da Magia</label><textarea id="modal_mag_desc" class="inv-input" style="min-height: 200px">${vals.desc}</textarea></div>
-        <div class="modal-footer" style="justify-content: space-between;">
-            <button type="button" class="btn-use-skill" onclick="usarMagia('${index}')">Usar</button>
-            <button type="button" class="btn-save-modal" onclick="salvarDetalhesMag()">Salvar no Grimório</button>
-        </div>
     `;
-    document.getElementById('modal-mag').style.display = 'flex'; // Show the modal
+
+    const modal = document.getElementById('modal-mag');
+    const footer = modal ? modal.querySelector('.modal-footer') : null;
+    if (footer) {
+        footer.style.justifyContent = 'space-between';
+        footer.innerHTML = `
+            <button type="button" class="btn-use-skill" onclick="usarMagia('${index}')">Usar Magia</button>
+            <button type="button" class="btn-save-modal" onclick="salvarDetalhesMag()">Salvar no Grimório</button>
+        `;
+    }
+
+    modal.style.display = 'flex'; // Show the modal
     atualizarCorNivel('modal');
 }
 
@@ -217,15 +224,22 @@ function usarMagia(index) {
     if (isNaN(custo) || custo <= 0) return showNotification("Defina um custo numérico para conjurar.", 'warning');
 
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    const racaKey = dados.raca || "nenhuma";
+    const h1 = dados.hibrido_raca_1 || "";
+    const h2 = dados.hibrido_raca_2 || "";
+    const isCorrompido = racaKey === "corrompido" || (racaKey === "hibrido" && (h1 === "corrompido" || h2 === "corrompido"));
+
     let recurso = (tipoCusto === "PM") ? "pm_atual" : (tipoCusto === "PV" ? "pv_atual" : null);
+    if (tipoCusto === "PM" && isCorrompido) recurso = "pv_atual";
 
     if (recurso) {
         let atual = parseInt(dados[recurso]) || 0;
-        if (atual < custo) return showNotification(`${tipoCusto} insuficiente!`, 'error');
+        if (atual < custo) return showNotification(`${(tipoCusto === "PM" && isCorrompido) ? "Vitalidade" : tipoCusto} insuficiente!`, 'error');
         dados[recurso] = atual - custo;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-        registrarHistorico(nome, custo, tipoCusto);
-        showNotification(`${nome} conjurada! -${custo} ${tipoCusto}`, 'success');
+        registrarHistorico(nome, custo, (tipoCusto === "PM" && isCorrompido) ? "Corrupção" : tipoCusto);
+        showNotification(`${nome} conjurada! -${custo} ${isCorrompido && tipoCusto === "PM" ? "Vitalidade" : tipoCusto}`, 'success');
         atualizarTudo();
     } else {
         showNotification(`Magia conjurada (Custo: ${custo} Outro).`, 'info');

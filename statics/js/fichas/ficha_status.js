@@ -11,6 +11,24 @@ function atualizarDefesa(mods, dadosObj, bonusItens = {}) {
     if (inputDef) inputDef.value = total;
 }
 
+/** Auxiliar para calcular ganho de mana vindo de classes */
+function getManaGanhaEngine(mods) {
+    let manaGanha = 0;
+    document.querySelectorAll('.class-row').forEach(row => {
+        const className = row.querySelector('[id^="class_name_"]')?.value;
+        const lvl = parseInt(row.querySelector('[id^="class_lvl_"]')?.value) || 0;
+        const sub = row.querySelector('[id^="class_sub_"]')?.value || "";
+        const data = CLASSES_DATA[className];
+        if (data) {
+            let pmLvl = data.pm_lvl;
+            if (className === 'cientista' && lvl >= 5 && sub === 'alquimista') pmLvl = 4;
+            let mod = data.pm_attr ? (mods[data.pm_attr] || 0) : 0;
+            manaGanha += (lvl * (mod + pmLvl));
+        }
+    });
+    return manaGanha;
+}
+
 function atualizarVida(mods, dados, bonusItens = {}) {
     const modFor = mods['forca'] || 0, modCon = mods['constituicao'] || 0;
     const vidaInicial = (modFor + modCon) * 4;
@@ -31,10 +49,23 @@ function atualizarVida(mods, dados, bonusItens = {}) {
         }
     });
     const racaKey = document.getElementById("raca")?.value || "nenhuma";
+    const h1 = dados.hibrido_raca_1 || "";
+    const h2 = dados.hibrido_raca_2 || "";
+    const isCorrompido = racaKey === "corrompido" || (racaKey === "hibrido" && (h1 === "corrompido" || h2 === "corrompido"));
+
     const isVamp = racaKey === "vampiro" || (racaKey === "hibrido" && (dados.hibrido_raca_1 === "vampiro" || dados.hibrido_raca_2 === "vampiro"));
     const formaMorcego = document.getElementById("vampiro_forma_morcego")?.checked || dados.vampiro_forma_morcego;
     let total = vidaInicial + vidaGanha + (bonusItens['pv_max'] || 0) + (RACAS_DATA[racaKey]?.pvBonus || 0);
     if (isVamp && formaMorcego) total = Math.floor(total / 2);
+
+    if (isCorrompido) {
+        const manaGanha = getManaGanhaEngine(mods);
+        const modInt = mods['inteligencia'] || 0, modSab = mods['sabedoria'] || 0;
+        const manaInicial = (modInt + modSab) * 3;
+        const totalMana = manaInicial + manaGanha + (bonusItens['pm_max'] || 0) + (RACAS_DATA[racaKey]?.manaBonus || 0) + (RACAS_DATA[racaKey]?.pmBonus || 0);
+        total += totalMana;
+    }
+
     const el = document.getElementById("pv_max");
     if (el) el.value = Math.max(racaKey === "humano" ? 4 : 1, total);
 }
@@ -42,25 +73,20 @@ function atualizarVida(mods, dados, bonusItens = {}) {
 function atualizarMana(mods, dados, bonusItens = {}) {
     const modInt = mods['inteligencia'] || 0, modSab = mods['sabedoria'] || 0;
     const manaInicial = (modInt + modSab) * 3;
-    let manaGanha = 0;
-    document.querySelectorAll('.class-row').forEach(row => {
-        const className = row.querySelector('[id^="class_name_"]')?.value;
-        const lvl = parseInt(row.querySelector('[id^="class_lvl_"]')?.value) || 0;
-        const sub = row.querySelector('[id^="class_sub_"]')?.value || "";
-        const data = CLASSES_DATA[className];
-        if (data) {
-            let pmLvl = data.pm_lvl;
-            if (className === 'cientista' && lvl >= 5 && sub === 'alquimista') pmLvl = 4;
+    const manaGanha = getManaGanhaEngine(mods);
 
-            let mod = data.pm_attr ? (mods[data.pm_attr] || 0) : 0;
-            manaGanha += (lvl * (mod + pmLvl));
-        }
-    });
     const racaKey = document.getElementById("raca")?.value || "nenhuma";
+    const h1 = dados.hibrido_raca_1 || "";
+    const h2 = dados.hibrido_raca_2 || "";
+    const isCorrompido = racaKey === "corrompido" || (racaKey === "hibrido" && (h1 === "corrompido" || h2 === "corrompido"));
+
     const isVamp = racaKey === "vampiro" || (racaKey === "hibrido" && (dados.hibrido_raca_1 === "vampiro" || dados.hibrido_raca_2 === "vampiro"));
     const formaMorcego = document.getElementById("vampiro_forma_morcego")?.checked || dados.vampiro_forma_morcego;
     let total = manaInicial + manaGanha + (bonusItens['pm_max'] || 0) + (RACAS_DATA[racaKey]?.manaBonus || 0) + (RACAS_DATA[racaKey]?.pmBonus || 0);
     if (isVamp && formaMorcego) total = Math.floor(total / 2);
+
+    if (isCorrompido) total = 0;
+
     const el = document.getElementById("pm_max");
     if (el) el.value = Math.max(racaKey === "humano" ? 3 : 1, total);
     const elInv = document.getElementById("invocacoes_max");
