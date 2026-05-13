@@ -29,11 +29,11 @@ function getOpcoesClassesHab(valorSelecionado = "") {
  * Atualiza as opções do select de filtro para baterem com as classes e origens disponíveis
  */
 function atualizarFiltroHabilidadesUI() {
-    const filterSelect = document.getElementById('filter-habilidade-tipo');
+    const filterSelect = document.getElementById('filter-habilidade-classe');
     if (!filterSelect) return;
 
     const valorAtual = filterSelect.value;
-    filterSelect.innerHTML = `<option value="todos">Todas as Classes/Origens</option>` + getOpcoesClassesHab(valorAtual);
+    filterSelect.innerHTML = `<option value="todos">Todas as Fontes</option>` + getOpcoesClassesHab(valorAtual);
 }
 
 function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "") {
@@ -96,6 +96,11 @@ function abrirModalHab(index) {
     const alcance = document.getElementById(`hab_alcance_${index}`).value;
     const acao = document.getElementById(`hab_acao_${index}`).value;
 
+    // DEBUG: Verifique os valores lidos dos campos ocultos
+    console.warn(`[DEBUG Habilidades] Lendo para modal - Duração: "${duracao}", Alcance: "${alcance}", Ação: "${acao}" para index: ${index}`);
+    // Se você vir "PM" ou um número grande aqui, significa que os dados no localStorage estão corrompidos.
+    // Para corrigir, você precisará apagar a habilidade e recriá-la, ou limpar o localStorage.
+
     document.getElementById('modal-hab-title').innerText = `Detalhes: ${nome || "Habilidade"}`;
 
     const body = document.getElementById('modal-hab-body');
@@ -144,13 +149,19 @@ function abrirModalHab(index) {
             <label>Descrição e Efeito</label>
             <textarea id="modal_hab_desc" class="inv-input" style="min-height: 200px">${desc}</textarea>
         </div>
-        <div class="modal-footer" style="justify-content: space-between;">
-            <button type="button" class="btn-use-skill" onclick="usarHabilidade('${index}')">Usar Habilidade</button>
-            <button type="button" class="btn-save-modal" onclick="salvarDetalhesHab()">Salvar e Fechar</button>
-        </div>
     `;
 
-    document.getElementById('modal-hab').style.display = 'flex';
+    const modal = document.getElementById('modal-hab');
+    const footer = modal ? modal.querySelector('.modal-footer') : null;
+    if (footer) {
+        footer.style.justifyContent = 'space-between';
+        footer.innerHTML = `
+            <button type="button" class="btn-use-skill" onclick="usarHabilidade('${index}')">Usar Habilidade</button>
+            <button type="button" class="btn-save-modal" onclick="salvarDetalhesHab()">Salvar e Fechar</button>
+        `;
+    }
+
+    modal.style.display = 'flex';
 }
 
 function fecharModalHab() {
@@ -290,7 +301,7 @@ function limparHabilidades() {
  */
 function resetarFiltrosHabilidades() {
     document.getElementById('search-habilidade').value = '';
-    if (document.getElementById('filter-habilidade-classe')) document.getElementById('filter-habilidade-classe').value = '';
+    if (document.getElementById('filter-habilidade-classe')) document.getElementById('filter-habilidade-classe').value = 'todos';
     document.getElementById('filter-habilidade-tipo').value = 'todos';
     filtrarHabilidades();
     showNotification("Filtro limpo", "info", 2000);
@@ -303,7 +314,8 @@ function filtrarHabilidades() {
     const termo = document.getElementById('search-habilidade').value.toLowerCase();
     const filtroTipo = document.getElementById('filter-habilidade-tipo').value;
     const filtroTipoLower = filtroTipo.toLowerCase();
-    const filtroClasse = document.getElementById('filter-habilidade-classe')?.value.toLowerCase() || "";
+    const filtroClasse = document.getElementById('filter-habilidade-classe')?.value.toLowerCase() || "todos";
+
     const rows = document.querySelectorAll('#habilidades-container .item-row'); // Seleciona apenas as linhas de habilidade
     let contador = 0;
 
@@ -311,10 +323,13 @@ function filtrarHabilidades() {
         const index = row.dataset.index;
         const nome = document.getElementById(`hab_nome_${index}`)?.value.toLowerCase() || "";
         const classe = document.getElementById(`hab_classe_${index}`)?.value.toLowerCase() || "geral";
+        const tipo = document.getElementById(`hab_tipo_${index}`)?.value.toLowerCase() || "ativa";
 
         const matchesNome = nome.includes(termo);
-        const matchesClasse = filtroTipo === 'todos' || classe === filtroTipoLower || classe.includes(filtroClasse);
-        const matches = matchesNome && matchesClasse;
+        const matchesTipo = filtroTipo === 'todos' || tipo === filtroTipoLower;
+        const matchesClasse = filtroClasse === 'todos' || classe === filtroClasse;
+
+        const matches = matchesNome && matchesTipo && matchesClasse;
 
         row.style.display = matches ? 'grid' : 'none';
         if (matches) contador++;
@@ -341,16 +356,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (indices.length > 0) {
             indices.sort((a, b) => parseInt(a) - parseInt(b)).forEach(idx => {
                 adicionarHabilidadeUI(
-                    salvo[`hab_nome_${idx}`] || "",      // 1. nome
-                    salvo[`hab_tipo_${idx}`] || "Ativa", // 2. tipo
-                    salvo[`hab_custo_${idx}`] || "",     // 3. custo
+                    salvo[`hab_nome_${idx}`] || "",         // 1. nome
+                    salvo[`hab_tipo_${idx}`] || "Ativa",    // 2. tipo
+                    salvo[`hab_custo_${idx}`] || "",        // 3. custo
                     salvo[`hab_tipo_custo_${idx}`] || "PM", // 4. tipoCusto
-                    salvo[`hab_desc_${idx}`] || "",      // 5. desc
-                    parseInt(idx),                       // 6. idIndex
-                    salvo[`hab_duracao_${idx}`] || "",   // 7. duracao
-                    salvo[`hab_alcance_${idx}`] || "",   // 8. alcance
-                    salvo[`hab_acao_${idx}`] || "",      // 9. acao
-                    salvo[`hab_classe_${idx}`] || ""     // 10. classe
+                    salvo[`hab_desc_${idx}`] || "",         // 5. desc
+                    parseInt(idx),                          // 6. idIndex
+                    salvo[`hab_duracao_${idx}`] || "",      // 7. duracao
+                    salvo[`hab_alcance_${idx}`] || "",      // 8. alcance
+                    salvo[`hab_acao_${idx}`] || "",         // 9. acao
+                    salvo[`hab_classe_${idx}`] || ""        // 10. classe
                 );
             });
         }

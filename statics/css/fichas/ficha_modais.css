@@ -13,26 +13,69 @@
   backdrop-filter: blur(5px);
 }
 
-.modal-content-box {
-  background: var(--bg-card);
+.modal-content-box,
+.modal-content {
+  background: var(--bg-card); /* Volta para o cinza padrão da ficha */
   border: 2px solid #ff4444;
   padding: 30px;
   border-radius: 12px;
   max-width: 500px;
   width: 90%;
-  text-align: center;
   box-shadow: 0 0 30px rgba(255, 68, 68, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 25px; /* Aumenta o espaço entre Header, Body e Footer */
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+  position: relative; /* Permite posicionar o X de forma absoluta se necessário */
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Dá respiro entre as linhas de inputs e grids */
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .modal-title {
   color: #ff4444;
-  margin-bottom: 15px;
+  margin: 0 auto; /* Força a centralização no container flex */
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+}
+
+/* Ajuste para o botão "X" (btn-remove-class) quando usado no header */
+.modal-header .btn-remove-class {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  margin: 0;
+  line-height: 1;
 }
 
 .modal-text {
   font-size: 0.9rem;
   margin-bottom: 20px;
   line-height: 1.5;
+  color: #ccc;
 }
 
 /* Opções de Seleção (Poderes) */
@@ -50,6 +93,7 @@
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.02);
   transition: background 0.2s;
+  color: white;
 }
 
 .selection-option:hover {
@@ -58,8 +102,49 @@
 }
 
 /* Botões Específicos */
-.btn-modal-close { margin-top: 20px; background: #555; width: 100%; }
-.btn-modal-confirm { width: 100%; }
+.btn-modal-close {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+  width: 100%;
+  margin-top: 20px;
+}
 
-.btn-status-pos { background: #1e3a8a; border: 1px solid #3b82f6; width: 100%; }
-.btn-status-neg { background: #450a0a; border: 1px solid #991b1b; width: 100%; }
+.btn-modal-close:hover {
+  background: #444;
+}
+
+.btn-modal-confirm {
+  width: 100%;
+}
+
+.btn-save-modal {
+  background: #ff4444;
+  color: #000;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-save-modal:hover {
+  filter: brightness(1.2);
+}
+
+.btn-status-pos {
+  background: #1e3a8a;
+  border: 1px solid #3b82f6;
+  width: 100%;
+}
+.btn-status-neg {
+  background: #450a0a;
+  border: 1px solid #991b1b;
+  width: 100%;
+}

@@ -3,6 +3,7 @@
  */
 
 let podSendoEditadoIdx = null;
+let currentPodModEditIdx = null;
 
 /**
  * Gera as opções de classe baseadas nas classes que o personagem possui
@@ -36,7 +37,7 @@ function atualizarFiltroPoderesUI() {
     filterSelect.innerHTML = `<option value="todos">Todas as Classes/Origens</option>` + getOpcoesClassesPod(valorAtual);
 }
 
-function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "") {
+function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "", pv_bonus = 0, pm_bonus = 0, mods = "[]") {
     const container = document.getElementById('poderes-container');
     if (!container) return;
 
@@ -71,6 +72,9 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
             <input type="hidden" id="poder_duracao_${index}" class="save-input" value="${duracao}">
             <input type="hidden" id="poder_alcance_${index}" class="save-input" value="${alcance}">
             <input type="hidden" id="poder_acao_${index}" class="save-input" value="${acao}">
+            <input type="hidden" id="poder_pv_bonus_${index}" class="save-input" value="${pv_bonus}">
+            <input type="hidden" id="poder_pm_bonus_${index}" class="save-input" value="${pm_bonus}">
+            <input type="hidden" id="poder_mods_${index}" class="save-input" value='${mods}'>
         </div>
     `;
 
@@ -94,9 +98,16 @@ function abrirModalPod(index) {
     const alcance = document.getElementById(`poder_alcance_${index}`).value;
     const acao = document.getElementById(`poder_acao_${index}`).value;
 
+    const modal = document.getElementById('modal-pod');
+    const body = document.getElementById('modal-pod-body');
+
+    if (!modal || !body) {
+        console.error("Erro: Container do modal 'modal-pod' não encontrado no HTML.");
+        return;
+    }
+
     document.getElementById('modal-pod-title').innerText = `Detalhes: ${nome || "Poder"}`;
 
-    const body = document.getElementById('modal-pod-body');
     body.innerHTML = `
         <div class="grid-2-cols">
             <div class="input-group">
@@ -133,13 +144,17 @@ function abrirModalPod(index) {
         <div class="input-group"><label>Ação</label><input type="text" id="modal_pod_acao" class="inv-input" value="${acao}"></div>
 
         <div class="input-group">
+            <label>Configurações de Buff</label>
+            <button type="button" class="btn-save-modal" style="width:100%; background: #ff4444; color: white; border: 1px solid #991b1b;" onclick="abrirModalBuffsPoder('${index}')">Definir Buffs</button>
+        </div>
+
+        <div class="input-group">
             <label>Descrição e Efeito</label>
             <textarea id="modal_pod_desc" class="inv-input" style="min-height: 180px">${desc}</textarea>
         </div>
     `;
 
-    const modal = document.getElementById('modal-pod');
-    const footer = modal ? modal.querySelector('.modal-footer') : null;
+    const footer = modal.querySelector('.modal-footer');
     if (footer) {
         footer.style.justifyContent = 'space-between';
         footer.innerHTML = `
@@ -241,7 +256,95 @@ function duplicarPoder(index) {
     const du = document.getElementById(`poder_duracao_${index}`).value;
     const al = document.getElementById(`poder_alcance_${index}`).value;
     const ac = document.getElementById(`poder_acao_${index}`).value;
-    adicionarPoderUI(n + " (Cópia)", t, c, tc, d, null, du, al, ac, cl);
+    const pvb = document.getElementById(`poder_pv_bonus_${index}`)?.value || 0;
+    const pmb = document.getElementById(`poder_pm_bonus_${index}`)?.value || 0;
+    const mods = document.getElementById(`poder_mods_${index}`)?.value || "[]";
+
+    adicionarPoderUI(n + " (Cópia)", t, c, tc, d, null, du, al, ac, cl, pvb, pmb, mods);
+}
+
+/**
+ * Abre o novo modal de Buffs, populando com os dados salvos em JSON
+ */
+function abrirModalBuffsPoder(index) {
+    currentPodModEditIdx = index;
+    let modsData = [];
+    try {
+        const rawVal = document.getElementById(`poder_mods_${index}`).value;
+        modsData = JSON.parse(rawVal || "[]");
+    } catch (e) {
+        console.warn("Erro ao ler modificações do poder, resetando:", e);
+        modsData = [];
+    }
+
+    const modal = document.getElementById('modal-pod-buffs');
+    const container = document.getElementById('pod-buffs-container');
+
+    if (!modal || !container) {
+        console.error("Modal de buffs ou container não encontrado no HTML!");
+        return;
+    }
+
+    container.innerHTML = '';
+
+    if (modsData.length > 0) {
+        modsData.forEach(m => adicionarLinhaBuffPoder(m.attr, m.mod));
+    } else {
+        adicionarLinhaBuffPoder();
+    }
+
+    modal.style.display = 'flex';
+}
+
+function fecharModalBuffPod() {
+    const modal = document.getElementById('modal-pod-buffs');
+    if (modal) modal.style.display = 'none';
+    currentPodModEditIdx = null;
+}
+
+function adicionarLinhaBuffPoder(attr = 'nenhum', mod = 0) {
+    const container = document.getElementById('pod-buffs-container');
+    if (!container) return;
+
+    const row = document.createElement('div');
+    row.className = 'material-attr-row';
+    row.style = 'display: flex; gap: 10px; margin-bottom: 10px;';
+
+    // Reutiliza a lista de atributos do inventário se disponível, senão usa fallback
+    const options = (typeof OPTIONS_ATTR !== 'undefined') ? OPTIONS_ATTR : [
+        { v: 'nenhum', t: '-' },
+        { v: 'pv_max', t: 'Vida Máx' },
+        { v: 'pm_max', t: 'Mana Máx' },
+        { v: 'forca', t: 'FOR' }, { v: 'destreza', t: 'DES' }, { v: 'constituicao', t: 'CON' },
+        { v: 'inteligencia', t: 'INT' }, { v: 'sabedoria', t: 'SAB' }, { v: 'carisma', t: 'CAR' }, { v: 'aura', t: 'AUR' }
+    ];
+
+    row.innerHTML = `
+        <select class="inv-input pod-buff-attr" style="flex: 2;">
+            ${options.map(opt => `<option value="${opt.v}" ${opt.v === attr ? 'selected' : ''}>${opt.t}</option>`).join('')}
+        </select>
+        <input type="number" class="inv-input pod-buff-val" style="flex: 1;" value="${mod}">
+        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(row);
+}
+
+function salvarBuffsPoder() {
+    if (currentPodModEditIdx === null) return;
+    const rows = document.querySelectorAll('#pod-buffs-container .material-attr-row');
+    const modsArr = [];
+
+    rows.forEach(row => {
+        const attr = row.querySelector('.pod-buff-attr')?.value;
+        const mod = parseInt(row.querySelector('.pod-buff-val')?.value) || 0;
+        if (attr && attr !== 'nenhum') {
+            modsArr.push({ attr, mod });
+        }
+    });
+
+    document.getElementById(`poder_mods_${currentPodModEditIdx}`).value = JSON.stringify(modsArr);
+    fecharModalBuffPod();
+    atualizarTudo();
 }
 
 function limparPoderes() {
@@ -310,16 +413,9 @@ function removerPoder(btn) {
     if (!row) return;
     const index = row.dataset.index;
 
+    // Limpeza robusta de todas as chaves associadas a este ID
     let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    delete dados[`poder_nome_${index}`];
-    delete dados[`poder_tipo_${index}`];
-    delete dados[`poder_classe_${index}`];
-    delete dados[`poder_custo_${index}`];
-    delete dados[`poder_desc_${index}`];
-    delete dados[`poder_tipo_custo_${index}`];
-    delete dados[`poder_duracao_${index}`];
-    delete dados[`poder_alcance_${index}`];
-    delete dados[`poder_acao_${index}`];
+    Object.keys(dados).forEach(k => { if (k.endsWith(`_${index}`) && k.startsWith('poder_')) delete dados[k]; });
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     row.remove();
@@ -346,7 +442,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 salvo[`poder_duracao_${idx}`] || "", // 7. duracao
                 salvo[`poder_alcance_${idx}`] || "", // 8. alcance
                 salvo[`poder_acao_${idx}`] || "",    // 9. acao
-                salvo[`poder_classe_${idx}`] || ""   // 10. classe
+                salvo[`poder_classe_${idx}`] || "",  // 10. classe
+                salvo[`poder_pv_bonus_${idx}`] || 0, // 11. pv_bonus
+                salvo[`poder_pm_bonus_${idx}`] || 0, // 12. pm_bonus
+                salvo[`poder_mods_${idx}`] || "[]"   // 13. mods
             );
         });
     }

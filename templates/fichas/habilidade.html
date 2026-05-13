@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../../statics/css/menu.css" />
     <link rel="stylesheet" href="../../statics/css/fichas/inventario.css" />
     <link rel="stylesheet" href="../../statics/css/fichas/habilidades.css" />
+    <link rel="stylesheet" href="../../statics/css/fichas/ficha_modais.css" />
     <!-- Opcional: Para herdar estilos de modal caso prefira -->
     <script src="../../statics/js/global.js"></script>
     <script src="../../statics/js/menu.js"></script>
@@ -47,6 +48,10 @@
           <option value="Reação">Reação</option>
           <option value="Outro">Outro</option>
         </select>
+        <select id="filter-habilidade-classe" class="inv-input" style="max-width: 150px" onchange="filtrarHabilidades()">
+          <option value="todos">Todas as Fontes</option>
+          <!-- Preenchido via JS -->
+        </select>
         <button type="button" class="btn-open-desc" onclick="resetarFiltrosHabilidades()" title="Limpar Filtros">🔄</button>
       </div>
 
@@ -80,14 +85,14 @@
     <div id="modal-hab" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 id="modal-hab-title" style="color: #ff4444; margin: 0">Detalhes da Habilidade</h3>
+          <h2 id="modal-hab-title" class="modal-title">Detalhes da Habilidade</h2>
           <button type="button" class="btn-remove-class" onclick="fecharModalHab()">×</button>
         </div>
         <div class="modal-body" id="modal-hab-body">
           <!-- Conteúdo dinâmico -->
         </div>
         <div class="modal-footer">
-          <!-- Botões movidos para dentro do body do modal para melhor organização -->
+          <!-- Gerado via JS -->
         </div>
       </div>
     </div>
@@ -96,7 +101,7 @@
     <div id="modal-historico" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 style="color: #3b82f6; margin: 0">Histórico de Ativações</h3>
+          <h2 class="modal-title" style="color: #3b82f6">Histórico de Ativações</h2>
           <button type="button" class="btn-remove-class" onclick="this.closest('.modal-overlay').style.display = 'none'">×</button>
         </div>
         <div class="modal-body" id="historico-lista">

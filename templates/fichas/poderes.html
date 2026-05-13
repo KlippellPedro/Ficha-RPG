@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../../statics/css/menu.css" />
     <link rel="stylesheet" href="../../statics/css/fichas/inventario.css" />
     <link rel="stylesheet" href="../../statics/css/fichas/habilidades.css" />
+    <link rel="stylesheet" href="../../statics/css/fichas/ficha_modais.css" />
     <script src="../../statics/js/global.js"></script>
     <script src="../../statics/js/menu.js"></script>
     <script src="../../statics/js/fichas/poderes.js"></script>
@@ -79,6 +80,35 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn-save-modal" onclick="salvarDetalhesPod()">Salvar e Fechar</button>
+        </div>
+      </div>
+    </div>
+    <div id="modal-pod-buffs" class="modal-overlay">
+      <div class="modal-content-box" style="max-width: 450px; border-color: #ff4444">
+        <h2 class="modal-title" style="color: #ff4444">Configurar Buffs do Poder</h2>
+        <div id="pod-buffs-container" style="margin: 20px 0; max-height: 300px; overflow-y: auto; padding-right: 10px">
+          <!-- Linhas de bônus geradas via JS -->
+        </div>
+        <button type="button" class="btn-add-class" style="width: 100%; margin-bottom: 20px" onclick="adicionarLinhaBuffPoder()">
+          + Adicionar Outro Bônus
+        </button>
+        <div style="display: flex; gap: 10px; justify-content: flex-end">
+          <button
+            type="button"
+            class="btn-modal-close"
+            style="width: auto; margin-top: 0; padding: 8px 20px; background: #555"
+            onclick="fecharModalBuffPod()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn-save-modal"
+            style="padding: 8px 20px; background: #ff4444; color: white; border: 1px solid #991b1b"
+            onclick="salvarBuffsPoder()"
+          >
+            Salvar Buffs
+          </button>
         </div>
       </div>
     </div>

@@ -168,11 +168,15 @@ function verificarExtraDeusEscolhido(dados) {
     const h1 = dados.hibrido_raca_1 || "";
     const h2 = dados.hibrido_raca_2 || "";
 
+    const isDeus = racaKey === "deus" || (racaKey === "hibrido" && (h1 === "deus" || h2 === "deus"));
     const isSpecialRaca = ["deus", "escolhido"].includes(racaKey) ||
         (racaKey === "hibrido" && (["deus", "escolhido"].includes(h1) || ["deus", "escolhido"].includes(h2)));
 
     const extraEl = document.getElementById("deus-escolhido-extra");
     if (extraEl) extraEl.style.display = isSpecialRaca ? 'block' : 'none';
+
+    const headerExtra = document.getElementById("deus-raca-header");
+    if (headerExtra) headerExtra.style.display = isDeus ? 'flex' : 'none';
 }
 
 function verificarCorrompido(dados) {

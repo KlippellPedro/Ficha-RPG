@@ -71,6 +71,10 @@
             <label>Família da Fada</label>
             <input type="text" id="fada_familia" class="save-input header-input" placeholder="Ex: Inverno" />
           </div>
+          <div id="deus-raca-header" class="input-group" style="display: none">
+            <label>Deus do(a)</label>
+            <input type="text" id="deus_dominio_raca" class="save-input header-input" placeholder="Ex: Trovão" />
+          </div>
           <div id="hibrido-extra" class="input-group grid-span-2" style="display: none">
             <label>Raças Híbridas (Escolha 2)</label>
             <div style="display: flex; gap: 10px">
@@ -324,6 +328,10 @@
           <label>Divindade</label>
           <input type="text" id="deus_divindade" class="save-input header-input" placeholder="Nome da Divindade" />
         </div>
+        <div class="input-group">
+          <label>Deus de...</label>
+          <input type="text" id="deus_dominio" class="save-input header-input" placeholder="Ex: Trovão, Guerra..." />
+        </div>
       </div>
 
       <div id="section-diplomata" class="combat-header-row" style="display: none">
@@ -448,27 +456,6 @@ DESSA PRA MELHOR: Intangibilidade, visão noturna + objeto amado.&#10;CONTRATO C
         <textarea class="trait-textarea" style="height: 60px" readonly>
 MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por semana.&#10;PONTO FRACO: Itens feitos de madeira excelente causam x3 de dano.</textarea
         >
-      </div>
-      <div id="deus-escolhido-extra" class="extra-section-block" style="display: none">
-        <label class="extra-section-label">BÔNUS CUSTOMIZÁVEIS</label>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; padding: 10px">
-          <div class="input-group">
-            <label>Vida Extra</label>
-            <input type="number" id="pv_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
-          </div>
-          <div class="input-group">
-            <label>Mana Extra</label>
-            <input type="number" id="pm_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
-          </div>
-          <div class="input-group">
-            <label>Defesa Extra</label>
-            <input type="number" id="defesa_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
-          </div>
-          <div class="input-group">
-            <label>Movimento Extra</label>
-            <input type="number" id="movimento_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
-          </div>
-        </div>
       </div>
       <div id="deus-escolhido-extra" class="extra-section-block" style="display: none">
         <label class="extra-section-label">BÔNUS CUSTOMIZÁVEIS</label>
@@ -645,6 +632,32 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
           </div>
         </div>
         <button type="button" class="btn-modal-close" onclick="fecharModalCientistaSubclasse()">Fechar</button>
+      </div>
+    </div>
+
+    <!-- Modais de Poderes -->
+    <div id="modal-pod" class="modal-overlay">
+      <div class="modal-content-box">
+        <div class="modal-header">
+          <h2 id="modal-pod-title" class="modal-title">Detalhes do Poder</h2>
+        </div>
+        <div id="modal-pod-body" class="modal-body"></div>
+        <div class="modal-footer"></div>
+        <button type="button" class="btn-modal-close" onclick="fecharModalPod()">Fechar</button>
+      </div>
+    </div>
+
+    <div id="modal-pod-buffs" class="modal-overlay">
+      <div class="modal-content-box" style="max-width: 450px; border-color: #ff4444">
+        <h2 class="modal-title" style="color: #ff4444">Configurar Buffs</h2>
+        <div id="pod-buffs-container" class="modal-body"></div>
+        <button type="button" class="btn-add-class" style="width: 100%" onclick="adicionarLinhaBuffPoder()">+ Adicionar Bônus</button>
+        <div class="modal-footer" style="margin-top: 20px; justify-content: flex-end">
+          <button type="button" class="btn-modal-close" style="width: auto; margin-top: 0; padding: 8px 20px" onclick="fecharModalBuffPod()">
+            Cancelar
+          </button>
+          <button type="button" class="btn-save-modal" style="padding: 8px 20px" onclick="salvarBuffsPoder()">Salvar</button>
+        </div>
       </div>
     </div>
   </body>

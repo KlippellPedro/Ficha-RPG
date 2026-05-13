@@ -157,7 +157,7 @@
 .item-row.equipped-row {
   background: linear-gradient(90deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 68, 68, 0.02) 100%);
   border-left: 4px solid #ff4444;
-  box-shadow: 
+  box-shadow:
     inset 5px 0 15px rgba(255, 68, 68, 0.05),
     0 2px 10px rgba(0, 0, 0, 0.3);
 }
@@ -342,76 +342,6 @@
   background: rgba(255, 68, 68, 0.1);
 }
 
-/* Modal de Descrição */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 2000;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(5px);
-}
-
-.modal-content {
-  background: var(--bg-card);
-  border: 2px solid #ff4444;
-  border-radius: 12px;
-  width: 95%;
-  max-width: 500px;
-  padding: 25px;
-  box-shadow: 0 0 30px rgba(255, 68, 68, 0.3);
-  display: flex;
-  flex-direction: column;
-  gap: 25px; /* Maior separação entre os blocos principais */
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 10px;
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 25px; /* Maior separação entre as linhas de inputs */
-  margin-top: 10px;
-  max-height: 70vh;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-.modal-body .input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.btn-save-modal {
-  background: #ff4444;
-  color: #000;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
 .btn-save-modal:hover {
   filter: brightness(1.2);
 }
@@ -493,7 +423,9 @@ select.inv-input option {
 }
 .rarity-especial {
   color: #00faee;
-  text-shadow: 0 0 15px rgba(0, 250, 238, 0.6), 0 0 5px rgba(255, 255, 255, 0.3);
+  text-shadow:
+    0 0 15px rgba(0, 250, 238, 0.6),
+    0 0 5px rgba(255, 255, 255, 0.3);
   font-weight: 900;
   letter-spacing: 0.5px;
 }

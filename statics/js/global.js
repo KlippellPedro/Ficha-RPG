@@ -17,25 +17,42 @@ function atualizarTudo() {
         }
     }
 
-    // Obtém racaKey cedo para uso em múltiplas funções
-    const racaEl = document.getElementById("raca");
-    const racaKey = (racaEl && racaEl.value) ? racaEl.value : (dados.raca || "nenhuma"); // Fallback para dados salvos se o elemento estiver vazio
-
-    // 1. Calcula Nível Total (Baseado nas classes salvas ou na tela)
-    const nivelTotal = calcularNivelTotalEngine(dados);
-
-    // 2. Coleta dados de todos os inputs marcados para salvamento
+    // 1. Coleta dados de todos os inputs marcados para salvamento PRIMEIRO
     const inputsParaSalvar = document.querySelectorAll(".save-input");
     inputsParaSalvar.forEach(input => {
         const val = input.type === "checkbox" ? input.checked : input.value;
         dados[input.id] = val;
     });
 
+    // 2. Calcula Nível Total com base nos dados recém coletados
+    const nivelTotal = calcularNivelTotalEngine(dados);
+
+    const racaEl = document.getElementById("raca");
+    const racaKey = dados.raca || "nenhuma";
+
     // 3. Resolve Nível e Atributos (Shared)
     dados.nivel = nivelTotal;
     if (document.getElementById("nivel")) document.getElementById("nivel").value = nivelTotal;
 
     const bonusItens = calcularBonusItens(dados);
+
+    // Soma bônus vindos de Poderes (Buffs passivos)
+    Object.keys(dados).forEach(key => {
+        if (key.startsWith('poder_pv_bonus_')) bonusItens['pv_max'] = (bonusItens['pv_max'] || 0) + (parseInt(dados[key]) || 0);
+        if (key.startsWith('poder_pm_bonus_')) bonusItens['pm_max'] = (bonusItens['pm_max'] || 0) + (parseInt(dados[key]) || 0);
+
+        // Bônus vindos de Modificações dinâmicas de Poderes (JSON)
+        if (key.startsWith('poder_mods_') && typeof dados[key] === 'string' && dados[key].startsWith('[')) {
+            try {
+                const mods = JSON.parse(dados[key]);
+                mods.forEach(m => {
+                    if (m.attr && m.attr !== 'nenhum') {
+                        bonusItens[m.attr] = (bonusItens[m.attr] || 0) + (parseInt(m.mod) || 0);
+                    }
+                });
+            } catch (e) { console.error("Erro ao processar modificações do poder:", key); }
+        }
+    });
 
     // Adiciona bônus manuais para as raças Deus e Escolhido (customizáveis pelo player)
     const isDeusEscolhido = ["deus", "escolhido"].includes(racaKey) ||
@@ -224,7 +241,7 @@ function calcularBonusItens(dados) {
 
             // 5. Bônus de Raridade e Buffs Mágicos (Para todos os itens)
             const raroRaw = dados[`inv_raro_${id}`];
-            if (raroRaw && typeof raroRaw === 'string' && raroRaw.startsWith('{')) {
+            if (raroRaw && typeof raroRaw === 'string' && raroRaw.startsWith('{') && raroRaw.endsWith('}')) {
                 try {
                     const raroData = JSON.parse(raroRaw);
                     if (raroData.attributes && Array.isArray(raroData.attributes)) {
@@ -238,7 +255,7 @@ function calcularBonusItens(dados) {
                             }
                         });
                     }
-                } catch (e) { console.error(`Erro nos buffs de raridade do item ${id}`); }
+                } catch (e) { /* Silencia erro de parsing durante edição ou dados incompletos */ }
             }
         }
     });
