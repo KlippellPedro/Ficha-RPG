@@ -418,16 +418,29 @@ select.inv-input option {
   text-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
 }
 .rarity-mitico {
-  color: #f59e0b;
-  text-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+  color: #ff4444 !important;
+  text-shadow: 0 0 15px rgba(255, 68, 68, 0.8);
+  font-weight: bold !important;
 }
 .rarity-especial {
-  color: #00faee;
-  text-shadow:
-    0 0 15px rgba(0, 250, 238, 0.6),
-    0 0 5px rgba(255, 255, 255, 0.3);
-  font-weight: 900;
-  letter-spacing: 0.5px;
+  color: #00d4ff !important;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.9);
+  font-weight: bold !important;
+  animation: rarity-reliquia-glow 2s infinite ease-in-out;
+}
+
+@keyframes rarity-reliquia-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow:
+      0 0 25px rgba(0, 212, 255, 1),
+      0 0 10px rgba(255, 255, 255, 0.5);
+    filter: brightness(1.5);
+  }
 }
 
 @keyframes fadeIn {

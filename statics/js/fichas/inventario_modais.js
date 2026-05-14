@@ -148,7 +148,17 @@ function abrirModalItem(index) {
     }
 
     body.innerHTML = htmlExtra;
-    if (document.getElementById('modal_raro')) document.getElementById('modal_raro').value = raroRaw;
+
+    // Garante que o select de raridade (se existir) mostre o valor correto, mesmo que venha de um JSON
+    const modalRaroSimple = document.getElementById('modal_raro');
+    if (modalRaroSimple) {
+        let rVal = raroRaw;
+        if (raroRaw && raroRaw.startsWith('{')) {
+            try { rVal = JSON.parse(raroRaw).raridade || 'comum'; } catch (e) { rVal = 'comum'; }
+        }
+        modalRaroSimple.value = rVal;
+    }
+
     if (document.getElementById('modal_attr')) document.getElementById('modal_attr').value = modAttr;
     if (document.getElementById('modal_tipo')) document.getElementById('modal_tipo').value = document.getElementById(`inv_tipo_${index}`).value || "";
     if (document.getElementById('modal_alcance')) document.getElementById('modal_alcance').value = document.getElementById(`inv_alcance_${index}`).value || "toque";
@@ -411,8 +421,14 @@ function salvarDetalhesItem() {
         document.getElementById(`inv_qtd_${idx}`).value = document.getElementById('modal_qtd').value;
 
         const categoria = document.getElementById(`inv_cat_${idx}`).value;
-        if (document.getElementById('modal_raro')) {
-            document.getElementById(`inv_raro_${idx}`).value = document.getElementById('modal_raro').value;
+
+        // Só atualiza inv_raro se o select simples de raridade existir no modal
+        const modalRaroSimple = document.getElementById('modal_raro');
+        if (modalRaroSimple) {
+            // Se for um item simples, salva apenas a string. 
+            // Se já for um JSON, mantém a estrutura mas atualiza o campo 'raridade'
+            let currentRarity = document.getElementById(`inv_raro_${idx}`).value;
+            document.getElementById(`inv_raro_${idx}`).value = modalRaroSimple.value;
         }
 
         document.getElementById(`inv_attr_${idx}`).value = document.getElementById('modal_attr').value;

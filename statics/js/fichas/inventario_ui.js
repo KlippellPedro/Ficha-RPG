@@ -283,14 +283,31 @@ function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "o
     if (equipado) row.classList.add('equipped-row');
     row.dataset.index = index;
 
+    // Normaliza a raridade para um objeto estruturado
+    let raroObj = { raridade: 'comum', attributes: [] };
+    try {
+        if (typeof raridade === 'object' && raridade !== null) {
+            raroObj = raridade;
+        } else if (raridade && raridade.toString().startsWith('{')) {
+            raroObj = JSON.parse(raridade);
+        } else {
+            raroObj.raridade = raridade || 'comum';
+        }
+    } catch (e) {
+        console.warn("Erro ao processar raridade do item:", e);
+    }
+
+    const baseRarity = raroObj.raridade || 'comum';
+
     // Escapa aspas duplas para JSONs em atributos HTML
     const escapedCabo = (typeof cabo === 'object' ? JSON.stringify(cabo) : cabo || '{}').replace(/"/g, '&quot;');
     const escapedBase = (typeof base === 'object' ? JSON.stringify(base) : base || '{}').replace(/"/g, '&quot;');
     const escapedMods = (typeof modificacoes === 'object' ? JSON.stringify(modificacoes) : modificacoes || '{}').replace(/"/g, '&quot;');
+    const escapedRaro = JSON.stringify(raroObj).replace(/"/g, '&quot;');
 
     row.innerHTML = `
         <input type="checkbox" id="inv_eqp_${index}" class="save-input inv-checkbox" ${equipado ? 'checked' : ''} onchange="verificarTipoItem('${index}'); ordenarItens(); filtrarItens(); atualizarTudo()">
-        <input type="text" id="inv_nome_${index}" class="save-input inv-input rarity-${raridade}" value="${nome}" placeholder="Nome do item" oninput="verificarTipoItem('${index}')" onblur="ordenarItens(); filtrarItens();">
+        <input type="text" id="inv_nome_${index}" class="save-input inv-input rarity-${baseRarity}" value="${nome}" placeholder="Nome do item" oninput="verificarTipoItem('${index}')" onblur="ordenarItens(); filtrarItens();">
         <select id="inv_cat_${index}" class="save-input inv-input" onchange="verificarTipoItem('${index}'); ordenarItens(); filtrarItens(); atualizarTudo()">
             ${optionsCat.map(opt => `<option value="${opt.v}" ${categoria === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
         </select>
@@ -313,7 +330,7 @@ function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "o
             <input type="hidden" id="inv_efeito_${index}" class="save-input" value="${efeito || ''}">
             <input type="hidden" id="inv_attr_${index}" class="save-input" value="${attr_mod || 'nenhum'}">
             <input type="hidden" id="inv_mod_${index}" class="save-input" value="${val_mod || 0}">
-            <input type="hidden" id="inv_raro_${index}" class="save-input" value="${raridade || 'comum'}">
+            <input type="hidden" id="inv_raro_${index}" class="save-input" value="${escapedRaro}">
             <input type="hidden" id="inv_peso_${index}" class="save-input item-peso" value="${peso || 0}">
             <input type="hidden" id="inv_qtd_${index}" class="save-input item-qtd" value="${qtd || 1}">
             <input type="hidden" id="inv_desc_${index}" class="save-input" value="${desc || ''}">

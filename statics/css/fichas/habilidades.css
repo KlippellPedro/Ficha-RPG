@@ -190,3 +190,46 @@
   background: rgba(59, 130, 246, 0.1);
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
 }
+
+/* --- Cores e Efeitos de Raridade de Itens --- */
+.rarity-comum {
+  color: #ffffff !important;
+}
+.rarity-incomum {
+  color: #4ade80 !important;
+}
+.rarity-raro {
+  color: #3b82f6 !important;
+}
+.rarity-epico {
+  color: #a855f7 !important;
+}
+
+/* Mítico: Vermelho com Brilho */
+.rarity-mitico {
+  color: #ff4444 !important;
+  text-shadow: 0 0 15px rgba(255, 68, 68, 0.8);
+  font-weight: bold !important;
+}
+
+/* Relíquia (Especial): Azul com Brilho e Pulsação */
+.rarity-especial {
+  color: #00d4ff !important;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.9);
+  font-weight: bold !important;
+  animation: rarity-reliquia-glow 2s infinite ease-in-out;
+}
+
+@keyframes rarity-reliquia-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow:
+      0 0 25px rgba(0, 212, 255, 1),
+      0 0 10px rgba(255, 255, 255, 0.5);
+    filter: brightness(1.5);
+  }
+}
