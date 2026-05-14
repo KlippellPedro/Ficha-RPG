@@ -334,8 +334,48 @@
               ></textarea>
             </div>
           </div>
+
+          <!-- Coluna 5: Condições (Parecido com Resistências) -->
+          <div class="combat-col flex-grow">
+            <div class="input-group" style="height: 100%">
+              <label>Condições Ativas</label>
+              <textarea id="condicao" class="save-input detail-textarea" style="flex: 1" placeholder="Ex: Envenenado (3 turnos), Caído..."></textarea>
+            </div>
+          </div>
         </section>
       </header>
+
+      <!-- Seção de Ações de Combate -->
+      <div class="actions-hud-section">
+        <div class="actions-container">
+          <div class="action-item">
+            <label>Ação Padrão</label>
+            <div class="counter-control">
+              <button type="button" onclick="alterarValor('acao_padrao', -1)">-</button>
+              <input type="number" id="acao_padrao" class="save-input counter-input" value="1" />
+              <button type="button" onclick="alterarValor('acao_padrao', 1)">+</button>
+            </div>
+          </div>
+
+          <div class="action-item">
+            <label>Ação Movimento</label>
+            <div class="counter-control">
+              <button type="button" onclick="alterarValor('acao_movimento', -1)">-</button>
+              <input type="number" id="acao_movimento" class="save-input counter-input" value="1" />
+              <button type="button" onclick="alterarValor('acao_movimento', 1)">+</button>
+            </div>
+          </div>
+
+          <div class="action-item">
+            <label>Turnos</label>
+            <div class="counter-control">
+              <button type="button" onclick="alterarValor('turnos', -1)">-</button>
+              <input type="number" id="turnos" class="save-input counter-input" value="0" />
+              <button type="button" onclick="alterarValor('turnos', 1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Seções Específicas de Classes -->
       <div id="section-lutador" class="combat-header-row" style="display: none">

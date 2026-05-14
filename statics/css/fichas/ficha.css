@@ -117,7 +117,7 @@
 .combat-header-row {
   margin-top: 25px;
   display: grid;
-  grid-template-columns: 180px 180px 1fr 1fr; /* Dividindo o espaço entre Resistências e Proficiências */
+  grid-template-columns: 180px 180px 1fr 1fr 1fr; /* Adicionado espaço para Condições */
   gap: 20px;
   padding-top: 15px;
   border-top: 1px dashed rgba(255, 255, 255, 0.1);
@@ -809,6 +809,64 @@
   box-shadow: 0 0 10px #ff8800;
   border-radius: 2px;
   filter: blur(0.5px);
+}
+.combat-status-section {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin: 20px auto; /* Centraliza o painel na página */
+  width: fit-content; /* Ajusta a largura ao conteúdo */
+  min-width: 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.actions-container {
+  display: flex;
+  flex-direction: row; /* Volta os campos para o layout horizontal */
+  gap: 30px; /* Espaçamento entre os grupos de ação */
+  align-items: flex-end;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.counter-control {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.counter-control button {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: white;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.counter-control button:hover {
+  background: var(--danger);
+  color: black;
+}
+
+.counter-input {
+  width: 45px;
+  text-align: center;
+  border: none !important;
+  background: transparent !important;
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
 @keyframes float-up {

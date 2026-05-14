@@ -13,7 +13,7 @@ function getOpcoesClassesHab(valorSelecionado = "") {
     const classes = getClassesAtivas(dados);
     let opcoes = `<option value="Geral" ${valorSelecionado === 'Geral' || !valorSelecionado ? 'selected' : ''}>Geral</option>`;
     opcoes += `<option value="Raça" ${valorSelecionado === 'Raça' ? 'selected' : ''}>Raça</option>`;
-    opcoes += `<option value="Povo" ${valorSelecionado === 'Povo' ? 'selected' : ''}>Povo</option>`;
+    opcoes += `<option value="Ancião" ${valorSelecionado === 'Ancião' ? 'selected' : ''}>Ancião</option>`;
     opcoes += `<option value="Outro" ${valorSelecionado === 'Outro' ? 'selected' : ''}>Outro</option>`;
 
     classes.forEach(c => {
