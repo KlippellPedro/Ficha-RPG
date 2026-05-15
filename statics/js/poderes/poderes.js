@@ -1,0 +1,97 @@
+/**
+ * Orquestrador dos Poderes
+ */
+
+function usarPoder(index) {
+    const custoStr = document.getElementById(`poder_custo_${index}`).value.trim();
+    const tipoCusto = document.getElementById(`poder_tipo_custo_${index}`).value;
+    const custo = parseInt(custoStr);
+    if (isNaN(custo) || custo <= 0) return showNotification("Defina um custo numérico válido e positivo.", 'warning');
+
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    const racaKey = dados.raca || "nenhuma";
+    const h1 = dados.hibrido_raca_1 || "";
+    const h2 = dados.hibrido_raca_2 || "";
+    const isCorrompido = racaKey === "corrompido" || (racaKey === "hibrido" && (h1 === "corrompido" || h2 === "corrompido"));
+
+    if (tipoCusto === "PM") {
+        if (isCorrompido) return usarPoderCorrompido(index, custo);
+        let recursoAtual = parseInt(dados.pm_atual) || 0;
+        let recursoMax = parseInt(dados.pm_max) || 0;
+        if (recursoAtual < custo) return showNotification(`Mana insuficiente! Você tem ${recursoAtual} PM, mas precisa de ${custo} PM.`, 'error');
+
+        recursoAtual -= custo;
+        dados.pm_atual = recursoAtual;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        registrarHistorico(document.getElementById(`poder_nome_${index}`).value || "Poder", custo, tipoCusto);
+        showNotification(`Poder usado! ${custo} PM subtraídos. Mana atual: ${recursoAtual}/${recursoMax}.`, 'success');
+        atualizarTudo();
+    } else if (tipoCusto === "PV") {
+        let recursoAtual = parseInt(dados.pv_atual) || 0;
+        let recursoMax = parseInt(dados.pv_max) || 0;
+        if (recursoAtual < custo) return showNotification(`Vida insuficiente! Você tem ${recursoAtual} PV, mas precisa de ${custo} PV.`, 'error');
+
+        recursoAtual -= custo;
+        dados.pv_atual = recursoAtual;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        registrarHistorico(document.getElementById(`poder_nome_${index}`).value || "Poder", custo, tipoCusto);
+        showNotification(`Poder usado! ${custo} PV subtraídos. Vida atual: ${recursoAtual}/${recursoMax}.`, 'success');
+        atualizarTudo();
+    } else if (tipoCusto === "Outro") {
+        showNotification(`Poder custa ${custo} de um recurso "Outro". Gerencie isso manualmente.`, 'info');
+        atualizarTudo(); // Apenas para garantir que a UI seja atualizada
+    } else { showNotification("Gerencie esse custo manualmente.", 'info'); }
+    // Não é necessário chamar atualizarEstiloCustoPoder(index) aqui, pois atualizarTudo() já fará isso globalmente.
+}
+
+function usarPoderCorrompido(index, custo) {
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    let recursoAtual = parseInt(dados.pv_atual) || 0;
+
+    if (recursoAtual < custo) {
+        return showNotification(`Vitalidade insuficiente para corrupção!`, 'error'); //
+    }
+
+    recursoAtual -= custo;
+    dados.pv_atual = recursoAtual;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    registrarHistorico(document.getElementById(`poder_nome_${index}`).value || "Poder", custo, "Corrupção");
+    showNotification(`Poder usado via Corrupção! -${custo} Vitalidade.`, 'success');
+    atualizarTudo();
+    return true;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    const indices = Object.keys(salvo)
+        .filter(k => k.startsWith('poder_nome_'))
+        .map(k => k.replace('poder_nome_', ''));
+
+    if (indices.length > 0) {
+        indices.sort((a, b) => parseInt(a) - parseInt(b)).forEach(idx => {
+            adicionarPoderUI(
+                salvo[`poder_nome_${idx}`] || "",    // 1. nome
+                salvo[`poder_tipo_${idx}`] || "Poder de Classe", // 2. tipo
+                salvo[`poder_custo_${idx}`] || "",   // 3. custo
+                salvo[`poder_tipo_custo_${idx}`] || "PM", // 4. tipoCusto
+                salvo[`poder_desc_${idx}`] || "",    // 5. desc
+                parseInt(idx),                       // 6. idIndex
+                salvo[`poder_duracao_${idx}`] || "", // 7. duracao
+                salvo[`poder_alcance_${idx}`] || "", // 8. alcance
+                salvo[`poder_acao_${idx}`] || "",    // 9. acao
+                salvo[`poder_classe_${idx}`] || "",  // 10. classe
+                salvo[`poder_pv_bonus_${idx}`] || 0, // 11. pv_bonus
+                salvo[`poder_pm_bonus_${idx}`] || 0, // 12. pm_bonus
+                salvo[`poder_mods_${idx}`] || "[]"   // 13. mods
+            );
+        });
+    }
+
+    // Atualiza o dropdown de filtros para as classes/origens
+    atualizarFiltroPoderesUI();
+
+    // Chama atualizarTudo() uma única vez após carregar todos os elementos dinâmicos
+    atualizarTudo();
+    filtrarPoderes();
+});

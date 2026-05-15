@@ -1,0 +1,39 @@
+/* Estilos Gerais para Modais da Ficha */
+.modal-overlay {
+  /* Estilos base movidos para global_modals.css */
+}
+
+.modal-content-box,
+.modal-content {
+.modal-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+}
+
+.selection-option {
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s;
+  color: white;
+}
+
+.selection-option:hover {
+  background: rgba(255, 68, 68, 0.05);
+  border-color: #ff4444;
+}
+
+.btn-status-pos {
+  background: #1e3a8a;
+  border: 1px solid #3b82f6;
+  width: 100%;
+}
+.btn-status-neg {
+  background: #450a0a;
+  border: 1px solid #991b1b;
+  width: 100%;
+}

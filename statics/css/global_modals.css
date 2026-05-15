@@ -1,0 +1,182 @@
+/* Estilos Gerais para Modais */
+.modal-overlay {
+  display: none; /* Controlado via JS (flex/none) */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content-box,
+.modal-content {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 0 30px rgba(255, 68, 68, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+  position: relative;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-title {
+  color: var(--primary);
+  margin: 0 auto;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+}
+
+.modal-header .btn-remove-class {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  margin: 0;
+  line-height: 1;
+}
+
+.modal-text {
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  color: #ccc;
+}
+
+.modal-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+}
+
+.selection-option {
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s;
+  color: white;
+}
+
+.selection-option:hover {
+  background: rgba(255, 68, 68, 0.05);
+  border-color: var(--primary);
+}
+
+.btn-modal-close {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.btn-modal-close:hover {
+  background: #444;
+}
+
+.btn-save-modal {
+  background: var(--primary);
+  color: #000;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-save-modal:hover {
+  filter: brightness(1.2);
+}
+
+.btn-status-pos {
+  background: #1e3a8a;
+  border: 1px solid #3b82f6;
+  width: 100%;
+}
+.btn-status-neg {
+  background: #450a0a;
+  border: 1px solid #991b1b;
+  width: 100%;
+}
+
+/* Estilos para o modal de confirmação */
+#modal-confirm .modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+#modal-confirm .modal-title {
+    font-size: 1.2rem;
+}
+#modal-confirm .modal-body {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    gap: 15px;
+}
+#modal-confirm .modal-footer {
+    justify-content: center;
+    gap: 15px;
+}
+#modal-confirm .btn-confirm-yes {
+    background: var(--primary);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: filter 0.2s;
+}
+#modal-confirm .btn-confirm-yes:hover {
+    filter: brightness(1.2);
+}
+#modal-confirm .btn-confirm-no {
+    background: #555;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+#modal-confirm .btn-confirm-no:hover {
+    background: #777;
+}

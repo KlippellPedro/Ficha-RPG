@@ -1,0 +1,190 @@
+/* Estilos Específicos para Habilidades e Poderes */
+
+/* Alinhamento dos textos do cabeçalho com os botões abaixo */
+.inv-header span {
+  display: flex;
+  justify-content: flex-start;
+  text-align: left;
+  padding-left: 10px;
+}
+
+/* Centraliza colunas de ações e ícones (as últimas 4 colunas em todas as páginas) */
+.hab-header-grid span:nth-last-child(-n + 4),
+.pod-header-grid span:nth-last-child(-n + 4),
+.mag-header-grid span:nth-last-child(-n + 4),
+.atk-header-grid span:nth-last-child(-n + 3) {
+  justify-content: center;
+  padding-left: 0;
+  text-align: center;
+}
+
+.inv-header {
+  display: grid;
+  gap: 15px;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid #ff4444;
+  font-weight: bold;
+  color: #ff4444;
+  align-items: center;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Botões de Ação */
+.btn-open-desc {
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid #ff4444;
+  color: #ff4444;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  transition: 0.2s;
+  justify-self: center;
+}
+
+.btn-open-desc:hover {
+  background: #ff4444;
+  color: #000;
+}
+
+.btn-add-card {
+  margin: 30px auto;
+  display: block;
+  background: transparent;
+  border: 2px dashed #ff4444;
+  color: #ff4444;
+  padding: 15px 40px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+.btn-add-card:hover {
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 12px 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid #ff4444;
+}
+
+.search-group {
+  flex: 1;
+}
+
+/* Container de Custo (Input + Select) */
+.cost-container {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* Definição das colunas para Habilidades e Poderes */
+.hab-header-grid,
+.hab-row-grid {
+  /* Nome | Classe | Custo+Recurso | Info | Usar | Dup | X */
+  display: grid; /* Removido !important */
+  grid-template-columns: 2fr 160px 180px 50px 70px 50px 40px;
+}
+
+.pod-header-grid,
+.pod-row-grid {
+  /* Nome | Tipo | Custo+Recurso | Info | Usar | Dup | X */
+  display: grid; /* Removido !important */
+  grid-template-columns: 2fr 110px 160px 50px 60px 50px 40px; /* Removido !important */
+}
+
+/* Estilo para o botão "Usar Habilidade" */
+.btn-use-skill {
+  background: #4ade80; /* Verde */
+  color: #000;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-use-skill:hover {
+  filter: brightness(1.1);
+}
+
+/* Estilos para feedback de custo de Mana */
+.item-row.mana-ok {
+  border-left-color: #4ade80; /* Verde */
+}
+
+.item-row.mana-insufficient {
+  border-left-color: #ff4444; /* Vermelho */
+}
+
+.btn-history {
+  background: transparent;
+  border: 2px dashed #3b82f6;
+  color: #3b82f6;
+  padding: 15px;
+  cursor: pointer;
+  margin-top: 15px;
+  border-radius: 8px;
+  transition: 0.3s;
+  font-weight: bold;
+  margin-left: 10px;
+}
+.btn-history:hover {
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+}
+
+/* --- Cores e Efeitos de Raridade de Itens --- */
+.rarity-comum {
+  color: #ffffff !important;
+}
+.rarity-incomum {
+  color: #4ade80 !important;
+}
+.rarity-raro {
+  color: #3b82f6 !important;
+}
+.rarity-epico {
+  color: #a855f7 !important;
+}
+
+/* Mítico: Vermelho com Brilho */
+.rarity-mitico {
+  color: #ff4444 !important;
+  text-shadow: 0 0 15px rgba(255, 68, 68, 0.8);
+  font-weight: bold !important;
+}
+
+/* Relíquia (Especial): Azul com Brilho e Pulsação */
+.rarity-especial {
+  color: #00d4ff !important;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.9);
+  font-weight: bold !important;
+  animation: rarity-reliquia-glow 2s infinite ease-in-out;
+}
+
+@keyframes rarity-reliquia-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow:
+      0 0 25px rgba(0, 212, 255, 1),
+      0 0 10px rgba(255, 255, 255, 0.5);
+    filter: brightness(1.5);
+  }
+}

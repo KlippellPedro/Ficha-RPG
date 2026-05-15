@@ -79,42 +79,96 @@ h1 {
   color: var(--primary);
   letter-spacing: 2px;
 }
-/* Global Notification */
-#global-notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: rgba(30, 30, 35, 0.95);
-  color: white;
-  padding: 15px 25px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  z-index: 3000;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-20px);
-  transition: opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0.3s ease-out;
+
+/* --- Framework de Layout (Comum a todas as páginas) --- */
+.container {
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6);
+  width: 95%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  border: 1px solid var(--border-color);
+  margin: 120px auto 40px auto;
+  box-sizing: border-box;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.filter-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  border-left: 5px solid;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 12px 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary);
 }
 
-#global-notification.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+.inv-input {
+  background: var(--bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 0.9rem;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
-#global-notification.info { border-color: #3b82f6; } /* Azul */
-#global-notification.success { border-color: #4ade80; } /* Verde */
-#global-notification.error { border-color: #ff4444; } /* Vermelho */
-#global-notification.warning { border-color: #f59e0b; } /* Laranja */
-
-#global-notification .icon {
-  font-size: 1.2rem;
+.inv-input:focus {
+  border-color: var(--primary);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 8px rgba(255, 68, 68, 0.3);
 }
 
-#global-notification .message {
-  font-size: 0.95rem;
+/* --- Padrão de Listas (Inventário, Magias, Poderes, etc) --- */
+.inventory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.item-row {
+  display: grid;
+  gap: 15px;
+  padding: 8px 20px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Animações Globais */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

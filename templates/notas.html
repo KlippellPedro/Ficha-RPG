@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notas - Supremacia do Protesto</title>
+    <link rel="stylesheet" href="../statics/css/global.css" />
+    <link rel="stylesheet" href="../statics/css/global_modals.css" />
+    <link rel="stylesheet" href="../statics/css/menu.css" />
+    <link rel="stylesheet" href="../statics/css/habilidades/habilidades.css" />
+    <link rel="stylesheet" href="../statics/css/notas/notas.css" />
+    <script src="../statics/js/global.js"></script>
+    <script src="../statics/js/global_modals.js"></script>
+    <script src="../statics/js/menu.js"></script>
+    <script src="../statics/js/notas/notas_ui.js"></script>
+    <script src="../statics/js/notas/modais/notas_modais.js"></script>
+    <script src="../statics/js/notas/notas.js"></script>
+  </head>
+  <body>
+    <nav class="top-menu">
+      <div class="menu-links"></div>
+    </nav>
+
+    <div id="global-notification">
+      <span class="icon"></span>
+      <span class="message"></span>
+    </div>
+
+    <div class="container">
+      <header>
+        <h1>NOTAS E DIÁRIO</h1>
+      </header>
+
+      <div class="filter-bar">
+        <div class="search-group">
+          <input type="text" id="search-nota" class="inv-input" placeholder="🔍 Pesquisar em títulos ou tipos..." oninput="filtrarNotas()" />
+        </div>
+        <button type="button" class="btn-open-desc" onclick="resetarFiltrosNota()" title="Limpar Filtros">🔄</button>
+      </div>
+
+      <div
+        id="notas-counter"
+        style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; padding-left: 5px"
+      >
+        Notas visíveis: 0
+      </div>
+
+      <div class="inv-header nota-header-grid">
+        <span>★</span>
+        <span>Título da Nota</span>
+        <span>Tipo / Marcador</span>
+        <span>Info</span>
+        <span>Dup</span>
+        <span>X</span>
+      </div>
+
+      <section id="notas-container" class="inventory-list"></section>
+
+      <button type="button" class="btn-add-card" onclick="adicionarNotaUI()">+ Criar Nova Nota</button>
+      <button type="button" class="btn-clear-inventory" onclick="limparNotas()">Apagar Tudo</button>
+    </div>
+  </body>
+</html>

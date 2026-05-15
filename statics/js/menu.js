@@ -2,12 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuContainer = document.querySelector('.menu-links');
     if (!menuContainer) return;
 
-    // Detecta se estamos dentro da pasta de fichas ou na raiz
-    // Isso evita o erro de caminhos duplicados (templates/templates/...)
-    const isFichaFolder = window.location.pathname.includes('/fichas/');
+    // Detecta se estamos dentro da pasta templates ou na raiz
+    const isInTemplates = window.location.pathname.includes('/templates/');
 
-    const prefix = isFichaFolder ? '' : 'templates/fichas/';
-    const homePrefix = isFichaFolder ? '../../' : '';
+    const prefix = isInTemplates ? '' : 'templates/';
+    const homePrefix = isInTemplates ? '../' : '';
 
     // Definição dos campos padrão do menu
     const menuItems = [

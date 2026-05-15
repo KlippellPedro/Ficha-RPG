@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habilidades - Supremacia do Protesto</title>
+    <link rel="stylesheet" href="../statics/css/global.css" />
+    <link rel="stylesheet" href="../statics/css/global_modals.css" />
+    <link rel="stylesheet" href="../statics/css/menu.css" />
+    <link rel="stylesheet" href="../statics/css/inventario/inventario.css" />
+    <link rel="stylesheet" href="../statics/css/habilidades/habilidades.css" />
+    <!-- Opcional: Para herdar estilos de modal caso prefira -->
+    <script src="../statics/js/global.js"></script>
+    <script src="../statics/js/global_modals.js"></script>
+    <script src="../statics/js/menu.js"></script>
+    <script src="../statics/js/habilidades/habilidades_ui.js"></script>
+    <script src="../statics/js/habilidades/modais/habilidades_modais.js"></script>
+    <script src="../statics/js/habilidades/habilidades.js"></script>
+  </head>
+  <body>
+    <!-- Menu Superior Dinâmico -->
+    <nav class="top-menu">
+      <div class="menu-links"></div>
+    </nav>
+
+    <!-- Global Notification Area -->
+    <div id="global-notification">
+      <span class="icon"></span>
+      <span class="message"></span>
+    </div>
+
+    <div class="container">
+      <header>
+        <h1>HABILIDADES</h1>
+      </header>
+
+      <div class="filter-bar">
+        <div class="search-group">
+          <input
+            type="text"
+            id="search-habilidade"
+            class="inv-input"
+            placeholder="🔍 Pesquisar habilidade pelo nome..."
+            oninput="filtrarHabilidades()"
+          />
+        </div>
+        <select id="filter-habilidade-tipo" class="inv-input" style="max-width: 150px" onchange="filtrarHabilidades()">
+          <option value="todos">Todos os Tipos</option>
+          <option value="Ativa">Ativa</option>
+          <option value="Passiva">Passiva</option>
+          <option value="Reação">Reação</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <select id="filter-habilidade-classe" class="inv-input" style="max-width: 150px" onchange="filtrarHabilidades()">
+          <option value="todos">Todas as Fontes</option>
+          <!-- Preenchido via JS -->
+        </select>
+        <button type="button" class="btn-open-desc" onclick="resetarFiltrosHabilidades()" title="Limpar Filtros">🔄</button>
+      </div>
+
+      <div
+        id="habilidades-counter"
+        style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; padding-left: 5px"
+      >
+        Habilidades visíveis: 0
+      </div>
+
+      <div class="inv-header hab-header-grid">
+        <span>Nome</span>
+        <span>Tipo</span>
+        <span>Custo</span>
+        <span>Info</span>
+        <span>Usar</span>
+        <span>Dup</span>
+        <span>X</span>
+      </div>
+
+      <section id="habilidades-container" class="inventory-list">
+        <!-- Injetado via JS -->
+      </section>
+
+      <button type="button" class="btn-add-card" onclick="adicionarHabilidadeUI()">+ Adicionar Nova Habilidade</button>
+      <button type="button" class="btn-clear-inventory" onclick="limparHabilidades()">Limpar Habilidades</button>
+      <button type="button" class="btn-history" onclick="abrirModalHistorico()">📜 Histórico de Uso</button>
+    </div>
+  </body>
+</html>

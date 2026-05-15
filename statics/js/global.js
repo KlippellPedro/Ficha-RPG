@@ -701,43 +701,6 @@ function showNotification(message, type = 'info', duration = 5000) {
     notificationTimeout = setTimeout(() => notificationEl.classList.remove('show'), duration);
 }
 
-/**
- * Registra o uso de uma habilidade ou poder no histórico
- */
-function registrarHistorico(nome, custo, tipoCusto) {
-    let historico = [];
-    try {
-        historico = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-    } catch (e) { historico = []; }
-
-    historico.unshift({
-        nome: nome,
-        custo: custo,
-        tipoCusto: tipoCusto,
-        timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-    });
-
-    if (historico.length > 20) historico.pop();
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(historico));
-}
-
-function abrirModalHistorico() {
-    const modal = document.getElementById('modal-historico');
-    const container = document.getElementById('historico-lista');
-    if (!modal || !container) return;
-
-    let historico = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-
-    container.innerHTML = historico.length ? historico.map(h => `
-        <div style="display:flex; justify-content:space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;">
-            <span><strong style="color:#ff4444">${h.nome}</strong> <small style="color:#888; margin-left:8px;">${h.timestamp}</small></span>
-            <span style="color:#4ade80">-${h.custo} ${h.tipoCusto}</span>
-        </div>
-    `).join('') : '<p style="text-align:center; color:#888; padding:30px;">Nenhum uso registrado recentemente.</p>';
-
-    modal.style.display = 'flex';
-}
-
 // Carregamento Inicial Genérico
 document.addEventListener('DOMContentLoaded', () => {
     try {
