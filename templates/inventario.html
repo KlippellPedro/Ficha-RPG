@@ -120,5 +120,24 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal para Modificações do Item -->
+    <div id="modal-item-mods" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 style="color: #ff4444; margin: 0">Modificações e Encantamentos</h3>
+          <button type="button" class="btn-remove-class" onclick="fecharModalModificacoes()">×</button>
+        </div>
+        <div class="modal-body">
+          <div id="modal-mods-container">
+            <!-- Linhas de modificação entram aqui -->
+          </div>
+          <button type="button" class="btn-add-class" onclick="adicionarLinhaModificacao()">+ Adicionar Modificação</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-save-modal" onclick="salvarDetalhesModificacoes()">Salvar Modificações</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

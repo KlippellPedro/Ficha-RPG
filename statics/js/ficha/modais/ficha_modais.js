@@ -47,10 +47,15 @@ function abrirModalCalculoGenerico(alias) {
 
     body.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 10px; text-align: left;">
-            ${items.map(item => `
+            ${items.map(item => {
+        const colored = item
+            .replace(/(\+\d+)/g, '<span style="color: #4ade80; font-weight: bold;">$1</span>')
+            .replace(/(\-\d+)/g, '<span style="color: #ff5f5f; font-weight: bold;">$1</span>');
+        return `
                 <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 3px solid #ff4444; font-size: 0.9rem;">
-                    ${item}
-                </div>`).join('')}
+                    ${colored}
+                </div>`;
+    }).join('')}
             <div style="margin-top: 10px; padding: 12px; background: rgba(255,68,68,0.1); border-radius: 4px; color: #ff4444; font-weight: bold; font-size: 1.1rem; text-align: center;">
                 Total: ${el.value}
             </div>

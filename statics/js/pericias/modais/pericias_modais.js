@@ -53,7 +53,12 @@ function mostrarAjudaSkill(skillSlug) {
     body.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
             ${formulaHtml}
-            ${items.map(item => `<div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 3px solid #ff4444; font-size: 0.85rem;">${item}</div>`).join('')}
+            ${items.map(item => {
+        const colored = item
+            .replace(/(\+\d+)/g, '<span style="color: #4ade80; font-weight: bold;">$1</span>')
+            .replace(/(\-\d+)/g, '<span style="color: #ff5f5f; font-weight: bold;">$1</span>');
+        return `<div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 3px solid #ff4444; font-size: 0.85rem;">${colored}</div>`;
+    }).join('')}
             ${treinoTabela}
             <div style="margin-top: 10px; padding: 12px; background: rgba(255,68,68,0.1); border-radius: 4px; color: #ff4444; font-weight: bold; font-size: 1.1rem; text-align: center;">Total: ${display.innerText}</div>
         </div>

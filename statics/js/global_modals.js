@@ -109,6 +109,23 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
+    // Modal de Ajuda de Cálculo (Usado na Ficha e Perícias)
+    const ajudaModalHtml = `
+        <div id="modal-calc-ajuda" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-calc-ajuda-title" class="modal-title">Cálculo</h3>
+                    <button type="button" class="btn-remove-class" onclick="this.closest('.modal-overlay').style.display = 'none'">×</button>
+                </div>
+                <div class="modal-body" id="modal-calc-ajuda-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-save-modal" style="width: 100%" onclick="this.closest('.modal-overlay').style.display = 'none'">Entendido</button>
+                </div>
+            </div>
+        </div>
+    `;
+
     body.insertAdjacentHTML('beforeend', confirmModalHtml);
     body.insertAdjacentHTML('beforeend', historicoModalHtml);
+    body.insertAdjacentHTML('beforeend', ajudaModalHtml);
 });

@@ -1,15 +1,13 @@
 /* Estilos Gerais para Modais da Ficha */
-.modal-overlay {
-  /* Estilos base movidos para global_modals.css */
-}
 
 .modal-content-box,
 .modal-content {
-.modal-selection-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  text-align: left;
+  .modal-selection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+  }
 }
 
 .selection-option {

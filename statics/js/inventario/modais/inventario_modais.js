@@ -34,8 +34,8 @@ function abrirModalItem(index) {
                 </div>
             </div>
             <div class="grid-2-cols">
-                <div class="input-group"><label>Centro (Cabo)</label><button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'cabo')">Editar Material</button></div>
-                <div class="input-group"><label>Base (Lâmina/Corpo)</label><button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'base')">Editar Material</button></div>
+                <div class="input-group"><label>Centro</label><button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'cabo')">Editar Material</button></div>
+                <div class="input-group"><label>Base</label><button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'base')">Editar Material</button></div>
             </div>
         `;
     } else if (cat === 'armaduras') {
@@ -47,6 +47,16 @@ function abrirModalItem(index) {
         `;
     }
 
+    // Gerar HTML das modificações
+    const modsHtml = `
+        <div style="margin-top: 20px; border-top: 1px solid rgba(255,68,68,0.3); padding-top: 15px;">
+            <div class="input-group">
+                <label style="color: #ff4444; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Modificações e Encantamentos</label>
+                <button type="button" class="btn-material-edit" onclick="abrirModalModificacoes('${index}')">Editar Modificações</button>
+            </div>
+        </div>
+    `;
+
     document.getElementById('modal-body-content').innerHTML = `
         <div class="grid-2-cols">
             <div class="input-group"><label>Peso (kg)</label><input type="number" step="0.1" id="modal_inv_peso" class="inv-input" value="${peso}"></div>
@@ -56,6 +66,7 @@ function abrirModalItem(index) {
         <div class="input-group"><label>Descrição / Efeitos</label>
             <textarea id="modal_inv_desc" class="inv-input" style="min-height: 120px">${desc}</textarea>
         </div>
+        ${modsHtml}
     `;
 
     document.getElementById('modal-desc').style.display = 'flex';
@@ -86,6 +97,90 @@ function salvarDetalhesItem() {
     fecharModalDescricao();
     if (typeof verificarTipoItem === 'function') verificarTipoItem(idx);
     atualizarTudo();
+}
+
+/**
+ * Abre o modal específico de Modificações
+ */
+function abrirModalModificacoes(index) {
+    itemSendoEditadoIdx = index;
+    const raw = document.getElementById(`inv_mods_item_${index}`).value;
+    let modsData = { attributes: [] };
+    try { if (raw && raw !== "{}") modsData = JSON.parse(raw); } catch (e) { }
+
+    const container = document.getElementById('modal-mods-container');
+    container.innerHTML = "";
+
+    if (modsData.attributes && modsData.attributes.length > 0) {
+        modsData.attributes.forEach(m => adicionarLinhaModificacao(m.attr, m.mod, m.isAdv));
+    } else {
+        adicionarLinhaModificacao();
+    }
+
+    document.getElementById('modal-item-mods').style.display = 'flex';
+}
+
+function fecharModalModificacoes() {
+    document.getElementById('modal-item-mods').style.display = 'none';
+}
+
+function salvarDetalhesModificacoes() {
+    if (itemSendoEditadoIdx === null) return;
+    const idx = itemSendoEditadoIdx;
+
+    const modRows = document.querySelectorAll('#modal-mods-container .item-mod-row');
+    const attributes = [];
+    modRows.forEach(row => {
+        const cat = row.querySelector('.mod-cat-select')?.value;
+        const attr = row.querySelector('.mod-attr-select')?.value;
+        const mod = parseInt(row.querySelector('.mod-val-input')?.value) || 0;
+        if (attr !== 'nenhum') {
+            attributes.push({ attr, mod, isAdv: cat === 'vantagem' });
+        }
+    });
+    document.getElementById(`inv_mods_item_${idx}`).value = JSON.stringify({ attributes });
+
+    fecharModalModificacoes();
+    atualizarTudo();
+}
+
+function adicionarLinhaModificacao(attr = "nenhum", mod = 0, isAdv = false) {
+    const container = document.getElementById('modal-mods-container');
+    if (!container) return;
+
+    const row = document.createElement('div');
+    row.className = 'item-mod-row';
+    row.style = "display: flex; gap: 8px; margin-bottom: 8px; align-items: center;";
+
+    const categories = [
+        { v: "ficha", t: "Ficha" },
+        { v: "pericia", t: "Perícia" },
+        { v: "arma", t: "Arma" },
+        { v: "vantagem", t: "Vantagem" }
+    ];
+
+    row.innerHTML = `
+        <select class="inv-input mod-cat-select" style="flex: 1; font-size: 0.8rem;">
+            ${categories.map(c => `<option value="${c.v}" ${isAdv && c.v === 'vantagem' ? 'selected' : ''}>${c.t}</option>`).join('')}
+        </select>
+        <select class="inv-input mod-attr-select" style="flex: 1.5; font-size: 0.8rem;"></select>
+        <input type="number" class="inv-input mod-val-input" style="flex: 0.7; text-align: center;" value="${mod}">
+        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+    `;
+
+    container.appendChild(row);
+
+    const catSel = row.querySelector('.mod-cat-select');
+    const attrSel = row.querySelector('.mod-attr-select');
+
+    const updateOptions = (currentVal = "nenhum") => {
+        const cat = catSel.value;
+        const options = window.OPTIONS_CATEGORIZADAS[cat] || [];
+        attrSel.innerHTML = options.map(o => `<option value="${o.v}" ${o.v === currentVal ? 'selected' : ''}>${o.t}</option>`).join('');
+    };
+
+    catSel.onchange = () => updateOptions();
+    updateOptions(attr);
 }
 
 /**
