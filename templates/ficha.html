@@ -10,10 +10,13 @@
     <link rel="stylesheet" href="../statics/css/ficha/ficha.css" />
     <link rel="stylesheet" href="../statics/css/ficha/modais/ficha_modais.css" />
     <link rel="stylesheet" href="../statics/css/ficha/ficha_especiais.css" />
+    <link rel="stylesheet" href="../statics/css/responsive.css" />
     <script src="../statics/js/global.js"></script>
     <script src="../statics/js/global_modals.js"></script>
     <script src="../statics/js/menu.js"></script>
+    <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/ficha/classes/classes_data.js"></script>
+    <script src="../statics/js/ficha/classes/class_loader.js"></script>
     <script src="../statics/js/ficha/racas/racas_data.js"></script>
     <script src="../statics/js/ficha/modais/ficha_modais.js"></script>
     <script src="../statics/js/ficha/ficha_efeitos.js"></script>
@@ -77,6 +80,30 @@
           <div id="deus-raca-header" class="input-group" style="display: none">
             <label>Deus do(a)</label>
             <input type="text" id="deus_dominio_raca" class="save-input header-input" placeholder="Ex: Trovão" />
+          </div>
+          <div id="semideus-raca-header" class="input-group" style="display: none">
+            <label>Filho(a) de</label>
+            <input type="text" id="semideus_filho_raca" class="save-input header-input" placeholder="Ex: Zeus, Odin..." />
+          </div>
+          <div id="anjo-raca-header" class="grid-span-2" style="display: none; flex-direction: row; gap: 20px">
+            <div class="input-group" style="flex: 2; min-width: 0">
+              <label>Reino (Virtude)</label>
+              <input type="text" id="anjo_virtude_raca" class="save-input header-input" placeholder="Ex: Paciência" />
+            </div>
+            <div class="input-group" style="flex: 1; min-width: 0">
+              <label>Escalão</label>
+              <input type="text" id="anjo_escalao_raca" class="save-input header-input" placeholder="Ex: Virtude" />
+            </div>
+          </div>
+          <div id="demonio-raca-header" class="grid-span-2" style="display: none; flex-direction: row; gap: 20px">
+            <div class="input-group" style="flex: 2; min-width: 0">
+              <label>Reino (Pecado)</label>
+              <input type="text" id="demonio_pecado_raca" class="save-input header-input" placeholder="Ex: Ira" />
+            </div>
+            <div class="input-group" style="flex: 1; min-width: 0">
+              <label>Escalão</label>
+              <input type="text" id="demonio_escalao_raca" class="save-input header-input" placeholder="Ex: Pecado" />
+            </div>
           </div>
           <div id="hibrido-extra" class="input-group grid-span-2" style="display: none">
             <label>Raças Híbridas (Escolha 2)</label>
@@ -547,6 +574,47 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
       </div>
       <div id="deus-escolhido-extra" class="extra-section-block" style="display: none">
         <label class="extra-section-label">BÔNUS CUSTOMIZÁVEIS</label>
+
+        <!-- Atributos -->
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px dashed var(--primary-glow);
+            margin-bottom: 15px;
+          "
+        >
+          <div class="input-group">
+            <label>FOR Extra</label><input type="number" id="forca_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>DES Extra</label
+            ><input type="number" id="destreza_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>CON Extra</label
+            ><input type="number" id="constituicao_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>INT Extra</label
+            ><input type="number" id="inteligencia_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>SAB Extra</label
+            ><input type="number" id="sabedoria_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>CAR Extra</label
+            ><input type="number" id="carisma_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>AUR Extra</label><input type="number" id="aura_extra_raca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+        </div>
+
+        <!-- Status -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; padding: 10px">
           <div class="input-group">
             <label>Vida Extra</label>
@@ -578,18 +646,18 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
             align-items: center;
             justify-content: center;
             gap: 10px;
-            border-top: 1px dashed rgba(255, 68, 68, 0.3);
+            border-top: 1px dashed var(--primary-glow);
             padding-top: 10px;
           "
         >
-          <label for="vampiro_forma_morcego" style="color: #ff4444; font-size: 0.8rem; font-weight: bold; cursor: pointer"
+          <label for="vampiro_forma_morcego" style="color: var(--primary-color); font-size: 0.8rem; font-weight: bold; cursor: pointer"
             >TRANSFORMAR EM MORCEGO:</label
           >
           <input
             type="checkbox"
             id="vampiro_forma_morcego"
             class="save-input"
-            style="width: 20px; height: 20px; accent-color: #ff4444; cursor: pointer"
+            style="width: 20px; height: 20px; accent-color: var(--primary-color); cursor: pointer"
             onchange="atualizarTudo()"
           />
         </div>
@@ -616,8 +684,8 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
         <button type="button" onclick="exportarFicha()">Exportar JSON</button>
         <input type="file" id="import-file" style="display: none" onchange="importarFicha(event)" />
         <button type="button" onclick="document.getElementById('import-file').click()">Importar JSON</button>
+        <button type="button" onclick="limparTodaFicha()">Limpar Ficha</button>
       </div>
     </div>
-
   </body>
 </html>

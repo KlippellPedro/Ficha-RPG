@@ -18,10 +18,16 @@ function abrirModalMag(index) {
         teste: document.getElementById(`mag_teste_${index}`)?.value || ""
     };
 
-    document.getElementById('modal-mag-title').innerText = `Grimório: ${vals.nome || "Nova Magia"}`;
+    const titleEl = document.getElementById('modal-magia-title');
+    const bodyEl = document.getElementById('modal-magia-body');
+    const modalEl = document.getElementById('modal-magia');
+
+    if (!titleEl || !bodyEl || !modalEl) return;
+
+    titleEl.innerText = `Grimório: ${vals.nome || "Nova Magia"}`;
     let optionsHtml = TIPOS_MAGIA.map(t => `<option value="${t}" ${vals.tipo === t ? 'selected' : ''}>${t}</option>`).join('');
 
-    document.getElementById('modal-mag-body').innerHTML = `
+    bodyEl.innerHTML = `
         <div class="grid-3-cols" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
             <div class="input-group"><label>Tipo</label>
                 <select id="modal_mag_tipo" class="inv-input" onchange="const c = document.getElementById('modal_nivel_container'); c.innerHTML = renderizarCampoNivel(this.value, '', 'modal'); atualizarCorNivel('modal');">${optionsHtml}</select>
@@ -53,8 +59,7 @@ function abrirModalMag(index) {
         <div class="input-group"><label>Efeito da Magia</label><textarea id="modal_mag_desc" class="inv-input" style="min-height: 200px">${vals.desc}</textarea></div>
     `;
 
-    const modal = document.getElementById('modal-mag');
-    const footer = modal ? modal.querySelector('.modal-footer') : null;
+    const footer = modalEl.querySelector('.modal-footer');
     if (footer) {
         footer.style.justifyContent = 'space-between';
         footer.innerHTML = `
@@ -63,12 +68,13 @@ function abrirModalMag(index) {
         `;
     }
 
-    modal.style.display = 'flex';
+    modalEl.style.display = 'flex';
     atualizarCorNivel('modal');
 }
 
 function fecharModalMag() {
-    document.getElementById('modal-mag').style.display = 'none';
+    const modal = document.getElementById('modal-magia');
+    if (modal) modal.style.display = 'none';
     magSendoEditadaIdx = null;
 }
 

@@ -8,11 +8,15 @@
     <link rel="stylesheet" href="../statics/css/global_modals.css" />
     <link rel="stylesheet" href="../statics/css/menu.css" />
     <link rel="stylesheet" href="../statics/css/inventario/inventario.css" />
+    <link rel="stylesheet" href="../statics/css/inventario/inventario_responsive.css" />
+    <link rel="stylesheet" href="../statics/css/responsive.css" />
     <script src="../statics/js/ficha/classes/classes_data.js"></script>
+    <script src="../statics/js/ficha/classes/class_loader.js"></script>
     <script src="../statics/js/ficha/racas/racas_data.js"></script>
     <script src="../statics/js/global.js"></script>
     <script src="../statics/js/global_modals.js"></script>
     <script src="../statics/js/menu.js"></script>
+    <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/inventario/inventario_data.js"></script>
     <script src="../statics/js/inventario/modais/inventario_modais.js"></script>
     <script src="../statics/js/inventario/inventario.js"></script>
@@ -102,7 +106,7 @@
     <div id="modal-material-details" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 id="modal-material-title" style="color: #ff4444; margin: 0">Detalhes do Material</h3>
+          <h3 id="modal-material-title" class="modal-title" style="margin: 0">Detalhes do Material</h3>
           <button type="button" class="btn-remove-class" onclick="fecharModalMaterial()">×</button>
         </div>
         <div class="modal-body">
@@ -125,10 +129,11 @@
     <div id="modal-item-mods" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 style="color: #ff4444; margin: 0">Modificações e Encantamentos</h3>
+          <h3 class="modal-title" style="margin: 0">Propriedades e Encantamentos</h3>
           <button type="button" class="btn-remove-class" onclick="fecharModalModificacoes()">×</button>
         </div>
         <div class="modal-body">
+          <div class="section-divider">Modificações e Melhorias</div>
           <div id="modal-mods-container">
             <!-- Linhas de modificação entram aqui -->
           </div>
@@ -136,6 +141,37 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn-save-modal" onclick="salvarDetalhesModificacoes()">Salvar Modificações</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Raridade e Buffs Mágicos -->
+    <div id="modal-item-rarity" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" style="margin: 0">Raridade e Encantamentos</h3>
+          <button type="button" class="btn-remove-class" onclick="fecharModalRaridade()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <label>Nível de Raridade</label>
+            <select id="modal_rarity_level" class="inv-input" onchange="this.className = 'inv-input rarity-' + this.value">
+              <option value="comum">Comum</option>
+              <option value="incomum">Incomum</option>
+              <option value="raro">Raro</option>
+              <option value="epico">Épico</option>
+              <option value="mitico">Mítico</option>
+              <option value="especial">Relíquia</option>
+            </select>
+          </div>
+          <div class="section-divider">Bônus</div>
+          <div id="modal-rarity-buffs-container">
+            <!-- Injetado via JS -->
+          </div>
+          <button type="button" class="btn-add-class" onclick="adicionarLinhaBuffRaridade()">+ Adicionar Bônus</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-save-modal" onclick="salvarDetalhesRaridade()">Salvar Raridade</button>
         </div>
       </div>
     </div>

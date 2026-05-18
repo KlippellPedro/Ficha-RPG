@@ -13,9 +13,15 @@ function abrirModalNota(index) {
     let campos = [];
     try { campos = JSON.parse(camposRaw || "[]"); } catch (e) { campos = []; }
 
-    document.getElementById('modal-nota-title').innerText = `Diário: ${titulo || "Nova Nota"}`;
+    const titleEl = document.getElementById('modal-nota-title');
+    const bodyEl = document.getElementById('modal-nota-body');
+    const modalEl = document.getElementById('modal-nota');
 
-    document.getElementById('modal-nota-body').innerHTML = `
+    if (!titleEl || !bodyEl || !modalEl) return;
+
+    titleEl.innerText = `Diário: ${titulo || "Nova Nota"}`;
+
+    bodyEl.innerHTML = `
         <div class="input-group">
             <label>Tipo / Categoria</label>
             <input type="text" id="modal_nota_tipo" class="inv-input" value="${tipo}" placeholder="Ex: Lore, Personagem, Alvo...">

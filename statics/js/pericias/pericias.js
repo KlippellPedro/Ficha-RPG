@@ -180,8 +180,8 @@ function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}, breakdow
             display.innerText = (total >= 0 ? "+" : "") + total;
             display.title = `Total: ${total} (${details.join(' | ')})`;
             if (itemSkillBonus > 0) display.style.color = '#4ade80';
-            else if (itemSkillBonus < 0) display.style.color = '#ff5f5f';
-            else display.style.color = '#ff4444';
+            else if (itemSkillBonus < 0) display.style.color = 'var(--danger)';
+            else display.style.color = 'var(--primary-color)';
         }
     });
 }

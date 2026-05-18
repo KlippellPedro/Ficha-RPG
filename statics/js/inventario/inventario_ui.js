@@ -13,7 +13,7 @@ function atualizarEstiloRaridade(index) {
     const raroInput = document.getElementById(`inv_raro_${index}`);
     const nomeInput = document.getElementById(`inv_nome_${index}`);
     const catSelect = document.getElementById(`inv_cat_${index}`);
-    if (!raroInput || !nomeInput || !catSelect) return;
+    if (!raroInput || !nomeInput) return;
 
     const raroRaw = raroInput.value;
     let itemRarity = 'comum';

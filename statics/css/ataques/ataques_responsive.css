@@ -1,0 +1,230 @@
+/* Responsividade específica para a Página de Ataques */
+
+@media (max-width: 768px) {
+  /* Esconde o cabeçalho da lista */
+  html body .atk-header-grid {
+    display: none !important;
+  }
+
+  /* Transforma cada linha em um Card (Ataques) */
+  html body .atk-row-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-areas:
+      "nome-area nome-area nome-area fechar-area"
+      "teste-area teste-area dano-area dano-area"
+      "crit-area crit-area tipo-area tipo-area"
+      "alcance-area alcance-area alcance-area alcance-area"
+      "lupa-btn dup-btn usar-btn usar-btn" !important;
+    gap: 12px !important;
+    padding: 20px 18px !important;
+    height: auto !important;
+    background: #151518 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-left: 6px solid var(--primary-color) !important;
+    border-radius: 12px !important;
+    margin-bottom: 16px !important;
+    align-items: center !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  /* CRUCIAL: Remove campos ocultos do fluxo do Grid */
+  html body .atk-row-grid > div[style*="display:none"],
+  html body .atk-row-grid > div[style*="display: none"],
+  html body .atk-row-grid textarea,
+  html body .atk-row-grid .item-hidden-data {
+    display: none !important;
+    grid-area: auto !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* NOME DO ATAQUE/ARMA */
+  html body .atk-row-grid input[id^="atk_nome_"] {
+    grid-area: nome-area !important;
+    font-size: 1.2rem !important;
+    font-weight: bold !important;
+    text-transform: uppercase;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.15) !important;
+    padding: 0 0 10px 0 !important;
+    color: white !important;
+    margin-bottom: 8px !important;
+    letter-spacing: 1px;
+    width: 100% !important;
+  }
+
+  /* Configuração dos Containers de Dados */
+  html body .atk-row-grid > div:not(.btn-remove-class):not(.btn-open-desc):not(.btn-duplicate):not(.btn-use-skill) {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  /* Rótulos de Apoio (::before) para identificar os campos no mobile */
+
+  /* TESTE (ATAQUE) */
+  html body .atk-row-grid > div:nth-child(2) {
+    grid-area: teste-area !important;
+  }
+  html body .atk-row-grid > div:nth-child(2)::before {
+    content: "TESTE";
+    font-size: 0.65rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  /* DANO */
+  html body .atk-row-grid > div:nth-child(3) {
+    grid-area: dano-area !important;
+  }
+  html body .atk-row-grid > div:nth-child(3)::before {
+    content: "DANO";
+    font-size: 0.65rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  /* CRÍTICO */
+  html body .atk-row-grid > div:nth-child(4) {
+    grid-area: crit-area !important;
+  }
+  html body .atk-row-grid > div:nth-child(4)::before {
+    content: "CRÍTICO";
+    font-size: 0.65rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  /* TIPO */
+  html body .atk-row-grid > div:nth-child(5) {
+    grid-area: tipo-area !important;
+  }
+  html body .atk-row-grid > div:nth-child(5)::before {
+    content: "TIPO";
+    font-size: 0.65rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  /* ALCANCE (Layout horizontal para economizar espaço) */
+  html body .atk-row-grid > div:nth-child(6) {
+    grid-area: alcance-area !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+  html body .atk-row-grid > div:nth-child(6)::before {
+    content: "ALCANCE:";
+    font-size: 0.65rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-right: 8px;
+  }
+
+  /* Estilo comum para inputs e selects dentro do card */
+  html body .atk-row-grid input:not([id^="atk_nome_"]),
+  html body .atk-row-grid select {
+    width: 100% !important;
+    height: 40px !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 4px !important;
+    text-align: center !important;
+    color: #e4e4e7 !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* BOTÕES DE AÇÃO */
+  html body .atk-row-grid .btn-open-desc {
+    display: flex !important;
+    width: 100% !important;
+    height: 44px !important;
+    font-size: 1.2rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Lupa - Primeiro botão */
+  html body .atk-row-grid .btn-open-desc:nth-of-type(1) {
+    grid-area: lupa-btn !important;
+  }
+
+  /* Duplicar - Segundo botão (ou com classe específica) */
+  html body .atk-row-grid .btn-open-desc:nth-of-type(2),
+  html body .atk-row-grid .btn-duplicate {
+    grid-area: dup-btn !important;
+    display: flex !important;
+    width: 100% !important;
+    height: 44px !important;
+    font-size: 1.2rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Botão de Rolar Ataque (Destaque Verde) */
+  html body .atk-row-grid .btn-use-skill,
+  html body .atk-row-grid .btn-roll-atk {
+    grid-area: usar-btn !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 44px !important;
+    background: #4ade80 !important;
+    color: black !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 10px rgba(74, 222, 128, 0.2) !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+
+  /* BOTÃO REMOVER (X) */
+  html body .atk-row-grid .btn-remove-class {
+    grid-area: fechar-area !important;
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.2rem !important;
+    justify-self: end !important;
+    background: var(--primary-glow) !important;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    border-radius: 8px !important;
+    opacity: 0.7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+  }
+  html body .atk-row-grid .btn-remove-class:hover {
+    opacity: 1 !important;
+    background: var(--primary-color) !important;
+    color: black !important;
+  }
+}

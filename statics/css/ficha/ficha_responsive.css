@@ -1,0 +1,41 @@
+/* Responsividade específica da Página de Ficha Principal */
+
+@media (max-width: 768px) {
+  /* Cabeçalho da Ficha */
+  html body .char-header {
+    grid-template-columns: 1fr !important;
+  }
+  html body .char-header .flex-2 {
+    grid-column: auto !important;
+  }
+
+  /* Atributos: 2 por linha no celular */
+  html body .atributos-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+    gap: 10px !important;
+  }
+  html body .attribute-card {
+    width: 100% !important;
+  }
+
+  /* Barras de Vida/Mana */
+  html body .stats-container {
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+  html body .stat-group {
+    max-width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  /* Seção de Combate e Status */
+  html body .combat-header-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Grades de especialidades */
+  html body .grid-span-2 {
+    grid-column: auto !important;
+  }
+}

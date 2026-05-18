@@ -37,7 +37,7 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
         <select id="poder_classe_${index}" class="save-input inv-input" onchange="atualizarTudo()">
             ${getOpcoesClassesPod(classe || tipo)} 
         </select>
-        <div style="display:flex; gap:5px;">
+        <div class="cost-container" style="display:flex; gap:5px;">
             <input type="text" id="poder_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
             <select id="poder_tipo_custo_${index}" class="save-input inv-input" style="width:60px;">
                 <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
@@ -46,8 +46,8 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
             </select>
         </div>
         <button type="button" class="btn-open-desc" onclick="abrirModalPod('${index}')">🔍</button>
+        <button type="button" class="btn-duplicate" onclick="duplicarPoder('${index}')" title="Duplicar">📋</button>
         <button type="button" class="btn-use-skill" onclick="usarPoder('${index}')">Usar</button>
-        <button type="button" class="btn-open-desc" onclick="duplicarPoder('${index}')" title="Duplicar">📋</button>
         <button type="button" class="btn-remove-class" onclick="removerPoder(this)">×</button>
 
         <div style="display:none">

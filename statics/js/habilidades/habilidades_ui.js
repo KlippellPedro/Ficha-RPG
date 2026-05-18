@@ -47,7 +47,7 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
         </div>
         <button type="button" class="btn-open-desc" onclick="abrirModalHab('${index}')">🔍</button>
         <button type="button" class="btn-use-skill" onclick="usarHabilidade('${index}')">Usar</button>
-        <button type="button" class="btn-open-desc" onclick="duplicarHabilidade('${index}')" title="Duplicar">📋</button>
+        <button type="button" class="btn-duplicate" onclick="duplicarHabilidade('${index}')" title="Duplicar">📋</button>
         <button type="button" class="btn-remove-class" onclick="removerHabilidade(this)">×</button>
 
         <div style="display:none">

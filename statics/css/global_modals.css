@@ -16,12 +16,12 @@
 .modal-content-box,
 .modal-content {
   background: var(--bg-card);
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-color);
   padding: 30px;
   border-radius: 12px;
   max-width: 500px;
   width: 90%;
-  box-shadow: 0 0 30px rgba(255, 68, 68, 0.2);
+  box-shadow: 0 0 30px var(--primary-glow);
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -53,7 +53,7 @@
 }
 
 .modal-title {
-  color: var(--primary);
+  color: var(--primary-color);
   margin: 0 auto;
   font-weight: bold;
   text-align: center;
@@ -95,8 +95,8 @@
 }
 
 .selection-option:hover {
-  background: rgba(255, 68, 68, 0.05);
-  border-color: var(--primary);
+  background: var(--primary-glow);
+  border-color: var(--primary-color);
 }
 
 .btn-modal-close {
@@ -117,7 +117,7 @@
 }
 
 .btn-save-modal {
-  background: var(--primary);
+  background: var(--primary-color);
   color: #000;
   border: none;
   padding: 12px 25px;
@@ -143,40 +143,44 @@
 }
 
 /* Estilos para o modal de confirmação */
+#modal-confirm {
+  z-index: 10010; /* Garante que fique acima de outros modais (9999) e notificações (10000) */
+}
+
 #modal-confirm .modal-content {
-    max-width: 400px;
-    text-align: center;
+  max-width: 400px;
+  text-align: center;
 }
 #modal-confirm .modal-title {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 #modal-confirm .modal-body {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    gap: 15px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  gap: 15px;
 }
 #modal-confirm .modal-footer {
-    justify-content: center;
-    gap: 15px;
+  justify-content: center;
+  gap: 15px;
 }
 #modal-confirm .btn-confirm-yes {
-    background: var(--primary);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: bold;
-    transition: filter 0.2s;
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: filter 0.2s;
 }
 #modal-confirm .btn-confirm-yes:hover {
-    filter: brightness(1.2);
+  filter: brightness(1.2);
 }
 #modal-confirm .btn-confirm-no {
-    background: #555;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    transition: background 0.2s;
+  background: #555;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  transition: background 0.2s;
 }
 #modal-confirm .btn-confirm-no:hover {
-    background: #777;
+  background: #777;
 }

@@ -13,9 +13,13 @@ function abrirModalPod(index) {
     const alcance = document.getElementById(`poder_alcance_${index}`).value;
     const acao = document.getElementById(`poder_acao_${index}`).value;
 
-    document.getElementById('modal-pod-title').innerText = `Detalhes: ${nome || "Poder"}`;
+    const titleEl = document.getElementById('modal-poder-title');
+    const body = document.getElementById('modal-poder-body');
+    const modal = document.getElementById('modal-poder');
 
-    const body = document.getElementById('modal-pod-body');
+    if (!titleEl || !body || !modal) return;
+
+    titleEl.innerText = `Detalhes: ${nome || "Poder"}`;
     body.innerHTML = `
         <div class="grid-2-cols">
             <div class="input-group"><label>Duração</label><input type="text" id="modal_pod_duracao" class="inv-input" value="${duracao}"></div>
@@ -30,11 +34,18 @@ function abrirModalPod(index) {
             <textarea id="modal_pod_desc" class="inv-input" style="min-height: 150px">${desc}</textarea>
         </div>
     `;
-    document.getElementById('modal-pod').style.display = 'flex';
+
+    const footer = modal.querySelector('.modal-footer');
+    if (footer) {
+        footer.innerHTML = `<button type="button" class="btn-save-modal" style="width:100%" onclick="salvarDetalhesPod()">Salvar e Fechar</button>`;
+    }
+
+    modal.style.display = 'flex';
 }
 
 function fecharModalPod() {
-    document.getElementById('modal-pod').style.display = 'none';
+    const modal = document.getElementById('modal-poder');
+    if (modal) modal.style.display = 'none';
     podSendoEditadoIdx = null;
 }
 
@@ -55,13 +66,20 @@ function abrirModalBuffPod(index) {
     try { modsData = JSON.parse(document.getElementById(`poder_mods_${index}`).value || "[]"); } catch (e) { modsData = []; }
 
     const container = document.getElementById('pod-buffs-container');
+    const modal = document.getElementById('modal-pod-buffs');
+    if (!container || !modal) return;
+
     container.innerHTML = '';
     if (modsData.length > 0) {
-        modsData.forEach(m => adicionarLinhaBuffPoder(m.attr, m.mod, m.isAdv));
+        modsData.forEach(m => adicionarLinhaBuffPod(m.attr, m.mod, m.isAdv));
     } else {
-        adicionarLinhaBuffPoder();
+        adicionarLinhaBuffPod();
     }
-    document.getElementById('modal-pod-buffs').style.display = 'flex';
+
+    const btnSalvar = modal.querySelector('.btn-save-modal');
+    if (btnSalvar) btnSalvar.setAttribute('onclick', 'salvarBuffsPoder()');
+
+    modal.style.display = 'flex';
 }
 
 function fecharModalBuffPod() {
@@ -69,8 +87,9 @@ function fecharModalBuffPod() {
     currentPodModEditIdx = null;
 }
 
-function adicionarLinhaBuffPoder(attr = 'nenhum', mod = 0, isAdv = false) {
+function adicionarLinhaBuffPod(attr = 'nenhum', mod = 0, isAdv = false) {
     const container = document.getElementById('pod-buffs-container');
+    if (!container) return;
     const row = document.createElement('div');
     row.className = 'material-attr-row';
     row.style = "display: flex; gap: 10px; margin-bottom: 10px;";

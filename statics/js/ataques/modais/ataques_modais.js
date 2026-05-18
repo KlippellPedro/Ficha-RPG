@@ -16,10 +16,16 @@ function abrirModalAtk(index) {
         tipo_dano: document.getElementById(`atk_tipo_dano_${index}`).value
     };
 
-    document.getElementById('modal-atk-title').innerText = `Estatísticas: ${vals.nome || "Ataque"}`;
+    const titleEl = document.getElementById('modal-ataque-title');
+    const bodyEl = document.getElementById('modal-ataque-body');
+    const modalEl = document.getElementById('modal-ataque');
+
+    if (!titleEl || !bodyEl || !modalEl) return;
+
+    titleEl.innerText = `Estatísticas: ${vals.nome || "Ataque"}`;
     let optionsHtml = TIPOS_ATAQUE.map(t => `<option value="${t}" ${vals.tipo === t ? 'selected' : ''}>${t}</option>`).join('');
 
-    document.getElementById('modal-atk-body').innerHTML = `
+    bodyEl.innerHTML = `
         <div class="grid-2-cols" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <div class="input-group"><label>Tipo de Ataque</label>
                 <select id="modal_atk_tipo" class="inv-input">${optionsHtml}</select>
@@ -37,15 +43,19 @@ function abrirModalAtk(index) {
             <div class="input-group"><label>Alcance</label><input type="text" id="modal_atk_alcance" class="inv-input" value="${vals.alcance}"></div>
         </div>
         <div class="input-group"><label>Notas e Efeitos Especiais</label><textarea id="modal_atk_desc" class="inv-input" style="min-height: 150px">${vals.desc}</textarea></div>
-        <div class="modal-footer">
-            <button type="button" class="btn-save-modal" onclick="salvarDetalhesAtk()" style="width:100%">Salvar Alterações</button>
-        </div>
     `;
-    document.getElementById('modal-atk').style.display = 'flex';
+
+    const footer = modalEl.querySelector('.modal-footer');
+    if (footer) {
+        footer.innerHTML = `<button type="button" class="btn-save-modal" onclick="salvarDetalhesAtk()" style="width:100%">Salvar Alterações</button>`;
+    }
+
+    modalEl.style.display = 'flex';
 }
 
 function fecharModalAtk() {
-    document.getElementById('modal-atk').style.display = 'none';
+    const modal = document.getElementById('modal-ataque');
+    if (modal) modal.style.display = 'none';
     atkSendoEditadoIdx = null;
 }
 

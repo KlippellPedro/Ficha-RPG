@@ -15,10 +15,7 @@ function mostrarAjudaSkill(skillSlug) {
     const title = document.getElementById('modal-calc-ajuda-title');
     const body = document.getElementById('modal-calc-ajuda-body');
 
-    if (!modal || !title || !body) {
-        console.error("Erro Crítico: O Modal de Ajuda não foi encontrado no HTML desta página.");
-        return;
-    }
+    if (!modal || !title || !body) return;
 
     const row = display.closest('.skill-row');
     const skillName = row.querySelector('.skill-name')?.textContent || row.querySelector('.skill-name-input')?.value || "Perícia";
@@ -32,14 +29,14 @@ function mostrarAjudaSkill(skillSlug) {
     const nivel = parseInt(document.getElementById('nivel')?.value) || 1;
 
     const formulaHtml = `
-        <div style="margin-bottom: 12px; background: rgba(255,68,68,0.1); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,68,68,0.3); font-size: 0.8rem; color: #ff4444; text-align: center;">
+        <div style="margin-bottom: 12px; background: var(--primary-glow); padding: 10px; border-radius: 4px; border: 1px solid var(--primary-glow); font-size: 0.8rem; color: var(--primary-color); text-align: center;">
             <strong>Fórmula:</strong> Atributo + Treino + Itens/Poderes + Manual
         </div>
     `;
 
     const treinoTabela = `
-        <div style="margin-top: 15px; border-top: 1px dashed rgba(255,68,68,0.3); padding-top: 10px;">
-            <label style="color: #ff4444; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Referência de Treino (Nível ${nivel}):</label>
+        <div style="margin-top: 15px; border-top: 1px dashed var(--primary-glow); padding-top: 10px;">
+            <label style="color: var(--primary-color); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Referência de Treino (Nível ${nivel}):</label>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; font-size: 0.8rem; color: #bbb;">
                 <span>• Nenhum: <strong>+0</strong></span>
                 <span>• Treinado: <strong>+${Math.floor(nivel / 2)}</strong> (lvl/2)</span>
@@ -55,12 +52,13 @@ function mostrarAjudaSkill(skillSlug) {
             ${formulaHtml}
             ${items.map(item => {
         const colored = item
-            .replace(/(\+\d+)/g, '<span style="color: #4ade80; font-weight: bold;">$1</span>')
-            .replace(/(\-\d+)/g, '<span style="color: #ff5f5f; font-weight: bold;">$1</span>');
-        return `<div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 3px solid #ff4444; font-size: 0.85rem;">${colored}</div>`;
+            .replace(/Base: (\d+)/g, '<span class="calc-label-base">Base: $1</span>')
+            .replace(/(\+\d+)/g, '<span class="calc-label-bonus-pos">$1</span>')
+            .replace(/(\-\d+)/g, '<span class="calc-label-bonus-neg">$1</span>');
+        return `<div style="padding: 8px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 3px solid var(--primary-color); font-size: 0.85rem;">${colored}</div>`;
     }).join('')}
             ${treinoTabela}
-            <div style="margin-top: 10px; padding: 12px; background: rgba(255,68,68,0.1); border-radius: 4px; color: #ff4444; font-weight: bold; font-size: 1.1rem; text-align: center;">Total: ${display.innerText}</div>
+            <div class="calc-label-total" style="background: var(--primary-glow); border-radius: 4px; padding: 12px; text-align: center; border-top: none;">Total: ${display.innerText}</div>
         </div>
     `;
 

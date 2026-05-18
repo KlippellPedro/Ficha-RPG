@@ -23,6 +23,11 @@ function usarHabilidade(index) {
         let recursoMax = parseInt(dados.pm_max) || 0;
         if (recursoAtual < custo) return showNotification(`Mana insuficiente! Você tem ${recursoAtual} PM, mas precisa de ${custo} PM.`, 'error');
         recursoAtual -= custo;
+        
+        // Sincroniza o valor com o input na tela (se existir) para evitar que atualizarTudo() reverta a mudança
+        const inputPM = document.getElementById('pm_atual');
+        if (inputPM) inputPM.value = recursoAtual;
+
         dados.pm_atual = recursoAtual;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         registrarHistorico(document.getElementById(`hab_nome_${index}`).value || "Habilidade", custo, tipoCusto);
@@ -33,6 +38,10 @@ function usarHabilidade(index) {
         let recursoMax = parseInt(dados.pv_max) || 0;
         if (recursoAtual < custo) return showNotification(`Vida insuficiente! Você tem ${recursoAtual} PV, mas precisa de ${custo} PV.`, 'error');
         recursoAtual -= custo;
+
+        const inputPV = document.getElementById('pv_atual');
+        if (inputPV) inputPV.value = recursoAtual;
+
         dados.pv_atual = recursoAtual;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         registrarHistorico(document.getElementById(`hab_nome_${index}`).value || "Habilidade", custo, tipoCusto);

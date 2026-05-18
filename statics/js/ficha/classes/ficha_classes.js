@@ -43,30 +43,34 @@ function verificarVisibilidadeClasses() {
     };
 
     document.querySelectorAll('[id^="class_name_"]').forEach(select => {
-        const classesDB = typeof CLASSES_DATA !== 'undefined' ? CLASSES_DATA : {};
-        if (select.value === 'ceifeiro_almas') ambientTypes.push('soul');
-        if (select.value === 'anjo') ambientTypes.push('feather');
-        if (select.value === 'demonio') ambientTypes.push('ember');
-
+        const classesDB = window.CLASSES_DATA || {};
         const data = classesDB[select.value];
-        if (data) {
-            Object.keys(visibilityMap).forEach(section => {
-                const key = "show" + section.split('-')[1].charAt(0).toUpperCase() + section.split('-')[1].slice(1);
-                if (data[key]) visibilityMap[section] = true;
-            });
-        }
-
-        // Lógica Cientista Lvl 5
         const index = select.id.split('_').pop();
         const lvl = parseInt(document.getElementById(`class_lvl_${index}`)?.value) || 0;
         const subInput = document.getElementById(`class_sub_${index}`);
         const row = select.closest('.class-row');
 
-        if (select.value === 'cientista' && lvl >= 5) {
-            if (!subInput.value && currentCientistaIndex === null) abrirModalCientistaSubclasse(index);
-            if (subInput.value) row?.classList.add('cientista-lvl5-row');
-        } else {
-            row?.classList.remove('cientista-lvl5-row');
+        if (data) {
+            if (data.ambientType) ambientTypes.push(data.ambientType);
+
+            Object.keys(visibilityMap).forEach(section => {
+                const key = "show" + section.split('-')[1].charAt(0).toUpperCase() + section.split('-')[1].slice(1);
+                if (data[key]) visibilityMap[section] = true;
+            });
+
+            // Lógica Genérica de Subclasse e Estilos Dinâmicos
+            if (data.rowStyleClass) row?.classList.remove(data.rowStyleClass);
+
+            if (data.subclassAt && lvl >= data.subclassAt) {
+                // Só abre o modal se ainda não tiver uma subclasse definida
+                if (!subInput.value && currentCientistaIndex === null) {
+                    abrirModalCientistaSubclasse(index);
+                }
+                // Aplica o estilo visual se houver uma subclasse e uma classe de estilo definida
+                if (subInput.value && data.rowStyleClass) {
+                    row?.classList.add(data.rowStyleClass);
+                }
+            }
         }
     });
 
@@ -91,16 +95,16 @@ function verificarVisibilidadeClasses() {
 /** Auxiliar para calcular ganho de mana vindo de classes */
 function calcularManaPorClasses(mods) {
     let manaGanha = 0;
-    const classesDB = typeof CLASSES_DATA !== 'undefined' ? CLASSES_DATA : {};
+    const classesDB = window.CLASSES_DATA || {};
     document.querySelectorAll('.class-row').forEach(row => {
         const className = row.querySelector('[id^="class_name_"]')?.value;
         const lvl = parseInt(row.querySelector('[id^="class_lvl_"]')?.value) || 0;
         const sub = row.querySelector('[id^="class_sub_"]')?.value || "";
-        const data = CLASSES_DATA[className];
+        const data = classesDB[className];
         if (data) {
             let pmLvl = data.pm_lvl;
-            // Bônus específico: Cientista Alquimista ganha mais mana por nível
-            if (className === 'cientista' && lvl >= 5 && sub === 'alquimista') pmLvl = 4;
+            // Bônus específico: Cientista Químico ganha mais mana por nível
+            if (className === 'cientista' && lvl >= 5 && sub === 'Químico') pmLvl = 4;
 
             let mod = data.pm_attr ? (mods[data.pm_attr] || 0) : 0;
             manaGanha += (lvl * (mod + pmLvl));
@@ -112,16 +116,16 @@ function calcularManaPorClasses(mods) {
 /** Auxiliar para calcular ganho de vida vindo de classes */
 function calcularVidaPorClasses(mods, modConDefault) {
     let vidaGanha = 0;
-    const classesDB = typeof CLASSES_DATA !== 'undefined' ? CLASSES_DATA : {};
+    const classesDB = window.CLASSES_DATA || {};
     document.querySelectorAll('.class-row').forEach(row => {
         const className = row.querySelector('[id^="class_name_"]')?.value;
         const lvl = parseInt(row.querySelector('[id^="class_lvl_"]')?.value) || 0;
         const sub = row.querySelector('[id^="class_sub_"]')?.value || "";
-        const data = CLASSES_DATA[className];
+        const data = classesDB[className];
         if (data) {
             let pvLvl = data.pv_lvl;
             // Bônus específico: Cientista Ferreiro ganha mais vida por nível
-            if (className === 'cientista' && lvl >= 5 && sub === 'ferreiro') pvLvl = 4;
+            if (className === 'cientista' && lvl >= 5 && sub === 'Ferreiro') pvLvl = 4;
 
             let mod = (data.pv_attr && mods[data.pv_attr] !== undefined) ? mods[data.pv_attr] : modConDefault;
             if (data.pv_mod_half) mod = Math.floor(mod / 2);
@@ -134,21 +138,24 @@ function calcularVidaPorClasses(mods, modConDefault) {
 }
 
 function handleClassChange(selectEl) {
-    const value = selectEl.value;
-    if (value === 'ceifeiro_almas') {
+    const classesDB = window.CLASSES_DATA || {};
+    const data = classesDB[selectEl.value];
+
+    if (data?.isUnique) {
         const rows = document.querySelectorAll('.class-row');
         if (rows.length > 1) {
             pendingUniqueSelect = selectEl;
-            document.getElementById('modal-unique-class').style.display = 'flex';
+            if (typeof confirmarClasseUnica === 'function') confirmarClasseUnica();
             return;
         }
     }
-    // Se mudar para cientista e já for nível 5+, abre o modal
+
     const index = selectEl.id.split('_').pop();
     const lvl = parseInt(document.getElementById(`class_lvl_${index}`)?.value) || 0;
-    if (value === 'cientista' && lvl >= 5) {
+    if (data?.subclassAt && lvl >= data.subclassAt) {
         abrirModalCientistaSubclasse(index);
     }
+
     atualizarEstiloClasse(selectEl);
     atualizarTudo();
 }
@@ -166,11 +173,14 @@ function atualizarEstiloClasse(selectEl) {
         }
     }
 
-    row.classList.remove('special-class-row', 'ceifeiro-class-row', 'anjo-class-row', 'demonio-class-row');
+    // Limpa todos os estilos possíveis antes de aplicar o novo
+    row.classList.remove('special-class-row', 'ceifeiro-class-row', 'anjo-class-row', 'demonio-class-row', 'cientista-lvl5-row');
 
-    const classesDB = typeof CLASSES_DATA !== 'undefined' ? CLASSES_DATA : {};
-    const classData = classesDB[selectEl.value];
-    if (classData?.isSpecial) {
+    const classesDB = window.CLASSES_DATA || {};
+    const classData = selectEl.value ? classesDB[selectEl.value] : null;
+
+    const isSpecialName = ['ceifeiro_almas', 'anjo', 'demonio'].includes(selectEl.value);
+    if (classData?.isSpecial || isSpecialName) {
         row.classList.add('special-class-row');
         if (selectEl.value === 'ceifeiro_almas') row.classList.add('ceifeiro-class-row');
         else if (selectEl.value === 'anjo') row.classList.add('anjo-class-row');
@@ -183,9 +193,10 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
     if (!container) return;
     const index = idIndex !== null ? idIndex : Date.now();
 
-    const classesDB = typeof CLASSES_DATA !== 'undefined' ? CLASSES_DATA : {};
+    const classesDB = window.CLASSES_DATA || {};
     const options = Object.keys(classesDB).map(key => {
-        let label = classesDB[key].nome;
+        const classData = classesDB[key];
+        let label = classData.nome || key;
         if (key === 'cientista' && sub && lvl >= 5) {
             label = `Cientista (${sub.charAt(0).toUpperCase() + sub.slice(1)})`;
         }
@@ -194,10 +205,13 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
 
     let rowClasses = 'class-row';
     const currentClassData = classesDB[nome];
-    if (currentClassData?.isSpecial) rowClasses += ' special-class-row';
+
+    const isSpecial = currentClassData?.isSpecial || ['ceifeiro_almas', 'anjo', 'demonio'].includes(nome);
+    if (isSpecial) rowClasses += ' special-class-row';
+
     if (nome === 'ceifeiro_almas') rowClasses += ' ceifeiro-class-row';
-    if (nome === 'anjo') rowClasses += ' anjo-class-row';
-    if (nome === 'demonio') rowClasses += ' demonio-class-row';
+    else if (nome === 'anjo') rowClasses += ' anjo-class-row';
+    else if (nome === 'demonio') rowClasses += ' demonio-class-row';
     const maxAttr = nome === 'ceifeiro_almas' ? '' : 'max="20"';
 
     const row = document.createElement('div');
@@ -243,4 +257,83 @@ function formatarNomeClasseCientista(selectEl, subclass) {
         const subTitle = subclass ? ` (${subclass.charAt(0).toUpperCase() + subclass.slice(1)})` : "";
         option.textContent = `Cientista${subTitle}`;
     }
+}
+
+/**
+ * Verifica a progressão de nível de cada classe ativa e adiciona automaticamente
+ * as habilidades e poderes definidos no CLASSES_DATA caso o personagem tenha o nível necessário.
+ * @param {Object} dados - O objeto de dados da ficha (JSON) passado por referência.
+ * @returns {boolean} - Retorna true se algo novo foi adicionado.
+ */
+function verificarProgressaoHabilidades(dados) {
+    const classesAtivas = getClassesAtivas(dados);
+    const classesDB = window.CLASSES_DATA || {};
+    let mudou = false;
+
+    // 1. Mapeia nomes existentes para evitar duplicatas (normalizando para minúsculas)
+    const existentes = new Set();
+    Object.keys(dados).forEach(key => {
+        if (key.startsWith('hab_nome_') || key.startsWith('poder_nome_')) {
+            const nome = dados[key];
+            if (nome && typeof nome === 'string') {
+                existentes.add(nome.trim().toLowerCase());
+            }
+        }
+    });
+
+    classesAtivas.forEach(cl => {
+        const classData = classesDB[cl.name];
+        if (!classData || !classData.progressao) return;
+
+        // 2. Itera sobre os níveis de progressão configurados para a classe
+        Object.keys(classData.progressao).forEach(lvlReqStr => {
+            const lvlReq = parseInt(lvlReqStr);
+            if (cl.lvl >= lvlReq) {
+                const recompensa = classData.progressao[lvlReqStr];
+                let recompensaAdicionada = false;
+
+                // Processa Habilidades do Nível
+                const habs = recompensa.habilidades || [];
+                habs.forEach(nome => {
+                    const slug = nome.trim().toLowerCase();
+                    if (!existentes.has(slug) && slug !== "") {
+                        const id = "auto_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                        dados[`hab_nome_${id}`] = nome;
+                        dados[`hab_tipo_${id}`] = "Passiva"; // Tipo padrão
+                        existentes.add(slug);
+                        mudou = true;
+                        recompensaAdicionada = true;
+                        if (typeof showNotification === 'function') {
+                            showNotification(`Nova Habilidade: ${nome} (${classData.nome})`, "success");
+                        }
+                    }
+                });
+
+                // Processa Poderes do Nível
+                const pods = recompensa.poderes || [];
+                pods.forEach(nome => {
+                    const slug = nome.trim().toLowerCase();
+                    if (!existentes.has(slug) && slug !== "") {
+                        const id = "auto_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                        dados[`poder_nome_${id}`] = nome;
+                        existentes.add(slug);
+                        mudou = true;
+                        recompensaAdicionada = true;
+                        if (typeof showNotification === 'function') {
+                            showNotification(`Novo Poder: ${nome} (${classData.nome})`, "success");
+                        }
+                    }
+                });
+
+                // Exibe mensagem especial se algo novo foi adicionado neste nível
+                if (recompensa.msg && recompensaAdicionada) {
+                    if (typeof showNotification === 'function') {
+                        showNotification(recompensa.msg, "warning", 8000);
+                    }
+                }
+            }
+        });
+    });
+
+    return mudou;
 }

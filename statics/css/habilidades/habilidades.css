@@ -24,9 +24,9 @@
   padding: 12px 20px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 8px 8px 0 0;
-  border-bottom: 1px solid #ff4444;
+  border-bottom: 1px solid var(--primary-color);
   font-weight: bold;
-  color: #ff4444;
+  color: var(--primary-color);
   align-items: center;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -34,10 +34,11 @@
 }
 
 /* Botões de Ação */
-.btn-open-desc {
-  background: rgba(255, 68, 68, 0.1);
-  border: 1px solid #ff4444;
-  color: #ff4444;
+.btn-open-desc,
+.btn-duplicate {
+  background: var(--primary-glow);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
   border-radius: 4px;
   cursor: pointer;
   padding: 5px 8px;
@@ -46,8 +47,9 @@
   justify-self: center;
 }
 
-.btn-open-desc:hover {
-  background: #ff4444;
+.btn-open-desc:hover,
+.btn-duplicate:hover {
+  background: var(--primary-color);
   color: #000;
 }
 
@@ -55,8 +57,8 @@
   margin: 30px auto;
   display: block;
   background: transparent;
-  border: 2px dashed #ff4444;
-  color: #ff4444;
+  border: 2px dashed var(--primary-color);
+  color: var(--primary-color);
   padding: 15px 40px;
   font-weight: bold;
   cursor: pointer;
@@ -64,7 +66,7 @@
   transition: 0.3s;
 }
 .btn-add-card:hover {
-  background: rgba(255, 68, 68, 0.1);
+  background: var(--primary-glow);
 }
 
 .filter-bar {
@@ -76,7 +78,7 @@
   background: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   border: 1px solid var(--border-color);
-  border-left: 4px solid #ff4444;
+  border-left: 4px solid var(--primary-color);
 }
 
 .search-group {
@@ -126,13 +128,13 @@
 }
 
 .item-row.mana-insufficient {
-  border-left-color: #ff4444; /* Vermelho */
+  border-left-color: var(--danger); /* Mantido vermelho para erro de mana */
 }
 
 .btn-history {
   background: transparent;
-  border: 2px dashed #3b82f6;
-  color: #3b82f6;
+  border: 2px dashed var(--primary-color);
+  color: var(--primary-color);
   padding: 15px;
   cursor: pointer;
   margin-top: 15px;
@@ -142,8 +144,33 @@
   margin-left: 10px;
 }
 .btn-history:hover {
-  background: rgba(59, 130, 246, 0.1);
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+  background: var(--primary-glow);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Estilo unificado para botões de Limpar Tudo nas páginas de lista */
+.btn-clear-habilidades,
+.btn-clear-poderes,
+.btn-clear-magias,
+.btn-clear-ataques {
+  background: transparent;
+  border: 2px dashed var(--primary-color);
+  color: var(--primary-color);
+  padding: 15px;
+  cursor: pointer;
+  margin-top: 15px;
+  border-radius: 8px;
+  transition: 0.3s;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.btn-clear-habilidades:hover,
+.btn-clear-poderes:hover,
+.btn-clear-magias:hover,
+.btn-clear-ataques:hover {
+  background: var(--primary-glow);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 /* --- Cores e Efeitos de Raridade de Itens --- */
@@ -162,8 +189,8 @@
 
 /* Mítico: Vermelho com Brilho */
 .rarity-mitico {
-  color: #ff4444 !important;
-  text-shadow: 0 0 15px rgba(255, 68, 68, 0.8);
+  color: var(--primary-color) !important;
+  text-shadow: 0 0 15px var(--primary-glow);
   font-weight: bold !important;
 }
 

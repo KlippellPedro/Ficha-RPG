@@ -168,16 +168,30 @@ function verificarExtraHibrido(dados) { // dados is already passed
 }
 
 function verificarExtraDeusEscolhido(dados) {
-    const isDeus = isRacaAtiva("deus", dados);
-    const isEscolhido = isRacaAtiva("escolhido", dados);
-
-    const isSpecialRaca = isDeus || isEscolhido;
+    const racasComBonusExtra = ["deus", "escolhido", "corrompido", "anjo", "demonio", "semideus"];
+    
+    // Força a verificação tanto da raça base quanto de híbridos
+    const activeRaca = dados.raca || document.getElementById("raca")?.value || "nenhuma";
+    const isSpecialRaca = racasComBonusExtra.some(raca => isRacaAtiva(raca, dados));
 
     const extraEl = document.getElementById("deus-escolhido-extra");
     if (extraEl) extraEl.style.display = isSpecialRaca ? 'block' : 'none';
 
+    const isDeus = isRacaAtiva("deus", dados);
     const headerExtra = document.getElementById("deus-raca-header");
     if (headerExtra) headerExtra.style.display = isDeus ? 'flex' : 'none';
+
+    const isAnjo = isRacaAtiva("anjo", dados);
+    const headerAnjo = document.getElementById("anjo-raca-header");
+    if (headerAnjo) headerAnjo.style.display = isAnjo ? 'flex' : 'none';
+
+    const isDemonio = isRacaAtiva("demonio", dados);
+    const headerDemonio = document.getElementById("demonio-raca-header");
+    if (headerDemonio) headerDemonio.style.display = isDemonio ? 'flex' : 'none';
+
+    const isSemideus = isRacaAtiva("semideus", dados);
+    const headerSemideus = document.getElementById("semideus-raca-header");
+    if (headerSemideus) headerSemideus.style.display = isSemideus ? 'flex' : 'none';
 }
 
 function verificarCorrompido(dados) {

@@ -4,8 +4,8 @@
   margin-bottom: 15px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  border-left: 5px solid #ff4444;
-  color: #ff4444;
+  border-left: 5px solid var(--primary-color);
+  color: var(--primary-color);
   padding-left: 15px;
 }
 
@@ -22,7 +22,7 @@
   background: rgba(0, 0, 0, 0.4);
   padding: 25px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 68, 68, 0.2);
+  border: 1px solid var(--primary-glow);
   position: relative;
 }
 
@@ -39,7 +39,7 @@
 .weight-label {
   display: block;
   font-size: 0.8rem;
-  color: #ff4444;
+  color: var(--primary-color);
   text-transform: uppercase;
   margin-bottom: 5px;
   font-weight: bold;
@@ -65,7 +65,7 @@
 #weight-bar-inner {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #ff4444, #991b1b);
+  background: linear-gradient(90deg, var(--primary-color), #000);
   transition:
     width 0.5s ease,
     background-color 0.3s;
@@ -86,14 +86,14 @@
 
 .inv-header {
   display: grid;
-  grid-template-columns: 50px 1fr 140px 60px 40px; /* Ajustado para melhor alinhamento */
+  grid-template-columns: 50px 1fr 140px 60px 40px;
   gap: 15px;
   padding: 12px 20px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 8px 8px 0 0;
-  border-bottom: 1px solid #ff4444;
+  border-bottom: 1px solid var(--primary-color);
   font-weight: bold;
-  color: #ff4444;
+  color: var(--primary-color);
   align-items: center;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -109,7 +109,7 @@
 }
 
 .item-row {
-  grid-template-columns: 50px 1fr 140px 60px 40px; /* Define as colunas para bater com o header */
+  grid-template-columns: 50px 1fr 140px 60px 40px;
   animation: slideInRow 0.4s ease-out both;
 }
 
@@ -119,10 +119,10 @@
 }
 
 .item-row.equipped-row {
-  background: linear-gradient(90deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 68, 68, 0.02) 100%);
-  border-left: 4px solid #ff4444;
+  background: linear-gradient(90deg, var(--primary-glow) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-left: 4px solid var(--primary-color);
   box-shadow:
-    inset 5px 0 15px rgba(255, 68, 68, 0.05),
+    inset 5px 0 15px var(--primary-glow),
     0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -145,20 +145,20 @@
 .item-weapon-part {
   flex-grow: 1;
   min-width: 70px;
-  border-bottom: 1px dashed #ff4444 !important;
+  border-bottom: 1px dashed var(--primary-color) !important;
 }
 
 .item-effect-textarea {
   min-height: 38px; /* Altura mínima para textarea */
 }
 .inv-input:invalid {
-  border: 1px solid var(--danger) !important;
-  box-shadow: 0 0 5px rgba(255, 68, 68, 0.3);
+  border: 1px solid var(--primary-color) !important;
+  box-shadow: 0 0 5px var(--primary-glow);
 }
 
 .btn-remove-class {
   background: transparent;
-  color: var(--danger);
+  color: var(--primary-color);
   border: none;
   cursor: pointer;
   font-weight: bold;
@@ -182,7 +182,7 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #ff4444;
+  accent-color: var(--primary-color);
   justify-self: center;
 }
 
@@ -201,9 +201,9 @@
 }
 
 .btn-open-desc {
-  background: rgba(255, 68, 68, 0.1);
-  border: 1px solid #ff4444;
-  color: #ff4444;
+  background: var(--primary-glow);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
   border-radius: 4px;
   cursor: pointer;
   padding: 5px 8px;
@@ -212,15 +212,15 @@
 }
 
 .btn-open-desc:hover {
-  background: #ff4444;
+  background: var(--primary-color);
   color: #000;
 }
 
 /* Estilo para o novo botão de edição de material */
 .btn-material-edit {
-  background: rgba(255, 68, 68, 0.1);
-  border: 1px solid #ff4444;
-  color: #ff4444;
+  background: var(--primary-glow);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
   border-radius: 4px;
   cursor: pointer;
   padding: 8px 12px;
@@ -230,7 +230,7 @@
   text-align: center;
 }
 .btn-material-edit:hover {
-  background: #ff4444;
+  background: var(--primary-color);
   color: #000;
 }
 
@@ -254,11 +254,11 @@
 
 .filter-input-red {
   max-width: 180px;
-  border-color: #ff4444;
+  border-color: var(--primary-color);
 }
 
 .search-input-red {
-  border-color: #ff4444;
+  border-color: var(--primary-color);
 }
 
 /* Estilo para o novo botão de edição de material */
@@ -266,8 +266,8 @@
 /* Estilo para botões de adicionar menores dentro de modais */
 .btn-add-class {
   background: transparent;
-  border: 1px dashed #ff4444;
-  color: #ff4444;
+  border: 1px dashed var(--primary-color);
+  color: var(--primary-color);
   padding: 8px 15px;
   font-size: 0.8rem;
   cursor: pointer;
@@ -278,7 +278,7 @@
   align-self: center;
 }
 .btn-add-class:hover {
-  background: rgba(255, 68, 68, 0.1);
+  background: var(--primary-glow);
 }
 
 .btn-save-modal:hover {
@@ -289,7 +289,7 @@
 select.inv-input {
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ff4444' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,68,68,1)' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   padding-right: 30px;
@@ -307,8 +307,8 @@ select.inv-input option {
 
 .btn-add-item {
   background: transparent;
-  border: 2px dashed #ff4444;
-  color: #ff4444;
+  border: 2px dashed var(--primary-color);
+  color: var(--primary-color);
   padding: 15px;
   cursor: pointer;
   margin-top: 15px;
@@ -318,13 +318,13 @@ select.inv-input option {
 }
 
 .btn-add-item:hover {
-  background: rgba(255, 68, 68, 0.1);
+  background: var(--primary-glow);
 }
 
 .btn-clear-inventory {
   background: transparent;
-  border: 2px dashed var(--danger);
-  color: var(--danger);
+  border: 2px dashed var(--primary-color);
+  color: var(--primary-color);
   padding: 15px;
   cursor: pointer;
   margin-top: 15px;
@@ -335,8 +335,8 @@ select.inv-input option {
 }
 
 .btn-clear-inventory:hover {
-  background: rgba(255, 68, 68, 0.1);
-  box-shadow: 0 0 10px rgba(255, 68, 68, 0.1);
+  background: var(--primary-glow);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 /* Cores de Raridade */
@@ -344,21 +344,21 @@ select.inv-input option {
   font-weight: bold;
 }
 .rarity-comum {
-  color: var(--text-main);
+  color: var(--text-main) !important;
 }
 .rarity-incomum {
-  color: #4ade80;
+  color: #4ade80 !important;
 }
 .rarity-raro {
-  color: #3b82f6;
+  color: #3b82f6 !important;
 }
 .rarity-epico {
-  color: #a855f7;
+  color: #a855f7 !important;
   text-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
 }
 .rarity-mitico {
-  color: #ff4444 !important;
-  text-shadow: 0 0 15px rgba(255, 68, 68, 0.8);
+  color: var(--primary-color) !important;
+  text-shadow: 0 0 15px var(--primary-glow);
   font-weight: bold !important;
 }
 .rarity-especial {
@@ -416,6 +416,6 @@ select.inv-input option {
   }
   50% {
     filter: brightness(1.4);
-    box-shadow: 0 0 15px rgba(255, 68, 68, 0.6);
+    box-shadow: 0 0 15px var(--primary-glow);
   }
 }

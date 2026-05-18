@@ -44,8 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     style.textContent = `
         .top-menu { 
             background: rgba(13, 13, 15, 0.98) !important; 
-            border-bottom: 2px solid #ff4444 !important; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 68, 68, 0.2);
+            border-bottom: 2px solid var(--primary-color) !important; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px var(--primary-glow);
             backdrop-filter: blur(10px);
             padding: 5px 0 !important;
         }
@@ -63,14 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         .menu-links a:hover { 
             opacity: 1 !important;
-            color: #ff4444 !important; 
-            text-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+            color: var(--primary-color) !important; 
+            text-shadow: 0 0 8px var(--primary-glow);
             background: transparent !important;
+            border-bottom-color: var(--primary-color) !important;
         }
         .menu-links a.active { 
             opacity: 1 !important;
-            color: #ff4444 !important; 
-            border-bottom: 2px solid #ff4444 !important;
+            color: var(--primary-color) !important; 
+            border-bottom: 2px solid var(--primary-color) !important;
             background: transparent !important;
         }
     `;

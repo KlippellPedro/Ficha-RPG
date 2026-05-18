@@ -16,11 +16,11 @@
 }
 
 h1 {
-  color: #ff4444;
-  text-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+  color: var(--primary-color);
+  text-shadow: 0 0 15px var(--primary-glow);
   text-transform: uppercase;
   letter-spacing: 2px;
-  border-left: 5px solid #ff4444;
+  border-left: 5px solid var(--primary-color);
   padding-left: 15px;
   margin-bottom: 20px;
 }
@@ -55,14 +55,14 @@ h1 {
 }
 
 .skill-row:hover {
-  border-color: #ff4444;
+  border-color: var(--primary-color);
   transform: translateX(5px);
   background: rgba(255, 255, 255, 0.02);
 }
 
 .skill-total-box {
-  background: rgba(255, 68, 68, 0.05);
-  border: 1px solid rgba(255, 68, 68, 0.2);
+  background: var(--primary-glow);
+  border: 1px solid var(--primary-glow);
   border-radius: 6px;
   width: 50px;
   height: 50px;
@@ -81,9 +81,9 @@ h1 {
 }
 
 .btn-calc-ajuda {
-  background: rgba(255, 68, 68, 0.1);
-  border: 1px solid rgba(255, 68, 68, 0.4);
-  color: #ff4444;
+  background: var(--primary-glow);
+  border: 1px solid var(--primary-glow);
+  color: var(--primary-color);
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -98,15 +98,15 @@ h1 {
 }
 
 .btn-calc-ajuda:hover {
-  background: #ff4444;
+  background: var(--primary-color);
   color: white;
 }
 
 .skill-total {
   font-size: 1.3rem;
   font-weight: bold;
-  color: #ff4444;
-  text-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+  color: var(--primary-color) !important;
+  text-shadow: 0 0 10px var(--primary-glow);
 }
 
 .skill-name {
@@ -121,7 +121,7 @@ h1 {
 }
 
 .skill-attr-selector {
-  background: rgba(255, 68, 68, 0.05);
+  background: var(--primary-glow);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-muted);
   font-size: 0.7rem;
@@ -135,8 +135,8 @@ h1 {
 }
 
 .skill-attr-selector:hover {
-  border-color: #ff4444;
-  color: #ff4444;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .skill-training-select {
@@ -173,7 +173,7 @@ h1 {
 }
 
 .skill-training-select:focus {
-  box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 .skill-training-select option {
@@ -185,7 +185,7 @@ h1 {
   width: 55px;
   background: var(--bg-input);
   border: 1px solid var(--border-color);
-  color: #ff4444;
+  color: var(--primary-color);
   font-size: 0.8rem;
   padding: 4px;
   border-radius: 4px;
@@ -239,8 +239,15 @@ h1 {
 }
 
 @keyframes advantage-glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); }
-  50% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); border-color: #f59e0b; }
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    border-color: #f59e0b;
+  }
 }
 
 /* Remove as setinhas padrão do input de número para manter o visual limpo */
@@ -280,15 +287,15 @@ h1 {
 }
 
 .skill-name-input:focus {
-  border-bottom-color: #ff4444;
+  border-bottom-color: var(--primary-color);
 }
 
 .btn-add-skill {
   margin: 20px auto;
   display: block;
   background: transparent;
-  border: 1px dashed #ff4444;
-  color: #ff4444;
+  border: 1px dashed var(--primary-color);
+  color: var(--primary-color);
   padding: 10px 30px;
   font-weight: bold;
   cursor: pointer;
@@ -296,14 +303,14 @@ h1 {
 }
 
 .btn-add-skill:hover {
-  background: rgba(255, 68, 68, 0.1);
-  box-shadow: 0 0 15px rgba(255, 68, 68, 0.1);
+  background: var(--primary-glow);
+  box-shadow: 0 0 15px var(--primary-glow);
 }
 
 .btn-remove-skill {
   background: transparent;
   border: none;
-  color: var(--danger);
+  color: var(--primary-color);
   cursor: pointer;
   font-size: 1.5rem;
   margin-left: 5px;
@@ -341,4 +348,22 @@ h1 {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Estilo para o botão de fechar dos modais */
+.btn-remove-class {
+  background: transparent !important;
+  color: var(--primary-color) !important;
+  border: none !important;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 !important;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
 }

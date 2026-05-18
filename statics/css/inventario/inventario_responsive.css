@@ -1,0 +1,80 @@
+/* Responsividade para Inventário */
+@media (max-width: 768px) {
+  html body .inv-header {
+    display: none !important;
+  }
+
+  html body .item-row {
+    display: grid !important;
+    grid-template-columns: 50px 1fr 1fr 45px !important;
+    grid-template-areas:
+      "check-area name-area name-area fechar-area"
+      "cat-area cat-area weight-area qty-area"
+      "lupa-btn lupa-btn lupa-btn lupa-btn" !important;
+    gap: 12px !important;
+    padding: 15px !important;
+    background: #151518 !important;
+    border-radius: 12px !important;
+    margin-bottom: 12px !important;
+    height: auto !important;
+    border-left: 5px solid var(--primary-color) !important;
+  }
+
+  html body .inv-checkbox {
+    grid-area: check-area !important;
+  }
+  html body .item-row input[id^="inv_nome_"] {
+    grid-area: name-area !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Categoria */
+  html body .item-row select[id^="inv_cat_"] {
+    grid-area: cat-area !important;
+    width: 100% !important;
+    height: 38px !important;
+  }
+
+  /* Peso e Qtd */
+  html body .item-row input[id^="inv_peso_"] {
+    grid-area: weight-area !important;
+    width: 100% !important;
+    height: 38px !important;
+  }
+  html body .item-row input[id^="inv_qtd_"] {
+    grid-area: qty-area !important;
+    width: 100% !important;
+    height: 38px !important;
+  }
+
+  /* Botões */
+  html body .item-row .desc-cell {
+    grid-area: lupa-btn !important;
+    border: none !important;
+  }
+  html body .item-row .btn-open-desc {
+    width: 100% !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html body .item-row .btn-remove-class {
+    grid-area: fechar-area !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: var(--primary-glow) !important;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    border-radius: 8px !important;
+    opacity: 0.8 !important;
+  }
+}

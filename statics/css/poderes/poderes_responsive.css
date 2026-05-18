@@ -1,0 +1,128 @@
+/* Reaproveita toda a lógica de Habilidades para Poderes */
+@import url("../habilidades/habilidades_responsive.css");
+
+@media (max-width: 768px) {
+  html body .pod-header-grid {
+    display: none !important;
+  }
+
+  /* Transforma cada linha em um Card (Poderes) */
+  html body .pod-row-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-areas:
+      "nome-area nome-area nome-area fechar-area"
+      "tipo-area tipo-area tipo-area tipo-area"
+      "custo-area custo-area custo-area custo-area"
+      "lupa-btn dup-btn usar-btn usar-btn" !important;
+    gap: 12px !important;
+    padding: 18px !important;
+    height: auto !important;
+    background: #151518 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-left: 5px solid var(--primary-color) !important;
+    border-radius: 12px !important;
+    margin-bottom: 16px !important;
+    align-items: center !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* Limpeza de dados ocultos e textareas */
+  html body .pod-row-grid > input[type="hidden"],
+  html body .pod-row-grid textarea,
+  html body .item-hidden-data,
+  html body .item-hidden-data * {
+    display: none !important;
+    grid-area: auto !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* NOME */
+  html body .pod-row-grid input[id^="pod_nome_"] {
+    grid-area: nome-area !important;
+    font-size: 1.2rem !important;
+    font-weight: bold !important;
+    text-transform: uppercase;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 0 0 8px 0 !important;
+    color: white !important;
+    margin-bottom: 5px !important;
+    width: 100% !important;
+  }
+
+  /* TIPO DO PODER (SELECT) */
+  html body .pod-row-grid select[id^="pod_tipo_"] {
+    grid-area: tipo-area !important;
+    width: 100% !important;
+    height: 38px !important;
+    font-size: 0.8rem !important;
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important;
+    padding-left: 10px !important;
+  }
+
+  /* Container de Custo */
+  html body .pod-row-grid .cost-container {
+    grid-area: custo-area !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* BOTÕES DE AÇÃO (Lupa e Duplicar) */
+  html body .pod-row-grid .btn-open-desc,
+  html body .pod-row-grid .btn-duplicate {
+    display: flex !important;
+    width: 100% !important;
+    height: 44px !important;
+    font-size: 1.2rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html body .pod-row-grid .btn-open-desc {
+    grid-area: lupa-btn !important;
+  }
+
+  html body .pod-row-grid .btn-duplicate {
+    grid-area: dup-btn !important;
+  }
+
+  html body .pod-row-grid .btn-use-skill {
+    grid-area: usar-btn !important;
+  }
+
+  /* Botão Remover (X) Padronizado */
+  html body .pod-row-grid .btn-remove-class {
+    grid-area: fechar-area !important;
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.2rem !important;
+    justify-self: end !important;
+    background: var(--primary-glow) !important;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    border-radius: 8px !important;
+    opacity: 0.7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+  }
+}

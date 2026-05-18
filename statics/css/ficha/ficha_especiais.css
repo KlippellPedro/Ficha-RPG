@@ -4,12 +4,12 @@
   text-align: center;
   margin-top: 20px;
   padding: 15px;
-  border: 1px dashed #ff4444;
+  border: 1px dashed var(--primary-color);
   border-radius: 8px;
 }
 
 .extra-section-label {
-  color: #ff4444;
+  color: var(--primary-color);
   font-weight: bold;
   display: block;
   margin-bottom: 10px;
@@ -35,4 +35,6 @@
 }
 
 /* Utilitários de Grid */
-.grid-span-2 { grid-column: span 2; }
+.grid-span-2 {
+  grid-column: span 2;
+}

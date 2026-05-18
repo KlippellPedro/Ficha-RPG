@@ -42,12 +42,19 @@
   background: rgba(0, 0, 0, 0.2);
 }
 
-.section-divider {
-  margin: 20px 0 10px 0;
-  border-bottom: 1px dashed rgba(255, 68, 68, 0.3);
-  padding-bottom: 5px;
-  color: #ff4444;
-  font-size: 0.8rem;
+.btn-clear-notas {
+  background: transparent;
+  border: 2px dashed var(--primary-color);
+  color: var(--primary-color);
+  padding: 15px;
+  cursor: pointer;
+  margin-top: 15px;
+  border-radius: 8px;
+  transition: 0.3s;
   font-weight: bold;
-  text-transform: uppercase;
+  margin-left: 10px;
+}
+.btn-clear-notas:hover {
+  background: var(--primary-glow);
+  box-shadow: 0 0 10px var(--primary-glow);
 }

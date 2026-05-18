@@ -49,14 +49,15 @@ function abrirModalCalculoGenerico(alias) {
         <div style="display: flex; flex-direction: column; gap: 10px; text-align: left;">
             ${items.map(item => {
         const colored = item
-            .replace(/(\+\d+)/g, '<span style="color: #4ade80; font-weight: bold;">$1</span>')
-            .replace(/(\-\d+)/g, '<span style="color: #ff5f5f; font-weight: bold;">$1</span>');
+            .replace(/Base: (\d+)/g, '<span class="calc-label-base">Base: $1</span>')
+            .replace(/(\+\d+)/g, '<span class="calc-label-bonus-pos">$1</span>')
+            .replace(/(\-\d+)/g, '<span class="calc-label-bonus-neg">$1</span>');
         return `
-                <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 3px solid #ff4444; font-size: 0.9rem;">
+                <div style="padding: 10px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 3px solid var(--primary-color); font-size: 0.9rem;">
                     ${colored}
                 </div>`;
     }).join('')}
-            <div style="margin-top: 10px; padding: 12px; background: rgba(255,68,68,0.1); border-radius: 4px; color: #ff4444; font-weight: bold; font-size: 1.1rem; text-align: center;">
+            <div class="calc-label-total" style="background: var(--primary-glow); border-radius: 4px; padding: 12px; text-align: center; border-top: none;">
                 Total: ${el.value}
             </div>
         </div>
@@ -104,6 +105,9 @@ function confirmarClasseUnica() {
 
         document.querySelectorAll('.class-row').forEach(row => {
             if (row !== targetRow) {
+                // Dispara o efeito de fumaça/almas saindo da linha que será removida
+                if (typeof criarEfeitoFumaca === 'function') criarEfeitoFumaca(row);
+
                 const nameSelect = row.querySelector('[id^="class_name_"]');
                 const index = nameSelect?.id.split('_').pop();
                 if (index) {
@@ -111,18 +115,26 @@ function confirmarClasseUnica() {
                     delete dados[`class_lvl_${index}`];
                     delete dados[`class_sub_${index}`];
                 }
-                row.remove();
+
+                // Pequeno atraso para o efeito visual de fumaça ser percebido antes da remoção
+                setTimeout(() => row.remove(), 300);
             }
         });
         localStorage.setItem(key, JSON.stringify(dados));
         if (typeof atualizarEstiloClasse === 'function') atualizarEstiloClasse(pendingUniqueSelect);
-        document.getElementById('modal-unique-class').style.display = 'none';
+
+        const modalUnique = document.getElementById('modal-unique-class');
+        if (modalUnique) modalUnique.style.display = 'none';
+
         pendingUniqueSelect = null;
         atualizarTudo();
         showNotification("Classe Ceifeiro de Almas ativada. Outras classes removidas.", "success");
     }, () => {
         if (pendingUniqueSelect) pendingUniqueSelect.value = ""; // Reseta a seleção da classe
-        document.getElementById('modal-unique-class').style.display = 'none';
+
+        const modalUnique = document.getElementById('modal-unique-class');
+        if (modalUnique) modalUnique.style.display = 'none';
+
         pendingUniqueSelect = null;
         atualizarTudo();
         showNotification("Seleção de Ceifeiro de Almas cancelada.", "info");

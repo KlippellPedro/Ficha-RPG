@@ -17,9 +17,13 @@ function abrirModalHab(index) {
     const alcance = document.getElementById(`hab_alcance_${index}`)?.value || "";
     const acao = document.getElementById(`hab_acao_${index}`)?.value || "";
 
-    document.getElementById('modal-hab-title').innerText = `Detalhes: ${nome || "Habilidade"}`;
-
+    const titleEl = document.getElementById('modal-hab-title');
     const body = document.getElementById('modal-hab-body');
+    const modal = document.getElementById('modal-hab');
+
+    if (!titleEl || !body || !modal) return;
+
+    titleEl.innerText = `Detalhes: ${nome || "Habilidade"}`;
     body.innerHTML = `
         <div class="grid-2-cols">
             <div class="input-group">
@@ -71,7 +75,6 @@ function abrirModalHab(index) {
         </div>
     `;
 
-    const modal = document.getElementById('modal-hab');
     const footer = modal ? modal.querySelector('.modal-footer') : null;
     if (footer) {
         footer.style.justifyContent = 'space-between';

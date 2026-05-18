@@ -49,3 +49,28 @@ const OPTIONS_ATK_TIPO = [
     { v: "Magia", t: "Magia" },
     { v: "Outro", t: "Outro" }
 ];
+
+const OPTIONS_TAMANHO = [
+    { v: "Minúsculo", t: "Minúsculo" },
+    { v: "Pequeno", t: "Pequeno" },
+    { v: "Normal", t: "Normal" },
+    { v: "Grande", t: "Grande" },
+    { v: "Enorme", t: "Enorme" }
+];
+
+const OPTIONS_TIPO_DANO = [
+    { v: "Corte", t: "Corte" },
+    { v: "Perfuração", t: "Perfuração" },
+    { v: "Impacto", t: "Impacto" },
+    { v: "Balistico", t: "Balistico" },
+    { v: "Fogo", t: "Fogo" },
+    { v: "Frio", t: "Frio" },
+    { v: "Veneno", t: "Veneno" },
+    { v: "Mental", t: "Mental" },
+    { v: "Luz", t: "Luz" },
+    { v: "Escuridão", t: "Escuridão" },
+    { v: "Vida", t: "Vida" },
+    { v: "Morte", t: "Morte" },
+    { v: "Energia", t: "Energia" },
+    { v: "Outro", t: "Outro" }
+];

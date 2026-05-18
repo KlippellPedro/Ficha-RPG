@@ -2,12 +2,16 @@
   --bg-main: #09090b; /* Preto neutro profundo */
   --bg-card: #18181b; /* Cinza zinco escuro */
   --bg-input: #27272a; /* Cinza zinco médio */
-  --primary: #ff4444; /* Vermelho Supremacia do Protesto */
-  --primary-hover: #ff6666; /* Vermelho mais vibrante no hover */
+  --primary-color: #ff4444;
+  --primary-glow: rgba(255, 68, 68, 0.3);
+  --primary: var(--primary-color);
+  --primary-hover: var(--primary-color);
   --text-main: #f4f4f5; /* Branco acinzentado */
   --text-muted: #a1a1aa; /* Texto secundário neutro */
-  --danger: #ff4444;
-  --info: #ff4444;
+  --success: #4ade80;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: var(--primary-color);
   --border-color: #3f3f46; /* Bordas neutras */
   --transition-speed: 0.3s;
 }
@@ -49,14 +53,14 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-thumb {
-  background: var(--primary);
+  background: var(--primary-color);
   border-radius: 10px;
 }
 
 button {
   padding: 10px 20px;
   cursor: pointer;
-  background: var(--primary);
+  background: var(--primary-color);
   border: none;
   border-radius: 4px;
   font-weight: bold;
@@ -64,8 +68,8 @@ button {
 }
 
 button:hover {
-  background: var(--primary-hover);
-  box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
+  filter: brightness(1.2);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 button.secundario {
@@ -106,7 +110,7 @@ h1 {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   border: 1px solid var(--border-color);
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid var(--primary-color);
 }
 
 .inv-input {
@@ -124,9 +128,92 @@ h1 {
 }
 
 .inv-input:focus {
-  border-color: var(--primary);
+  border-color: var(--primary-color);
   background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 8px rgba(255, 68, 68, 0.3);
+  box-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* Dividores de Seção (Usados dentro de modais ou páginas) */
+.section-divider {
+  margin: 25px 0 10px 0;
+  border-top: 1px dashed var(--primary-color);
+  padding-top: 15px;
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* --- Notificações Globais --- */
+#global-notification {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 15px 25px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transform: translateX(150%);
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#global-notification.show {
+  transform: translateX(0);
+}
+
+#global-notification .icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+#global-notification.success {
+  border-color: var(--success);
+  color: var(--success);
+}
+#global-notification.error {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+#global-notification.warning {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+#global-notification.info {
+  border-color: var(--info);
+  color: var(--info);
+}
+
+/* Estilos para o Conteúdo do Modal de Cálculo (?) */
+.calc-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.95rem;
+}
+.calc-label-base {
+  color: #888;
+} /* Cinza para a Base */
+.calc-label-bonus-pos {
+  color: #4ade80;
+} /* Verde para bônus positivos */
+.calc-label-bonus-neg {
+  color: #ef4444;
+} /* Vermelho para bônus negativos */
+.calc-label-total {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-top: 1px solid var(--primary-glow);
+  margin-top: 5px;
+  padding-top: 12px;
 }
 
 /* --- Padrão de Listas (Inventário, Magias, Poderes, etc) --- */
