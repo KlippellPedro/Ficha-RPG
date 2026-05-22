@@ -1,0 +1,6 @@
+# Dependências
+node_modules/
+
+# IDEs e OS
+.vscode/
+.DS_Store

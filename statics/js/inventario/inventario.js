@@ -4,6 +4,15 @@
  * A lógica detalhada foi movida para inventario_ui.js, inventario_modais.js e inventario_carga.js.
  */
 
+// Variável global para rastrear qual item está sendo editado nos modais suspensos
+// Usamos var ou verificamos existência para evitar erro de redeclaração (SyntaxError)
+if (typeof itemSendoEditadoIdx === 'undefined') {
+    window.itemSendoEditadoIdx = null;
+}
+if (typeof materialSendoEditadoTipo === 'undefined') {
+    window.materialSendoEditadoTipo = null;
+}
+
 /**
  * Helper para obter o nome amigável da raridade a partir do seu valor
  */
@@ -125,6 +134,94 @@ function fecharModalDescricao() {
     itemSendoEditadoIdx = null;
 }
 
+/**
+ * Lógica para o modal de Modificações (Simples/Marciais)
+ */
+function abrirModalModificacoes(index) {
+    itemSendoEditadoIdx = index;
+    const modal = document.getElementById('modal-item-mods');
+    const container = document.getElementById('modal-mods-container');
+    if (!modal || !container) return;
+
+    const modsRaw = document.getElementById(`inv_mods_item_${index}`)?.value || "{}";
+    let modsData = { attributes: [] };
+    try {
+        modsData = modsRaw.startsWith('{') ? JSON.parse(modsRaw) : { attributes: [] };
+    } catch (e) { console.error("Erro ao ler modificações:", e); }
+
+    container.innerHTML = '';
+    if (modsData.attributes && modsData.attributes.length > 0) {
+        modsData.attributes.forEach(a => adicionarLinhaModificacao(a.attr, a.mod, a.isAdv));
+    } else {
+        adicionarLinhaModificacao(); // Adiciona uma linha vazia por padrão
+    }
+
+    modal.style.display = 'flex';
+}
+
+function fecharModalModificacoes() {
+    const modal = document.getElementById('modal-item-mods');
+    if (modal) modal.style.display = 'none';
+}
+
+function adicionarLinhaModificacao(attr = 'nenhum', mod = 0, isAdv = false) {
+    const container = document.getElementById('modal-mods-container');
+    if (!container) return;
+
+    // Determinar a categoria correta baseada no atributo para carregar o select certo
+    let cat = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && attr !== 'nenhum') {
+        if (window.OPTIONS_CATEGORIZADAS.pericia.some(o => o.v === attr)) cat = 'pericia';
+        else if (window.OPTIONS_CATEGORIZADAS.arma.some(o => o.v === attr)) cat = 'arma';
+    }
+
+    const row = document.createElement('div');
+    row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
+    row.innerHTML = `
+        <select class="inv-input mod-cat-select" style="flex: 1;">
+            <option value="ficha" ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia" ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma" ${cat === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="vantagem" ${cat === 'vantagem' ? 'selected' : ''}>Vantagem</option>
+        </select>
+        <select class="inv-input mod-attr-select" style="flex: 1.5;"></select>
+        <input type="text" class="inv-input mod-val-input" style="flex: 0.8;" value="${mod}" placeholder="Val">
+        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(row);
+
+    const selectCat = row.querySelector('.mod-cat-select');
+    const selectAttr = row.querySelector('.mod-attr-select');
+    const update = (val = "nenhum") => {
+        const options = window.OPTIONS_CATEGORIZADAS[selectCat.value] || [];
+        selectAttr.innerHTML = options.map(o => `<option value="${o.v}" ${o.v === val ? 'selected' : ''}>${o.t}</option>`).join('');
+    };
+    selectCat.onchange = () => update();
+    update(attr);
+}
+
+function salvarDetalhesModificacoes() {
+    const idx = itemSendoEditadoIdx;
+    if (idx === null) return;
+
+    const rows = document.querySelectorAll('#modal-mods-container > div');
+    const attributes = [];
+
+    rows.forEach(row => {
+        const cat = row.querySelector('.mod-cat-select').value;
+        const attr = row.querySelector('.mod-attr-select').value;
+        const modRaw = row.querySelector('.mod-val-input').value;
+        if (attr !== 'nenhum') {
+            attributes.push({ attr, mod: isNaN(parseInt(modRaw)) ? modRaw : parseInt(modRaw), isAdv: cat === 'vantagem' });
+        }
+    });
+
+    document.getElementById(`inv_mods_item_${idx}`).value = JSON.stringify({ attributes });
+    fecharModalModificacoes();
+    if (typeof verificarTipoItem === 'function') verificarTipoItem(idx);
+    if (typeof atualizarTudo === 'function') atualizarTudo();
+}
+
 function salvarDetalhesItem() {
     if (itemSendoEditadoIdx === null) return;
     const idx = itemSendoEditadoIdx;
@@ -194,14 +291,20 @@ function adicionarLinhaBuffRaridade(attr = 'nenhum', mod = 0, isAdv = false) {
     const container = document.getElementById('modal-rarity-buffs-container');
     if (!container) return;
 
+    let cat = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && attr !== 'nenhum') {
+        if (window.OPTIONS_CATEGORIZADAS.pericia.some(o => o.v === attr)) cat = 'pericia';
+        else if (window.OPTIONS_CATEGORIZADAS.arma.some(o => o.v === attr)) cat = 'arma';
+    }
+
     const row = document.createElement('div');
     row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
     row.innerHTML = `
         <select class="inv-input rarity-cat-select" style="flex: 1;">
-            <option value="ficha">Ficha</option>
-            <option value="pericia">Perícia</option>
-            <option value="arma">Arma</option>
-            <option value="vantagem" ${isAdv ? 'selected' : ''}>Vantagem</option>
+            <option value="ficha" ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia" ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma" ${cat === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="vantagem" ${cat === 'vantagem' ? 'selected' : ''}>Vantagem</option>
         </select>
         <select class="inv-input rarity-buff-attr" style="flex: 1.5;"></select>
         <input type="text" class="inv-input rarity-buff-val" style="flex: 0.8;" value="${mod}" placeholder="Val">
@@ -246,6 +349,93 @@ function salvarDetalhesRaridade() {
     }
 
     fecharModalRaridade();
+    if (typeof atualizarEstiloRaridade === 'function') atualizarEstiloRaridade(idx);
+    if (typeof atualizarTudo === 'function') atualizarTudo();
+}
+
+/**
+ * Lógica para o modal de Materiais (Centro e Base)
+ */
+function abrirModalMaterial(index, tipo) {
+    itemSendoEditadoIdx = index;
+    materialSendoEditadoTipo = tipo;
+    const modal = document.getElementById('modal-material-details');
+    const container = document.getElementById('material-attributes-container');
+    if (!modal || !container) return;
+
+    const fieldId = tipo === 'cabo' ? `inv_cabo_${index}` : `inv_base_${index}`;
+    const matRaw = document.getElementById(fieldId)?.value || "{}";
+    let matData = { nome: "", attributes: [] };
+    try {
+        matData = matRaw.startsWith('{') ? JSON.parse(matRaw) : { nome: matRaw, attributes: [] };
+    } catch (e) { }
+
+    document.getElementById('modal_material_nome').value = matData.nome || "";
+    document.getElementById('modal-material-title').innerText = tipo === 'cabo' ? 'Detalhes do Centro (Cabo)' : 'Detalhes da Base (Lâmina/Corpo)';
+
+    container.innerHTML = '';
+    if (matData.attributes) {
+        matData.attributes.forEach(a => adicionarAtributoMaterial(a.attr, a.mod, a.isAdv));
+    }
+
+    modal.style.display = 'flex';
+}
+
+function fecharModalMaterial() {
+    const modal = document.getElementById('modal-material-details');
+    if (modal) modal.style.display = 'none';
+}
+
+function adicionarAtributoMaterial(attr = 'nenhum', mod = 0, isAdv = false) {
+    const container = document.getElementById('material-attributes-container');
+
+    let cat = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && attr !== 'nenhum') {
+        if (window.OPTIONS_CATEGORIZADAS.pericia.some(o => o.v === attr)) cat = 'pericia';
+        else if (window.OPTIONS_CATEGORIZADAS.arma.some(o => o.v === attr)) cat = 'arma';
+    }
+
+    const row = document.createElement('div');
+    row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
+    row.innerHTML = `
+        <select class="inv-input mat-cat-select" style="flex: 1;">
+            <option value="ficha" ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia" ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma" ${cat === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="vantagem" ${cat === 'vantagem' ? 'selected' : ''}>Vantagem</option>
+        </select>
+        <select class="inv-input mat-attr-select" style="flex: 1.5;"></select>
+        <input type="text" class="inv-input mat-val-input" style="flex: 0.8;" value="${mod}">
+        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(row);
+    const selectCat = row.querySelector('.mat-cat-select'), sel = row.querySelector('.mat-attr-select');
+    const up = (v = "nenhum") => {
+        sel.innerHTML = (window.OPTIONS_CATEGORIZADAS[selectCat.value] || []).map(o => `<option value="${o.v}" ${o.v === v ? 'selected' : ''}>${o.t}</option>`).join('');
+    };
+    selectCat.onchange = () => up();
+    up(attr);
+}
+
+function salvarDetalhesMaterial() {
+    const idx = itemSendoEditadoIdx, tipo = materialSendoEditadoTipo;
+    if (idx === null || !tipo) return;
+
+    const nome = document.getElementById('modal_material_nome').value;
+    const rows = document.querySelectorAll('#material-attributes-container > div');
+    const attributes = [];
+    rows.forEach(row => {
+        const cat = row.querySelector('.mat-cat-select').value;
+        const attr = row.querySelector('.mat-attr-select').value;
+        const mod = row.querySelector('.mat-val-input').value;
+        if (attr !== 'nenhum') attributes.push({ attr, mod: isNaN(parseInt(mod)) ? mod : parseInt(mod), isAdv: cat === 'vantagem' });
+    });
+
+    const fieldId = tipo === 'cabo' ? `inv_cabo_${idx}` : `inv_base_${idx}`;
+    document.getElementById(fieldId).value = JSON.stringify({ nome, attributes });
+
+    fecharModalMaterial();
+    if (typeof verificarTipoItem === 'function') verificarTipoItem(idx);
     if (typeof atualizarEstiloRaridade === 'function') atualizarEstiloRaridade(idx);
     if (typeof atualizarTudo === 'function') atualizarTudo();
 }

@@ -1,0 +1,22 @@
+{
+  "name": "ficha-rpg-digital",
+  "version": "1.0.0",
+  "description": "Uma plataforma web avançada para gerenciamento de fichas de RPG com motor de cálculos automáticos e persistência local.",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server",
+    "dev": "live-server --port=5500"
+  },
+  "keywords": [
+    "rpg",
+    "character-sheet",
+    "javascript-vanilla",
+    "localstorage",
+    "vanilla-js",
+    "css-grid"
+  ],
+  "author": "Pedro",
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
