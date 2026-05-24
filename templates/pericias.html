@@ -40,6 +40,13 @@
         <h1>PERÍCIAS</h1>
       </header>
 
+      <div class="filter-bar">
+        <div class="search-box">
+          <input type="text" id="search-pericia" class="header-input" placeholder="Pesquisar perícia pelo nome..." oninput="filtrarPericias()" />
+        </div>
+        <button type="button" class="btn-clear-skills" onclick="resetarFiltrosPericias()">Limpar Filtros</button>
+      </div>
+
       <section class="skills-section">
         <div class="skills-grid" id="skills-container">
           <!-- As perícias serão geradas dinamicamente pelo pericia.js -->

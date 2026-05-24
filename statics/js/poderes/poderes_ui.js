@@ -46,8 +46,8 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
             </select>
         </div>
         <button type="button" class="btn-open-desc" onclick="abrirModalPod('${index}')">🔍</button>
-        <button type="button" class="btn-duplicate" onclick="duplicarPoder('${index}')" title="Duplicar">📋</button>
         <button type="button" class="btn-use-skill" onclick="usarPoder('${index}')">Usar</button>
+        <button type="button" class="btn-duplicate" onclick="duplicarPoder('${index}')" title="Duplicar">📋</button>
         <button type="button" class="btn-remove-class" onclick="removerPoder(this)">×</button>
 
         <div style="display:none">

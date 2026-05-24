@@ -1,5 +1,18 @@
 /* Responsividade para Perícias */
 @media (max-width: 768px) {
+  html body .filter-bar {
+    flex-direction: column !important;
+    padding: 15px !important;
+    gap: 10px !important;
+  }
+
+  html body .search-box,
+  html body #search-pericia,
+  html body .btn-clear-skills {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
   html body .skills-grid {
     grid-template-columns: 1fr !important;
   }

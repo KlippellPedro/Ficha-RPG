@@ -28,17 +28,16 @@ function abrirModalNota(index) {
     `;
 
     bodyEl.innerHTML = `
-        <div class="input-group">
-            <label style="color: var(--primary-color); font-size: 0.7rem; letter-spacing: 1px;">CATEGORIA / ETIQUETA</label>
+        <div class="diario-container">
+            <label class="diario-label">Categoria / Etiqueta</label>
             <input type="text" id="modal_nota_tipo" class="inv-input" value="${tipo}" placeholder="Ex: Lore, Personagem, Alvo...">
-        </div>
-        <div class="input-group">
-            <label style="color: var(--primary-color); font-size: 0.7rem; letter-spacing: 1px;">ANOTAÇÃO</label>
-            <textarea id="modal_nota_desc" class="inv-input" style="min-height: 300px; line-height: 1.6; font-size: 1.05rem; padding: 15px; background: rgba(0,0,0,0.2);">${desc}</textarea>
+            
+            <label class="diario-label">Anotações do Mestre / Jogador</label>
+            <textarea id="modal_nota_desc" class="inv-input diario-escrita" placeholder="Escreva aqui os detalhes da sua aventura...">${desc}</textarea>
         </div>
 
         <div class="section-divider">Campos Personalizados</div>
-        <div id="custom-fields-container"></div>
+        <div id="custom-fields-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
         <button type="button" class="btn-add-class" style="width: 100%; margin-top: 10px;" onclick="adicionarCampoDinamico()">+ Adicionar Campo Flexível</button>
 
         <div class="modal-footer" style="margin-top: 20px;">

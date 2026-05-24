@@ -211,4 +211,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (typeof atualizarTudo === 'function') atualizarTudo();
+    filtrarPericias();
 });
+
+/**
+ * Filtra a lista de perícias com base no termo digitado
+ */
+function filtrarPericias() {
+    const termo = document.getElementById('search-pericia')?.value.toLowerCase() || "";
+    const rows = document.querySelectorAll('#skills-container .skill-row');
+
+    rows.forEach(row => {
+        // Pega o nome das perícias estáticas ou o valor do input das dinâmicas
+        const staticName = row.querySelector('.static-skill-name')?.innerText.toLowerCase() || "";
+        const dynamicName = row.querySelector('.skill-name-input')?.value.toLowerCase() || "";
+        const nome = staticName || dynamicName;
+
+        row.style.display = nome.includes(termo) ? '' : 'none';
+    });
+}
+
+/**
+ * Limpa o campo de busca e restaura a lista completa
+ */
+function resetarFiltrosPericias() {
+    const search = document.getElementById('search-pericia');
+    if (search) {
+        search.value = '';
+        filtrarPericias();
+        showNotification("Filtro de perícias limpo", "info", 2000);
+    }
+}

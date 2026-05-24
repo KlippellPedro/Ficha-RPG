@@ -25,6 +25,61 @@ h1 {
   margin-bottom: 20px;
 }
 
+/* Estilização da Barra de Busca e Filtros */
+.filter-bar {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 30px;
+  backdrop-filter: blur(5px);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.search-box {
+  flex: 1;
+}
+
+#search-pericia {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--border-color) !important;
+  border-bottom: 2px solid var(--primary-color) !important;
+  padding: 12px 18px !important;
+  font-size: 1rem !important;
+  border-radius: 6px !important;
+  transition: all 0.3s ease !important;
+  color: white !important;
+}
+
+#search-pericia:focus {
+  background: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 0 15px var(--primary-glow) !important;
+  outline: none;
+}
+
+.btn-clear-skills {
+  background: var(--primary-glow);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.btn-clear-skills:hover {
+  background: var(--primary-color);
+  color: black;
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
 .skills-section {
   width: 100%;
   display: block;
