@@ -85,16 +85,26 @@ function ordenarNotas() {
 
 function filtrarNotas() {
     const termo = document.getElementById('search-nota')?.value.toLowerCase() || "";
+    const termoDesc = document.getElementById('search-nota-desc')?.value.toLowerCase() || "";
     let contador = 0;
 
     document.querySelectorAll('#notas-container .item-row').forEach(row => {
         const index = row.dataset.index;
         const titulo = document.getElementById(`nota_titulo_${index}`)?.value.toLowerCase() || "";
         const tipo = document.getElementById(`nota_tipo_${index}`)?.value.toLowerCase() || "";
+        const desc = document.getElementById(`nota_desc_${index}`)?.value.toLowerCase() || "";
 
-        const matches = titulo.includes(termo) || tipo.includes(termo);
-        row.style.display = matches ? 'grid' : 'none';
-        if (matches) contador++;
+        const matchesTitulo = titulo.includes(termo) || tipo.includes(termo);
+        const matchesDesc = desc.includes(termoDesc);
+
+        if (matchesTitulo && matchesDesc) {
+            // Remove a propriedade inline para deixar o CSS (grid) assumir o controle
+            row.style.removeProperty('display');
+            contador++;
+        } else {
+            // Usa setProperty com 'important' para garantir que sobreponha o CSS de responsividade
+            row.style.setProperty('display', 'none', 'important');
+        }
     });
 
     const counterEl = document.getElementById('notas-counter');
@@ -127,7 +137,9 @@ function removerNota(btn) {
 
 function resetarFiltrosNota() {
     const searchInput = document.getElementById('search-nota');
+    const searchDescInput = document.getElementById('search-nota-desc');
     if (searchInput) searchInput.value = '';
+    if (searchDescInput) searchDescInput.value = '';
     filtrarNotas();
     showNotification("Busca limpa", "info", 2000);
 }

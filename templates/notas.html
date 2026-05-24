@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="../statics/css/responsive.css" />
     <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/global.js"></script>
+    <script src="../statics/js/global_calculations.js"></script>
+    <script src="../statics/js/global_ui.js"></script>
+    <script src="../statics/js/global_data.js"></script>
+    <script src="../statics/js/global_images.js"></script>
     <script src="../statics/js/global_modals.js"></script>
     <script src="../statics/js/menu.js"></script>
     <script src="../statics/js/notas/notas_ui.js"></script>
@@ -37,6 +41,9 @@
       <div class="filter-bar">
         <div class="search-group">
           <input type="text" id="search-nota" class="inv-input" placeholder="🔍 Pesquisar em títulos ou tipos..." oninput="filtrarNotas()" />
+        </div>
+        <div class="search-group">
+          <input type="text" id="search-nota-desc" class="inv-input" placeholder="Buscar no conteúdo..." oninput="filtrarNotas()" />
         </div>
         <button type="button" class="btn-open-desc" onclick="resetarFiltrosNota()" title="Limpar Filtros">🔄</button>
       </div>

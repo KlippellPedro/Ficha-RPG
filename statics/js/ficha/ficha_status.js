@@ -42,6 +42,7 @@ function atualizarDefesa(mods, dadosObj, bonusItens = {}, breakdown = null) {
                 ...(breakdown.itens['defesa'] || []),
                 ...(breakdown.poderes['defesa'] || []),
                 ...(breakdown.habilidades['defesa'] || []),
+                ...(breakdown.aliados['defesa'] || []),
                 ...(breakdown.event['defesa'] || [])
             ];
             sources.forEach(s => details.push(s));
@@ -70,6 +71,7 @@ function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
             ...(breakdown.itens['pv_max'] || []),
             ...(breakdown.poderes['pv_max'] || []),
             ...(breakdown.habilidades['pv_max'] || []),
+            ...(breakdown.aliados['pv_max'] || []),
             ...(breakdown.event['pv_max'] || [])
         ];
         sources.forEach(s => details.push(s));
@@ -118,6 +120,7 @@ function atualizarMana(mods, dados, bonusItens = {}, breakdown = null) {
             ...(breakdown.itens['pm_max'] || []),
             ...(breakdown.poderes['pm_max'] || []),
             ...(breakdown.habilidades['pm_max'] || []),
+            ...(breakdown.aliados['pm_max'] || []),
             ...(breakdown.event['pm_max'] || [])
         ];
         sources.forEach(s => details.push(s));
@@ -171,7 +174,7 @@ function atualizarMovimento(mods, dadosObj, bonusItens = {}, breakdown = null) {
     const racaMov = state.racaData.movimentoBonus || 0;
     let bonusMorcego = (state.isVampiro && state.formaMorcego) ? 9 : 0;
 
-    let finalTotal = totalCalculado + racaMov + bonusMorcego + extraRaca;
+    let finalTotal = totalCalculado + racaMov + bonusMorcego;
     let usandoPadraoHumano = false;
 
     // O 3 só é aplicado se o total for 0 ou negativo para Humanos
@@ -201,6 +204,7 @@ function atualizarMovimento(mods, dadosObj, bonusItens = {}, breakdown = null) {
                 ...(breakdown.itens['movimentacao'] || []),
                 ...(breakdown.poderes['movimentacao'] || []),
                 ...(breakdown.habilidades['movimentacao'] || []),
+                ...(breakdown.aliados['movimentacao'] || []),
                 ...(breakdown.event['movimentacao'] || [])
             ];
             sources.forEach(s => details.push(s));

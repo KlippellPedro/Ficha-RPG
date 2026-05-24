@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aliados e Invocações - RPG</title>
+    <link rel="stylesheet" href="../statics/css/global.css" />
+    <link rel="stylesheet" href="../statics/css/global_modals.css" />
+    <link rel="stylesheet" href="../statics/css/menu.css" />
+    <link rel="stylesheet" href="../statics/css/aliados/aliados.css" />
+    <link rel="stylesheet" href="../statics/css/responsive.css" />
+    <script src="../statics/js/global.js"></script>
+    <script src="../statics/js/global_calculations.js"></script>
+    <script src="../statics/js/global_ui.js"></script>
+    <script src="../statics/js/global_data.js"></script>
+    <script src="../statics/js/global_images.js"></script>
+    <script src="../statics/js/global_modals.js"></script>
+    <script src="../statics/js/menu.js"></script>
+    <script src="../statics/js/aliados/aliados.js"></script>
+  </head>
+  <body>
+    <nav class="top-menu">
+      <div class="menu-links"></div>
+    </nav>
+
+    <div id="global-notification">
+      <span class="icon"></span>
+      <span class="message"></span>
+    </div>
+
+    <div class="container">
+      <header>
+        <h1>ALIADOS E INVOCAÇÕES</h1>
+        <p>Gerencie seus servos, pets e invocações.</p>
+      </header>
+
+      <div class="aliados-actions">
+        <button class="btn-add-card" onclick="adicionarNovoAliado()">+ Criar Novo Aliado</button>
+        <div class="import-export-group">
+          <label for="import-ally-json" class="btn-history">+ Importar Aliado </label>
+          <input type="file" id="import-ally-json" style="display: none" onchange="importarFichaComoAliado(event)" />
+        </div>
+      </div>
+
+      <div id="aliados-container" class="aliados-grid">
+        <!-- Cards dos aliados serão injetados aqui -->
+      </div>
+
+      <div id="empty-state" style="display: none; text-align: center; padding: 50px; color: #888">
+        <p>Você ainda não possui aliados. Clique em "Criar Novo Aliado" para começar!</p>
+      </div>
+    </div>
+
+    <template id="ally-card-template">
+      <div class="ally-card" data-id="">
+        <div class="ally-header">
+          <div class="ally-avatar-container" onclick="triggerAllyImageInput(this)">
+            <img class="ally-avatar-img" src="https://ui-avatars.com/api/?name=?&background=0d0d0f&color=ff4444" alt="Avatar" onerror="this.onerror=null;this.src='';" />
+            <input type="file" class="ally-image-input" style="display: none" onchange="salvarImagemAliado(this)" accept="image/*" />
+          </div>
+          <div class="ally-level-box">
+            <span>LVL</span>
+            <input type="number" class="ally-nivel-input" readonly />
+          </div>
+          <input type="text" class="ally-name-input" placeholder="Nome do Aliado" oninput="salvarStatusAliado(this)" />
+          <input type="color" class="ally-color-input" oninput="salvarStatusAliado(this)" title="Cor do Tema do Aliado" />
+          <button class="btn-remove-ally" onclick="removerAliado(this)">×</button>
+        </div>
+
+        <div class="ally-stats-container">
+          <div class="ally-stat-group">
+            <div class="ally-stat-labels">
+              <span>PV</span>
+              <div class="ally-inputs">
+                <input type="number" class="ally-pv-atual" oninput="salvarStatusAliado(this)" />
+                <span>/</span>
+                <input type="number" class="ally-pv-max" oninput="salvarStatusAliado(this)" />
+              </div>
+            </div>
+            <div class="ally-bar-outer">
+              <div class="ally-bar-inner ally-bar-pv"></div>
+            </div>
+          </div>
+
+          <div class="ally-stat-group">
+            <div class="ally-stat-labels">
+              <span>PM</span>
+              <div class="ally-inputs">
+                <input type="number" class="ally-pm-atual" oninput="salvarStatusAliado(this)" />
+                <span>/</span>
+                <input type="number" class="ally-pm-max" oninput="salvarStatusAliado(this)" />
+              </div>
+            </div>
+            <div class="ally-bar-outer">
+              <div class="ally-bar-inner ally-bar-pm"></div>
+            </div>
+          </div>
+
+          <div class="ally-stat-group">
+            <div class="ally-stat-labels">
+              <span>SAN</span>
+              <div class="ally-inputs">
+                <input type="number" class="ally-sanidade-atual" oninput="salvarStatusAliado(this)" />
+                <span>/</span>
+                <input type="number" class="ally-sanidade-max" oninput="salvarStatusAliado(this)" />
+              </div>
+            </div>
+            <div class="ally-bar-outer">
+              <div class="ally-bar-inner ally-bar-sanity"></div>
+            </div>
+          </div>
+
+          <div class="ally-quick-stats">
+            <div class="quick-stat-item">
+              <label>Defesa</label>
+              <input type="number" class="ally-defesa-input" oninput="salvarStatusAliado(this)" />
+            </div>
+            <div class="quick-stat-item">
+              <label>Movimento</label>
+              <input type="number" class="ally-movimentacao-input" oninput="salvarStatusAliado(this)" />
+            </div>
+          </div>
+        </div>
+
+        <div class="ally-footer">
+          <button class="btn-open-sheet" onclick="abrirFichaAliado(this)">Abrir Ficha Completa</button>
+          <button class="btn-export-ally" onclick="abrirModalBuffsAliado(this)" title="Buffs de Aliado">✨</button>
+          <button class="btn-export-ally" onclick="exportarFichaAliado(this)" title="Exportar JSON">💾</button>
+        </div>
+      </div>
+    </template>
+
+    <script src="../statics/js/responsive.js"></script>
+  </body>
+</html>

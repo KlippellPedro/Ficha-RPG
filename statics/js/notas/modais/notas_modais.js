@@ -32,13 +32,19 @@ function abrirModalNota(index) {
             <label class="diario-label">Categoria / Etiqueta</label>
             <input type="text" id="modal_nota_tipo" class="inv-input" value="${tipo}" placeholder="Ex: Lore, Personagem, Alvo...">
             
-            <label class="diario-label">Anotações do Mestre / Jogador</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: -15px;">
+                <label class="diario-label">Anotações Principais</label>
+                <button type="button" class="btn-expand-field" onclick="abrirEditorTexto('modal_nota_desc', 'Anotações Principais')" style="margin-bottom: 5px;">Expandir ↗</button>
+            </div>
             <textarea id="modal_nota_desc" class="inv-input diario-escrita" placeholder="Escreva aqui os detalhes da sua aventura...">${desc}</textarea>
         </div>
 
-        <div class="section-divider">Campos Personalizados</div>
-        <div id="custom-fields-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
-        <button type="button" class="btn-add-class" style="width: 100%; margin-top: 10px;" onclick="adicionarCampoDinamico()">+ Adicionar Campo Flexível</button>
+        <div class="section-divider">Tópicos e Informações Extras</div>
+        <div id="custom-fields-container" style="display: flex; flex-direction: column; gap: 15px;"></div>
+        
+        <div class="notes-modal-actions" style="margin-top: 15px;">
+            <button type="button" class="btn-add-note-field" onclick="adicionarTopicoExpandido()">+ Adicionar Novo Tópico</button>
+        </div>
 
         <div class="modal-footer" style="margin-top: 20px;">
             <button type="button" class="btn-save-modal" onclick="salvarDetalhesNota()" style="width:100%">Salvar no Diário</button>
@@ -48,8 +54,6 @@ function abrirModalNota(index) {
     const container = document.getElementById('custom-fields-container');
     if (campos.length > 0) {
         campos.forEach(c => adicionarCampoDinamico(c.label, c.valor));
-    } else {
-        adicionarCampoDinamico();
     }
 
     document.getElementById('modal-nota').style.display = 'flex';
@@ -58,14 +62,27 @@ function abrirModalNota(index) {
 function adicionarCampoDinamico(label = "", valor = "") {
     const container = document.getElementById('custom-fields-container');
     if (!container) return;
+
+    const fieldId = 'cf_val_' + Date.now() + Math.floor(Math.random() * 1000);
     const row = document.createElement('div');
     row.className = 'custom-field-row';
+    row.dataset.isBlock = "true";
+
     row.innerHTML = `
-        <input type="text" class="inv-input field-label" placeholder="Nome do campo" value="${label}" style="flex: 1;">
-        <input type="text" class="inv-input field-value" placeholder="Informação" value="${valor}" style="flex: 2;">
-        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+        <input type="text" class="inv-input field-label" placeholder="Título do tópico..." value="${label}" style="flex: 1; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <button type="button" class="btn-expand-field" onclick="abrirEditorTexto('${fieldId}', 'Editando Tópico')" title="Expandir Conteúdo">↗</button>
+        <button type="button" class="btn-remove-class" onclick="this.closest('.custom-field-row').remove()">×</button>
+        <textarea id="${fieldId}" class="field-value" style="display: none;">${valor}</textarea>
     `;
     container.appendChild(row);
+}
+
+function adicionarTopicoExpandido() {
+    adicionarCampoDinamico();
+    const textareas = document.querySelectorAll('#custom-fields-container textarea');
+    if (textareas.length === 0) return;
+    const lastId = textareas[textareas.length - 1].id;
+    abrirEditorTexto(lastId, "Novo Tópico Detalhado");
 }
 
 function fecharModalNota() {
@@ -85,7 +102,8 @@ function salvarDetalhesNota() {
     rows.forEach(row => {
         const l = row.querySelector('.field-label').value;
         const v = row.querySelector('.field-value').value;
-        if (l.trim() || v.trim()) camposArr.push({ label: l, valor: v });
+        const isBlock = row.dataset.isBlock === "true";
+        if (l.trim() || v.trim()) camposArr.push({ label: l, valor: v, isBlock });
     });
 
     document.getElementById(`nota_campos_${idx}`).value = JSON.stringify(camposArr);

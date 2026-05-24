@@ -100,8 +100,7 @@ function confirmarClasseUnica() {
     showConfirm("O Ceifeiro de Almas é uma classe exclusiva. Se você continuar, todas as suas outras classes serão removidas permanentemente. Deseja prosseguir?", () => {
         if (!pendingUniqueSelect) return;
         const targetRow = pendingUniqueSelect.closest('.class-row');
-        const key = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : "ficha_rpg_dados";
-        let dados = JSON.parse(localStorage.getItem(key)) || {};
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
         document.querySelectorAll('.class-row').forEach(row => {
             if (row !== targetRow) {
@@ -120,7 +119,7 @@ function confirmarClasseUnica() {
                 setTimeout(() => row.remove(), 300);
             }
         });
-        localStorage.setItem(key, JSON.stringify(dados));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         if (typeof atualizarEstiloClasse === 'function') atualizarEstiloClasse(pendingUniqueSelect);
 
         const modalUnique = document.getElementById('modal-unique-class');

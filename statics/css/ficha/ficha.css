@@ -19,6 +19,34 @@
   align-items: end;
 }
 
+.char-avatar-container {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-color);
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: 0.3s;
+  grid-row: span 2;
+  align-self: center;
+}
+
+.char-avatar-container:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.char-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Seletor de DLCs */
 .dlc-selector-box {
   background: rgba(0, 0, 0, 0.3);

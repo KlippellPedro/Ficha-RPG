@@ -1,17 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Detecta se estamos dentro da pasta templates ou na raiz
+    const isInTemplates = window.location.pathname.includes('/templates/');
+    const homePrefix = isInTemplates ? '../' : '';
+
+    // --- Configuração Automática do Favicon ---
+    // Procura por uma tag favicon existente ou cria uma nova dinamicamente.
+    let favicon = document.querySelector("link[rel*='icon']");
+    if (!favicon) {
+        favicon = document.createElement('link');
+        favicon.rel = 'shortcut icon';
+        document.head.appendChild(favicon);
+    }
+    // Define o caminho para a raiz. Quando a arte estiver pronta, salve-a como 'favicon.ico' na raiz do projeto.
+    // Caso a imagem seja um PNG, basta mudar para 'favicon.png' abaixo.
+    favicon.href = homePrefix + 'favicon.ico';
+
     const menuContainer = document.querySelector('.menu-links');
     if (!menuContainer) return;
 
-    // Detecta se estamos dentro da pasta templates ou na raiz
-    const isInTemplates = window.location.pathname.includes('/templates/');
-
     const prefix = isInTemplates ? '' : 'templates/';
-    const homePrefix = isInTemplates ? '../' : '';
+
+    // Detecta se estamos no contexto de um aliado
+    const urlParams = new URLSearchParams(window.location.search);
+    const allyId = urlParams.get('allyId');
 
     // Definição dos campos padrão do menu
-    const menuItems = [
+    let menuItems = [
         { name: 'Início', href: homePrefix + 'index.html' },
         { name: 'Ficha', href: prefix + 'ficha.html' },
+        { name: 'Aliados', href: prefix + 'aliados.html' },
         { name: 'Perícias', href: prefix + 'pericias.html' },
         { name: 'Inventário', href: prefix + 'inventario.html' },
         { name: 'Habilidades', href: prefix + 'habilidade.html' },
@@ -20,6 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'Ataques', href: prefix + 'ataques.html' },
         { name: 'Notas', href: prefix + 'notas.html' }
     ];
+
+    // Se for um aliado: Esconde "Aliados" e adiciona "Voltar"
+    if (allyId) {
+        menuItems = menuItems.filter(item => item.name !== 'Aliados' && item.name !== 'Início');
+
+        // Adiciona o botão de retorno ao início do menu
+        menuItems.unshift({
+            name: '⬅ VOLTAR À FICHA PRINCIPAL',
+            href: prefix + 'ficha.html',
+            isBackBtn: true
+        });
+
+        // Mantém o contexto do aliado em todos os outros links internos
+        menuItems.forEach(item => {
+            if (!item.isBackBtn) {
+                item.href += `?allyId=${allyId}`;
+            }
+        });
+    }
 
     let currentPath = window.location.pathname.split("/").pop();
     if (currentPath === "" || currentPath === "Ficha-RPG") currentPath = "index.html";
@@ -31,6 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const a = document.createElement('a');
         a.setAttribute('href', item.href);
         a.textContent = item.name;
+
+        if (item.isBackBtn) {
+            a.style.color = 'var(--primary-color) !important';
+            a.style.fontWeight = '800';
+        }
 
         if (item.href.includes(currentPath) && currentPath !== "") {
             a.classList.add('active');

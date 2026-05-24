@@ -16,4 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     atualizarTudo();
     ordenarNotas();
     filtrarNotas();
+
+    // Adiciona o ouvinte para a barra de pesquisa funcionar em tempo real
+    document.getElementById('search-nota')?.addEventListener('input', filtrarNotas);
+    document.getElementById('search-nota-desc')?.addEventListener('input', filtrarNotas);
 });

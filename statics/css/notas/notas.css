@@ -1,10 +1,10 @@
 /* Definição das colunas para Notas */
 .nota-header-grid,
 .nota-row-grid {
-  display: grid !important;
-  grid-template-columns: 35px 2fr 1fr 45px 45px 40px !important;
-  align-items: center !important;
-  gap: 10px !important;
+  display: grid;
+  grid-template-columns: 35px 2fr 1fr 45px 45px 40px;
+  align-items: center;
+  gap: 10px;
   background: rgba(255, 255, 255, 0.03);
   padding: 10px;
   border-radius: 8px;
@@ -145,6 +145,14 @@
   transition: 0.3s;
   font-weight: bold;
   margin-left: 10px;
+}
+
+/* Ajuste para as barras de pesquisa não ficarem grudadas */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px !important;
+  margin-bottom: 20px;
 }
 .btn-clear-notas:hover {
   background: var(--primary-glow);

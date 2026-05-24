@@ -6,8 +6,7 @@
  * Inicializa as classes salvas ao carregar a página.
  */
 function initClasses() {
-    const key = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : "ficha_rpg_dados";
-    const salvo = JSON.parse(localStorage.getItem(key)) || null;
+    const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || null;
 
     if (salvo) {
         const classesEncontradas = Object.keys(salvo)
@@ -38,8 +37,7 @@ function verificarVisibilidadeClasses() {
     const visibilityMap = {
         'section-extras': false, 'section-avatar': false, 'section-lutador': false,
         'section-amante': false, 'section-deus': false, 'section-diplomata': false,
-        'section-amigo': false, 'section-contrabandista': false, 'section-ceifeiro': false,
-        'section-demonio': false, 'section-anjo': false
+        'section-amigo': false, 'section-contrabandista': false, 'section-ceifeiro': false
     };
 
     document.querySelectorAll('[id^="class_name_"]').forEach(select => {
@@ -243,12 +241,11 @@ function removerClasseUI(btn) {
     const index = nameSelect?.id.split('_').pop();
 
     if (index) {
-        const key = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : "ficha_rpg_dados";
-        let dados = JSON.parse(localStorage.getItem(key)) || {};
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
         delete dados[`class_name_${index}`];
         delete dados[`class_lvl_${index}`];
         delete dados[`class_sub_${index}`];
-        localStorage.setItem(key, JSON.stringify(dados));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     }
 
     row.remove();

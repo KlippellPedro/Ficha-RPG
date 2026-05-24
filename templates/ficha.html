@@ -12,6 +12,10 @@
     <link rel="stylesheet" href="../statics/css/ficha/ficha_especiais.css" />
     <link rel="stylesheet" href="../statics/css/responsive.css" />
     <script src="../statics/js/global.js"></script>
+    <script src="../statics/js/global_calculations.js"></script>
+    <script src="../statics/js/global_ui.js"></script>
+    <script src="../statics/js/global_data.js"></script>
+    <script src="../statics/js/global_images.js"></script>
     <script src="../statics/js/global_modals.js"></script>
     <script src="../statics/js/ficha/xp.js"></script>
     <script src="../statics/js/menu.js"></script>
@@ -56,6 +60,10 @@
       <!-- Identidade do Personagem -->
       <header class="ficha-header-main">
         <div class="char-header">
+          <div class="char-avatar-container" onclick="triggerCharImageInput(this)">
+            <img id="char-avatar-img" class="char-avatar-img" src="https://ui-avatars.com/api/?name=?&background=0d0d0f&color=ff4444" alt="Avatar" onerror="this.onerror=null;this.src='';">
+            <input type="file" id="char-image-input" style="display: none" onchange="salvarImagemPersonagem(this)" accept="image/*">
+          </div>
           <div class="input-group flex-2">
             <label>Nome do Personagem</label>
             <input type="text" id="nome" class="save-input header-input" placeholder="Ex: Raijin" />
@@ -518,7 +526,7 @@
         <div class="input-group">
           <label>Tipo de Contrabandista</label>
           <select id="contrabandista_tipo" class="save-input header-input">
-            <option value="Legal">Legal</option>
+            <option value="Legal">Sedex</option>
             <option value="Ilegal">Ilegal</option>
             <option value="Autônomo">Autônomo</option>
           </select>
@@ -533,46 +541,6 @@
         <div class="input-group">
           <label>Almas Totais</label>
           <input type="number" id="ceifeiro_almas_total" class="save-input header-input" value="0" />
-        </div>
-      </div>
-
-      <div id="section-demonio" class="combat-header-row" style="display: none">
-        <div class="input-group">
-          <label>Reino (Pecado)</label>
-          <input type="text" id="demonio_pecado" class="save-input header-input" placeholder="Ex: Ira" />
-        </div>
-        <div class="input-group">
-          <label>Escalão</label>
-          <select id="demonio_escalao" class="save-input header-input">
-            <option value="Demônio Comum">Demônio Comum</option>
-            <option value="Demônio">Demônio</option>
-            <option value="Guarda Infernal">Guarda Infernal</option>
-            <option value="Cão Infernal">Cão Infernal</option>
-            <option value="Pecado">Pecado</option>
-            <option value="Família real">Família real</option>
-            <option value="Rei ou Rainha">Rei ou Rainha</option>
-            <option value="Dono do Inferno">Dono do Inferno</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="section-anjo" class="combat-header-row" style="display: none">
-        <div class="input-group">
-          <label>Reino (Virtude)</label>
-          <input type="text" id="anjo_virtude" class="save-input header-input" placeholder="Ex: Paciência" />
-        </div>
-        <div class="input-group">
-          <label>Escalão</label>
-          <select id="anjo_escalao" class="save-input header-input">
-            <option value="Anjo comum">Anjo comum</option>
-            <option value="Anjo">Anjo</option>
-            <option value="Guarda Angelical">Guarda Angelical</option>
-            <option value="Gato Angelical">Gato Angelical</option>
-            <option value="Virtude">Virtude</option>
-            <option value="Família real">Família real</option>
-            <option value="Rei ou Rainha">Rei ou Rainha</option>
-            <option value="Dono do Céu">Dono do Céu</option>
-          </select>
         </div>
       </div>
 

@@ -69,7 +69,14 @@ function alterarXP(delta) {
 function abrirModalEscolhaLevelUp() {
     const modal = document.getElementById('modal-level-up');
     const container = document.getElementById('level-up-class-list');
+    const modalTitle = modal?.querySelector('.modal-title');
     if (!modal || !container) return;
+
+    // Diferencia visualmente se é um Level Up de aliado
+    if (modalTitle) {
+        modalTitle.innerText = allyId ? "LEVEL UP! (ALIADO)" : "LEVEL UP!";
+        modalTitle.style.color = allyId ? "var(--primary-color)" : "#f59e0b";
+    }
 
     const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
     const classes = typeof getClassesAtivas === 'function' ? getClassesAtivas(dados) : [];
@@ -190,6 +197,5 @@ function processarLevelUp(idx) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    validarXP();
-});
+// Removido o listener de DOMContentLoaded para evitar que o XP 
+// seja validado antes dos dados do aliado serem carregados no DOM.

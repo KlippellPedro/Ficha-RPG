@@ -1,8 +1,15 @@
-const STORAGE_KEY = "ficha_rpg_dados";
-const HISTORY_KEY = "ficha_rpg_historico";
+// Detecta se estamos no contexto de um aliado via URL
+const urlParams = new URLSearchParams(window.location.search);
+const allyId = urlParams.get('allyId');
+
+// Chaves de Armazenamento Dinâmicas: Se houver allyId, usa uma chave isolada
+const STORAGE_KEY = allyId ? `ally_${allyId}` : "ficha_rpg_dados";
+const HISTORY_KEY = allyId ? `ally_hist_${allyId}` : "ficha_rpg_historico";
+
 const BACKUP_KEY = "ficha_rpg_backup";
 const THEME_KEY = "ficha_rpg_tema";
 const DLCS_KEY = "ficha_rpg_dlcs";
+const ALIADOS_KEY = "ficha_rpg_aliados";
 
 window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
     ficha: [
@@ -82,8 +89,17 @@ function atualizarTudo() {
     dados.xp_max = xpMax;
     const xpMaxEl = document.getElementById('xp_max');
     const xpMaxDisp = document.getElementById('xp_max_display');
+    
+    // Coleta o XP atual diretamente do input ou do banco de dados do aliado
+    const xpAtualEl = document.getElementById('xp_atual');
+    const xpAtualVal = xpAtualEl ? (parseInt(xpAtualEl.value) || 0) : (parseInt(dados.xp_atual) || 0);
+
     if (xpMaxEl) xpMaxEl.innerText = xpMax;
-    if (xpMaxDisp) xpMaxDisp.innerText = xpMax;
+    if (xpMaxDisp) {
+        xpMaxDisp.innerText = xpMax;
+        const faltante = Math.max(0, xpMax - xpAtualVal);
+        xpMaxDisp.title = `Faltam ${faltante} XP para o próximo nível`;
+    }
     if (typeof validarXP === 'function') validarXP(); // Verifica se atingiu o limite
 
     // 1.5 Lógica de Modo de Evento
@@ -165,9 +181,31 @@ function atualizarTudo() {
         }
     });
 
+    // 3.5 Soma bônus vindos de Aliados (Buffs definidos para o dono)
+    const bonusAliados = {};
+    const fontesAliados = {};
+    const listaAliados = JSON.parse(localStorage.getItem(ALIADOS_KEY)) || [];
+
+    listaAliados.forEach(id => {
+        const allyData = JSON.parse(localStorage.getItem(id));
+        // Só aplica bônus se não for a própria ficha do aliado sendo editada
+        if (allyData && allyData.buffs_dono && Array.isArray(allyData.buffs_dono) && STORAGE_KEY !== id) {
+            const allyNome = allyData.nome || "Aliado";
+            allyData.buffs_dono.forEach(b => {
+                const val = parseInt(b.mod);
+                if (!isNaN(val) && b.attr && b.attr !== 'nenhum') {
+                    const target = b.isAdv ? `adv_${b.attr}` : b.attr;
+                    bonusAliados[target] = (bonusAliados[target] || 0) + val;
+                    if (!fontesAliados[target]) fontesAliados[target] = [];
+                    fontesAliados[target].push(`${allyNome} (${val > 0 ? '+' : ''}${val})`);
+                }
+            });
+        }
+    });
+
     // Consolida tudo em um único objeto de bônus para manter compatibilidade com outras funções
     const bonusItens = { ...bonusItensPuros };
-    [bonusPoderes, bonusHabilidades, eventBonuses].forEach(src => {
+    [bonusPoderes, bonusHabilidades, eventBonuses, bonusAliados].forEach(src => {
         Object.keys(src).forEach(k => bonusItens[k] = (bonusItens[k] || 0) + src[k]);
     });
 
@@ -175,6 +213,7 @@ function atualizarTudo() {
         itens: resultadoItens.sources,
         poderes: fontesPoderes,
         habilidades: fontesHabilidades,
+        aliados: fontesAliados,
         racaManual: {},
         event: eventSources
     };
@@ -276,417 +315,8 @@ function atualizarTudo() {
     if (typeof atualizarAtaques === 'function') atualizarAtaques(nivelTotal, infoAttr.mods, bonusItens);
     if (typeof atualizarRacaUI === 'function') atualizarRacaUI(racaKey); // Nova chamada para atualizar campos de raça
     if (typeof atualizarCarga === 'function') atualizarCarga(infoAttr, dados);
-    aplicarBonusVisuais(bonusItens, dados, breakdown);
-
-    // 5. Persistência
+    atualizarBarras(bonusItens);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-}
-
-/**
- * Helper para obter lista de classes ativa (da tela ou do objeto de dados)
- */
-function getClassesAtivas(dados) {
-    const classes = [];
-    const container = document.getElementById('classes-container');
-
-    if (container) {
-        container.querySelectorAll('.class-row').forEach(row => {
-            const name = row.querySelector('[id^="class_name_"]')?.value;
-            const lvl = parseInt(row.querySelector('[id^="class_lvl_"]')?.value) || 0;
-            const sub = row.querySelector('[id^="class_sub_"]')?.value || "";
-            if (name) classes.push({ name, lvl, sub });
-        });
-    } else {
-        Object.keys(dados).forEach(key => {
-            if (key.startsWith('class_name_')) {
-                const id = key.split('_').pop();
-                classes.push({ name: dados[key], lvl: parseInt(dados[`class_lvl_${id}`]) || 0 });
-            }
-        });
-    }
-    return classes;
-}
-
-/**
- * Soma todos os bônus de itens marcados como 'equipado' no inventário
- */
-function calcularBonusItens(dados) {
-    const totais = {};
-    const fontes = {}; // { forca: ["Item A (+2)"] }
-
-    const addBonus = (attr, val, nome) => {
-        if (!attr || attr === 'nenhum' || val === 0) return;
-        totais[attr] = (totais[attr] || 0) + val;
-        if (!fontes[attr]) fontes[attr] = [];
-        fontes[attr].push(`${nome} (${val > 0 ? '+' : ''}${val})`);
-    };
-
-    // Aplica bônus de reflexos do Morcego se ativo
-    if (dados.vampiro_forma_morcego) {
-        addBonus('reflexos', 6, 'Forma de Morcego');
-    }
-
-    Object.keys(dados).forEach(key => {
-        if (key.startsWith('inv_eqp_') && dados[key] === true) {
-            const id = key.replace('inv_eqp_', '');
-            const nome = dados[`inv_nome_${id}`] || "Item";
-
-            // 1. Bônus por atributo manual (Modificador)
-            const attr = dados[`inv_attr_${id}`];
-            const val = parseInt(dados[`inv_mod_${id}`]) || 0;
-            addBonus(attr, val, nome);
-
-            // 2. Bônus automático de Defesa para Armaduras equipadas
-            const categoria = dados[`inv_cat_${id}`];
-            if (categoria === 'armaduras') {
-                const defBonus = parseInt(dados[`inv_defesa_bonus_${id}`]) || 0;
-                const defPenalty = parseInt(dados[`inv_defesa_penalidade_${id}`]) || 0;
-                addBonus('defesa', defBonus, nome);
-                addBonus('movimentacao', -defPenalty, `${nome} (Peso)`);
-            }
-
-            // 3. Bônus de materiais (Centro e Base) para Armas equipadas
-            if (categoria === 'armas') {
-                ['cabo', 'base'].forEach(field => {
-                    const raw = dados[`inv_${field}_${id}`];
-                    if (raw && typeof raw === 'string' && raw.startsWith('{')) {
-                        try {
-                            const material = JSON.parse(raw);
-                            let attrs = material.attributes || [];
-                            if (material.attr && material.attr !== 'nenhum') {
-                                attrs.push({ attr: material.attr, mod: material.mod });
-                            }
-                            const materialNome = material.nome || (field === 'cabo' ? 'Centro' : 'Base');
-                            attrs.forEach(a => {
-                                if (a.attr && a.attr !== 'nenhum') {
-                                    const valM = parseInt(a.mod) || 0;
-                                    const attrM = a.isAdv ? `adv_${a.attr}` : a.attr;
-                                    addBonus(attrM, valM, `${nome} (${materialNome})`);
-                                }
-                            });
-                        } catch (e) { console.error(`Erro no material ${field} do item ${id}`); }
-                    }
-                });
-            }
-
-            // 4. Bônus de Modificações do Item (Simples/Marciais)
-            const modsRaw = dados[`inv_mods_item_${id}`];
-            if (modsRaw && typeof modsRaw === 'string' && modsRaw.startsWith('{')) {
-                try {
-                    const modsData = JSON.parse(modsRaw);
-                    if (modsData.attributes && Array.isArray(modsData.attributes)) {
-                        modsData.attributes.forEach(a => {
-                            if (a.attr && a.attr !== 'nenhum') {
-                                const valMod = parseInt(a.mod) || 0;
-                                const attrMod = a.isAdv ? `adv_${a.attr}` : a.attr;
-                                addBonus(attrMod, valMod, `${nome} (Mod)`);
-                            }
-                        });
-                    }
-                } catch (e) { console.error(`Erro nas modificações do item ${id}`); }
-            }
-
-            // 5. Bônus de Raridade e Buffs Mágicos (Para todos os itens)
-            const raroRaw = dados[`inv_raro_${id}`];
-            if (raroRaw && typeof raroRaw === 'string' && raroRaw.startsWith('{') && raroRaw.endsWith('}')) {
-                try {
-                    const raroData = JSON.parse(raroRaw);
-                    if (raroData.attributes && Array.isArray(raroData.attributes)) {
-                        raroData.attributes.forEach(a => {
-                            if (a.attr && a.attr !== 'nenhum') {
-                                const valR = parseInt(a.mod) || 0;
-                                const attrR = a.isAdv ? `adv_${a.attr}` : a.attr;
-                                addBonus(attrR, valR, `${nome} (Raro)`);
-                            }
-                        });
-                    }
-                } catch (e) { /* Silencia erro de parsing durante edição ou dados incompletos */ }
-            }
-        }
-    });
-    return { totals: totais, sources: fontes };
-}
-
-/**
- * Aplica bônus de itens em campos simples que não são atributos (ex: Movimentação)
- */
-function aplicarBonusVisuais(bonusItens, dadosObj, breakdown = null) {
-    const campos = ['movimentacao', 'defesa', 'status_info'];
-    campos.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            const bonus = bonusItens[id] || 0;
-
-            // Tooltip detalhado para Status (Defesa e Movimento já possuem tooltips em ficha_status.js)
-            if (id === 'status_info') {
-                let details = [];
-                let baseValue = dadosObj[id] || "0";
-                details.push(`Base: ${baseValue}`);
-                if (bonus !== 0) details.push(`Bônus: ${bonus > 0 ? '+' : ''}${bonus}`);
-
-                if (breakdown) {
-                    const sources = [
-                        ...(breakdown.itens[id] || []),
-                        ...(breakdown.poderes[id] || []),
-                        ...(breakdown.habilidades[id] || []),
-                        ...(breakdown.racaManual[id] || []),
-                        ...(breakdown.event[id] || [])
-                    ];
-                    sources.forEach(s => details.push(s));
-                }
-                // Define o title no formato padrão que o modal consegue ler
-                el.title = `Total: ${el.value || baseValue} (${details.join(' | ')})`;
-            }
-
-            if (bonus > 0) el.style.color = '#4ade80'; // Verde para bônus
-            else if (bonus < 0) el.style.color = '#ef4444'; // Vermelho (danger) para penalidade
-            else el.style.color = 'var(--text-main)';
-        }
-    });
-}
-
-/**
- * Atualiza visualmente as larguras das barras de status (PV/PM)
- */
-function atualizarBarras(bonusItens = {}, dadosObj = null) {
-    const stats = [
-        { atual: 'pv_atual', max: 'pv_max', bar: 'bar-pv' },
-        { atual: 'pm_atual', max: 'pm_max', bar: 'bar-pm' },
-        { atual: 'sanidade_atual', max: 'sanidade_max', bar: 'bar-sanidade' },
-        { atual: 'xp_atual', max: 'xp_max', bar: 'bar-xp' },
-    ];
-
-    const dados = dadosObj || (JSON.parse(localStorage.getItem(STORAGE_KEY)) || {});
-
-    const racaKey = dados.raca || "nenhuma";
-    const h1 = dados.hibrido_raca_1 || "";
-    const h2 = dados.hibrido_raca_2 || "";
-    const isCorrompido = racaKey === "corrompido" || (racaKey === "hibrido" && (h1 === "corrompido" || h2 === "corrompido"));
-
-    stats.forEach(s => {
-        const elAtual = document.getElementById(s.atual);
-        const elMax = document.getElementById(s.max);
-
-        // Se os elementos não existem na página (ex: no Inventário), busca no localStorage
-        const current = elAtual ? (parseInt(elAtual.value) || 0) : (parseInt(dados[s.atual]) || 0);
-        
-        let maxTotal;
-        if (elMax) {
-            // Se for input (PV/PM), usa .value. Se for span (XP), usa .innerText. 
-            // Fallback para o objeto de dados caso o DOM ainda não tenha processado o texto.
-            maxTotal = parseInt(elMax.tagName === 'INPUT' ? elMax.value : elMax.innerText) || parseInt(dados[s.max]) || 1;
-        } else {
-            maxTotal = parseInt(dados[s.max]) || 1;
-        }
-
-        // Se estamos em uma página sem os inputs (como Inventário), 
-        // precisamos garantir que o bônus de item seja somado ao valor base salvo
-        if (!elMax && bonusItens[s.max]) {
-            maxTotal += bonusItens[s.max];
-        }
-
-        const barEl = document.getElementById(s.bar);
-
-        if (barEl) {
-            const porcentagem = Math.min(100, Math.max(0, (current / maxTotal) * 100));
-            barEl.style.width = porcentagem + "%";
-
-            // Alterna a cor da barra de PV se for Corrompido
-            if (s.bar === 'bar-pv') {
-                barEl.classList.toggle('pv-corrompido-color', isCorrompido);
-                barEl.classList.toggle('pv-color', !isCorrompido);
-            }
-
-            // Lógica para XP Dourado: muda a cor quando atingir 90% de progresso
-            if (s.bar === 'bar-xp') {
-                const isNearLevel = porcentagem >= 90;
-                barEl.classList.toggle('xp-near-level-up', isNearLevel);
-                barEl.classList.toggle('xp-color', !isNearLevel);
-            }
-        }
-
-        // Lógica para barras temporárias
-        const elTemp = document.getElementById(`${s.atual.replace('_atual', '_temp')}`);
-        const temp = elTemp ? (parseInt(elTemp.value) || 0) : (parseInt(dados[`${s.atual.replace('_atual', '_temp')}`]) || 0);
-        const tempBarEl = document.getElementById(`${s.bar}-temp`);
-        const tempBarControlsEl = tempBarEl ? tempBarEl.closest('.temp-bar-controls') : null;
-
-        if (tempBarEl && tempBarControlsEl) {
-            const tempPorcentagem = Math.min(100, Math.max(0, (temp / maxTotal) * 100));
-            tempBarEl.style.width = tempPorcentagem + "%";
-        }
-    });
-}
-
-/**
- * Motor de cálculo de Nível Total
- */
-function calcularNivelTotalEngine(dados) {
-    const classes = getClassesAtivas(dados);
-    let soma = 0;
-    classes.forEach(c => {
-        // Removemos a trava de nível 20 para permitir progressões maiores
-        soma += c.lvl;
-    });
-    return soma;
-}
-
-/**
- * Motor central de Atributos. Lê da tela ou do storage.
- * breakdown: { itens: {attr: ["Nome (+val)"]}, poderes: {...}, habilidades: {...} }
- */
-function engineCalcularAtributos(dadosObj, bonusItens = {}, racaKey, breakdown = null) {
-    const cache = { mods: {}, totals: {} };
-    const attrInputs = document.querySelectorAll(".attr-input");
-    const attrs = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma", "aura"];
-
-    // Coleta bônus de raça (suporta Híbrido)
-    let bonusRaca = {};
-    let modBonusRaca = {};
-
-    const processarRaca = (key) => {
-        const rd = (typeof RACAS_DATA !== 'undefined') ? RACAS_DATA[key] : null;
-        if (rd) {
-            if (rd.bonus) Object.keys(rd.bonus).forEach(a => bonusRaca[a] = (bonusRaca[a] || 0) + rd.bonus[a]);
-            if (rd.modBonus) Object.keys(rd.modBonus).forEach(a => modBonusRaca[a] = (modBonusRaca[a] || 0) + rd.modBonus[a]);
-        }
-    };
-
-    processarRaca(racaKey);
-    if (racaKey === 'hibrido') {
-        processarRaca(dadosObj.hibrido_raca_1);
-        processarRaca(dadosObj.hibrido_raca_2);
-    }
-
-    // Ganhos de atributos por classe (se definido no futuro no banco de dados)
-    const classes = getClassesAtivas(dadosObj);
-    const bonusClasses = {};
-    classes.forEach(c => {
-        const data = (typeof CLASSES_DATA !== 'undefined') ? CLASSES_DATA[c.name] : null;
-        if (data && data.attrBonus) {
-            Object.keys(data.attrBonus).forEach(a => bonusClasses[a] = (bonusClasses[a] || 0) + data.attrBonus[a]);
-        }
-    });
-
-    if (attrInputs.length > 0) {
-        attrInputs.forEach(input => {
-            const totalBonus = (bonusItens[input.id] || 0) + (bonusRaca[input.id] || 0) + (bonusClasses[input.id] || 0);
-            const modBonus = (modBonusRaca[input.id] || 0);
-
-            let base;
-            if (input === document.activeElement) {
-                // Se o usuário está editando, derivamos a BASE a partir do TOTAL digitado
-                base = (parseInt(input.value) || 0) - totalBonus;
-            } else {
-                // Se não está editando, confiamos no valor BASE que veio do localStorage.
-                // Se o dado não existir (primeira vez), tenta deduzir do valor do input.
-                const storedBase = parseInt(dadosObj[input.id]);
-                base = !isNaN(storedBase) ? storedBase : (parseInt(input.value) || 10) - totalBonus;
-            }
-
-            const total = base + totalBonus;
-            const baseMod = Math.floor((total - 10) / 2);
-            const finalMod = baseMod + modBonus;
-
-            const display = document.getElementById(`mod${input.id.charAt(0).toUpperCase() + input.id.slice(1)}`);
-            if (display) {
-                display.innerText = (finalMod >= 0 ? "+" : "") + finalMod;
-
-                // Atualiza o valor do input para o TOTAL apenas se o usuário não estiver editando ele
-                if (input !== document.activeElement) {
-                    input.value = total;
-                }
-
-                // Destaque visual se o bônus de item estiver afetando este atributo
-                const bonus = bonusItens[input.id] || 0;
-                if (bonus > 0) display.style.color = '#4ade80';
-                else if (bonus < 0) display.style.color = '#ef4444';
-                else display.style.color = 'var(--primary-color)';
-
-                // Constrói string de detalhes para o tooltip (O que está afetando o atributo)
-                let details = [];
-                if (base !== 0) details.push(`Base: ${base}`);
-                if (bonusRaca[input.id]) details.push(`Raça: ${bonusRaca[input.id] > 0 ? '+' : ''}${bonusRaca[input.id]}`);
-                if (bonusClasses[input.id]) details.push(`Classe: ${bonusClasses[input.id] > 0 ? '+' : ''}${bonusClasses[input.id]}`);
-                if (modBonus !== 0) details.push(`Mod. Raça: ${modBonus > 0 ? '+' : ''}${modBonus}`);
-
-                if (breakdown) {
-                    const itms = breakdown.itens[input.id] || [];
-                    const pods = breakdown.poderes[input.id] || [];
-                    const habs = breakdown.habilidades[input.id] || [];
-                    const racaM = breakdown.racaManual[input.id] || [];
-                    const evts = breakdown.event[input.id] || [];
-                    itms.forEach(s => details.push(s));
-                    pods.forEach(s => details.push(s));
-                    habs.forEach(s => details.push(s));
-                    racaM.forEach(s => details.push(s));
-                    evts.forEach(s => details.push(s));
-                } else if (bonusItens[input.id]) {
-                    details.push(`Outros Bônus: ${bonusItens[input.id] > 0 ? '+' : ''}${bonusItens[input.id]}`);
-                }
-
-                input.title = `Total: ${total} (${details.join(' | ')})`;
-            }
-
-            // Salvamos o valor BASE para não inflar o cálculo no próximo save
-            dadosObj[input.id] = base;
-            cache.mods[input.id] = finalMod;
-            cache.totals[input.id] = total;
-        });
-    } else {
-        attrs.forEach(id => {
-            let base = parseInt(dadosObj[id]);
-            if (isNaN(base)) base = 10;
-            const totalBonus = (bonusItens[id] || 0) + (bonusRaca[id] || 0) + (bonusClasses[id] || 0);
-            const total = base + totalBonus;
-            const baseMod = Math.floor((total - 10) / 2);
-            cache.mods[id] = baseMod + (modBonusRaca[id] || 0);
-            cache.totals[id] = total;
-        });
-    }
-    return cache;
-}
-
-/**
- * Motor de Perícias Automáticas
- */
-function aplicarPericiasPorClasseEngine(dados) {
-    const trainedSkills = new Set();
-    const classes = getClassesAtivas(dados);
-    const racaKey = document.getElementById("raca")?.value || dados.raca || "nenhuma";
-
-    const racaData = (typeof RACAS_DATA !== 'undefined') ? RACAS_DATA[racaKey] : null;
-    if (racaData && racaData.skills) racaData.skills.forEach(sk => trainedSkills.add(sk.toLowerCase().replace(/\s/g, '_')));
-
-    // Lógica para Espírito
-    const h1 = document.getElementById('hibrido_raca_1')?.value || dados.hibrido_raca_1;
-    const h2 = document.getElementById('hibrido_raca_2')?.value || dados.hibrido_raca_2;
-    const isEspirito = racaKey === "espirito" || (racaKey === "hibrido" && (h1 === "espirito" || h2 === "espirito"));
-
-    if (isEspirito) {
-        if (dados.espirito_poder === 'assustador') trainedSkills.add('intimidação');
-        if (dados.espirito_poder === 'possessao') trainedSkills.add('oficio_possessao');
-    }
-
-    // Só aplica no DOM se estivermos na página de perícias
-    const skillRows = document.querySelectorAll('.skill-row');
-    if (skillRows.length > 0) {
-        skillRows.forEach(row => {
-            const skillSlug = row.querySelector(".skill-bonus")?.id.replace('skill_bonus_', '');
-            if (!skillSlug || skillSlug.startsWith('oficio_')) return;
-
-            const trainingSelect = row.querySelector(".skill-training-select");
-            if (trainedSkills.has(skillSlug)) {
-                if (trainingSelect.value === "nenhum") {
-                    trainingSelect.value = "treinado";
-                    trainingSelect.dataset.classTrained = "true";
-                }
-            } else if (trainingSelect.dataset.classTrained === "true") {
-                trainingSelect.value = "nenhum";
-                delete trainingSelect.dataset.classTrained;
-            }
-        });
-    }
 }
 
 /**
@@ -708,6 +338,149 @@ function alterarValor(id, delta) {
         atualizarTudo();
     }
 }
+
+window.currentImgTargetId = null; // Armazena se estamos editando ficha principal ou um aliado específico
+
+window.triggerCharImageInput = function(container) {
+    const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    if (dados.foto) {
+        window.abrirModalGerenciarImagem(null); // null indica que usa STORAGE_KEY
+    } else {
+        const input = container.querySelector('input[type="file"]');
+        if (input) input.click();
+    }
+};
+
+window.abrirModalGerenciarImagem = function(targetId) {
+    window.currentImgTargetId = targetId;
+    const key = targetId || STORAGE_KEY;
+    const dados = JSON.parse(localStorage.getItem(key)) || {};
+    
+    const modal = document.getElementById('modal-image-manager');
+    const preview = document.getElementById('image-manager-preview');
+    
+    if (!modal || !preview || !dados.foto) return;
+
+    preview.src = dados.foto;
+    
+    // Carrega valores salvos ou padrões
+    document.getElementById('img-manager-zoom').value = dados.foto_zoom || 1;
+    document.getElementById('img-manager-x').value = dados.foto_x || 50;
+    document.getElementById('img-manager-y').value = dados.foto_y || 50;
+
+    window.atualizarPreviewAjuste();
+    modal.style.display = 'flex';
+};
+
+window.fecharModalGerenciarImagem = function() {
+    const modal = document.getElementById('modal-image-manager');
+    if (modal) modal.style.display = 'none';
+};
+
+window.atualizarPreviewAjuste = function() {
+    const preview = document.getElementById('image-manager-preview');
+    const zoom = document.getElementById('img-manager-zoom').value;
+    const x = document.getElementById('img-manager-x').value;
+    const y = document.getElementById('img-manager-y').value;
+
+    if (preview) {
+        preview.style.transform = `scale(${zoom})`;
+        preview.style.objectPosition = `${x}% ${y}%`;
+        preview.style.transformOrigin = `${x}% ${y}%`;
+    }
+};
+
+window.salvarAjustesImagem = function() {
+    const key = window.currentImgTargetId || STORAGE_KEY;
+    const dados = JSON.parse(localStorage.getItem(key)) || {};
+
+    dados.foto_zoom = document.getElementById('img-manager-zoom').value;
+    dados.foto_x = document.getElementById('img-manager-x').value;
+    dados.foto_y = document.getElementById('img-manager-y').value;
+
+    localStorage.setItem(key, JSON.stringify(dados));
+    window.fecharModalGerenciarImagem();
+    
+    // Se estivermos na ficha, atualiza o avatar da ficha
+    if (window.location.pathname.includes('ficha.html')) {
+        const mainImg = document.getElementById('char-avatar-img');
+        if (mainImg) window.aplicarEstilosAvatar(mainImg, dados);
+    } else if (typeof renderizarAliados === 'function') {
+        renderizarAliados();
+    }
+    showNotification("Ajustes de imagem salvos!", "success");
+};
+
+window.removerImagem = function() {
+    showConfirm("Deseja remover a foto permanentemente?", () => {
+        const key = window.currentImgTargetId || STORAGE_KEY;
+        const dados = JSON.parse(localStorage.getItem(key)) || {};
+
+        delete dados.foto;
+        delete dados.foto_zoom;
+        delete dados.foto_x;
+        delete dados.foto_y;
+
+        localStorage.setItem(key, JSON.stringify(dados));
+        window.fecharModalGerenciarImagem();
+        location.reload(); // Recarrega para limpar o estado visual
+    });
+};
+
+window.trocarImagemDesdeModal = function() {
+    window.fecharModalGerenciarImagem();
+    // Se window.currentImgTargetId for nulo, estamos na ficha principal
+    if (!window.currentImgTargetId) {
+        document.getElementById('char-image-input').click();
+    } else {
+        // Se for aliado, precisamos achar o card e clicar no input dele
+        const card = document.querySelector(`.ally-card[data-id="${window.currentImgTargetId}"]`);
+        if (card) card.querySelector('.ally-image-input').click();
+    }
+};
+
+window.aplicarEstilosAvatar = function(imgEl, dados) {
+    if (!imgEl || !dados) return;
+    const zoom = dados.foto_zoom || 1;
+    const x = dados.foto_x || 50;
+    const y = dados.foto_y || 50;
+
+    imgEl.style.objectFit = 'cover';
+    imgEl.style.transform = `scale(${zoom})`;
+    imgEl.style.objectPosition = `${x}% ${y}%`;
+    imgEl.style.transformOrigin = `${x}% ${y}%`;
+};
+
+window.salvarImagemPersonagem = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+        if (typeof showNotification === 'function') showNotification("A imagem é muito pesada! Tente uma menor que 1MB.", "warning");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const base64 = e.target.result;
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        dados.foto = base64;
+        // Reseta ajustes ao trocar de foto
+        dados.foto_zoom = 1;
+        dados.foto_x = 50;
+        dados.foto_y = 50;
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+
+        const img = document.getElementById('char-avatar-img');
+        if (img) {
+            img.src = base64;
+            window.aplicarEstilosAvatar(img, dados);
+        }
+        if (typeof showNotification === 'function') showNotification("Avatar atualizado!", "success");
+    };
+    reader.readAsDataURL(file);
+};
 
 function exportarFicha() {
     // 1. Força a atualização imediata com o que estiver na tela no momento
@@ -801,13 +574,22 @@ function aplicarCorTema(cor) {
     const g = parseInt(cor.slice(3, 5), 16);
     const b = parseInt(cor.slice(5, 7), 16);
     document.documentElement.style.setProperty('--primary-glow', `rgba(${r}, ${g}, ${b}, 0.3)`);
-    localStorage.setItem(THEME_KEY, cor);
+
+    // Se estivermos editando um aliado, salvamos a cor nos dados dele.
+    // Caso contrário, salvamos no tema global da ficha.
+    if (allyId) {
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        dados.cor_tema = cor;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    } else {
+        localStorage.setItem(THEME_KEY, cor);
+    }
 }
 
 /**
  * Verifica se uma DLC específica está ativa
  */
-window.isDlcAtiva = function(dlcId) {
+window.isDlcAtiva = function (dlcId) {
     if (!dlcId) return true;
     let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY));
     if (!activeDlcs || !Array.isArray(activeDlcs) || activeDlcs.length === 0) activeDlcs = ['atual'];
@@ -817,7 +599,7 @@ window.isDlcAtiva = function(dlcId) {
 /**
  * Alterna o estado de uma DLC e atualiza a interface
  */
-window.toggleDlc = function(input) {
+window.toggleDlc = function (input) {
     let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY));
     if (!activeDlcs || !Array.isArray(activeDlcs) || activeDlcs.length === 0) activeDlcs = ['atual'];
     if (input.checked) {
@@ -829,7 +611,7 @@ window.toggleDlc = function(input) {
 
     // Atualiza Raças
     if (typeof initRaces === 'function') initRaces();
-    
+
     // Atualiza todos os seletores de classe existentes na tela
     document.querySelectorAll('[id^="class_name_"]').forEach(select => {
         const currentVal = select.value;
@@ -845,7 +627,7 @@ window.toggleDlc = function(input) {
     showNotification("Configuração de DLCs atualizada!", "info", 2000);
 };
 
-window.initDlcs = function() {
+window.initDlcs = function () {
     const container = document.getElementById('dlc-selector-container');
     if (!container) return;
 
@@ -885,11 +667,47 @@ document.addEventListener('DOMContentLoaded', () => {
                     else el.value = salvo[key];
                 }
             });
+
+            // Carrega a foto se existir
+            const charImg = document.getElementById('char-avatar-img');
+            if (charImg) {
+                if (salvo.foto) {
+                    charImg.src = salvo.foto;
+                    aplicarEstilosAvatar(charImg, salvo);
+                } else {
+                    charImg.src = "https://ui-avatars.com/api/?name=?&background=0d0d0f&color=ff4444";
+                }
+            }
         }
 
-        // Carrega o tema salvo
-        const temaSalvo = localStorage.getItem(THEME_KEY);
-        if (temaSalvo) aplicarCorTema(temaSalvo);
+        // Se estivermos em um aliado na página de ficha, injeta um aviso visual
+        if (allyId && window.location.pathname.includes('ficha.html')) {
+            const container = document.querySelector('.container');
+            if (container) {
+                const allyNotice = document.createElement('div');
+                allyNotice.style.cssText = `
+                    background: var(--primary-glow);
+                    border: 1px dashed var(--primary-color);
+                    padding: 10px;
+                    margin-bottom: 20px;
+                    border-radius: 8px;
+                    text-align: center;
+                    font-weight: bold;
+                    color: var(--primary-color);
+                `;
+                const nomeAliado = salvo ? (salvo.nome || "Aliado") : "Aliado";
+                allyNotice.innerHTML = `MODO DE EDIÇÃO DO ALIADO: <span>${nomeAliado}</span>`;
+                container.prepend(allyNotice);
+            }
+        }
+
+        // Carrega o tema: Prioridade para a cor do aliado se estiver no contexto de um
+        let temaParaAplicar = localStorage.getItem(THEME_KEY);
+        if (allyId && salvo && salvo.cor_tema) {
+            temaParaAplicar = salvo.cor_tema;
+        }
+        if (temaParaAplicar) aplicarCorTema(temaParaAplicar);
+
     } catch (e) {
         console.warn("Nenhum dado prévio encontrado ou erro no JSON.");
     }
@@ -912,6 +730,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicia o sistema de backup automático (a cada 10 minutos)
     setInterval(realizarBackupAutomatico, 10 * 60 * 1000);
+
+    // Sincronização em tempo real entre abas (Ficha <-> Dashboard)
+    window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY) {
+            const novosDados = JSON.parse(e.newValue);
+            if (!novosDados) return;
+
+            // Atualiza apenas os inputs de salvamento que não estão sendo focados pelo usuário
+            document.querySelectorAll('.save-input').forEach(input => {
+                if (document.activeElement !== input && novosDados[input.id] !== undefined) {
+                    if (input.type === "checkbox") input.checked = novosDados[input.id];
+                    else input.value = novosDados[input.id];
+                }
+            });
+            atualizarTudo();
+        }
+    });
 });
 
 /**

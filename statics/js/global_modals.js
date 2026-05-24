@@ -38,6 +38,40 @@ function fecharModalConfirm() {
 }
 
 /**
+ * Editor de Texto Expandido (Usado principalmente nas Notas)
+ */
+let targetTextareaId = null;
+
+function abrirEditorTexto(targetId, title = "Editor de Texto") {
+    targetTextareaId = targetId;
+    const sourceEl = document.getElementById(targetId);
+    const modalEl = document.getElementById('modal-text-editor');
+    const textareaEl = document.getElementById('modal-text-editor-textarea');
+    const titleEl = document.getElementById('modal-text-editor-title');
+
+    if (!modalEl || !textareaEl) return;
+
+    titleEl.innerText = title;
+    textareaEl.value = sourceEl ? sourceEl.value : "";
+    modalEl.style.display = 'flex';
+}
+
+function fecharEditorTexto() {
+    const modal = document.getElementById('modal-text-editor');
+    if (modal) modal.style.display = 'none';
+    targetTextareaId = null;
+}
+
+function confirmarEdicaoTexto() {
+    const textarea = document.getElementById('modal-text-editor-textarea');
+    if (textarea && targetTextareaId) {
+        const targetEl = document.getElementById(targetTextareaId);
+        if (targetEl) targetEl.value = textarea.value;
+    }
+    fecharEditorTexto();
+}
+
+/**
  * Registra o uso de uma habilidade ou poder no histórico
  */
 function registrarHistorico(nome, custo, tipoCusto) {
@@ -62,9 +96,8 @@ function abrirModalHistorico() {
     const container = document.getElementById('historico-lista');
     if (!modal || !container) return;
 
-    // Garante que a chave seja encontrada mesmo se global.js ainda não definiu a constante
-    const historyKey = typeof HISTORY_KEY !== 'undefined' ? HISTORY_KEY : "ficha_rpg_historico";
-    let historico = JSON.parse(localStorage.getItem(historyKey)) || [];
+    // Usa a constante global que agora já é sensível ao contexto de aliado
+    let historico = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
 
     container.innerHTML = historico.length ? historico.map(h => `
         <div style="display:flex; justify-content:space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;">
@@ -81,8 +114,7 @@ function abrirModalHistorico() {
  */
 function limparHistorico() {
     showConfirm("Deseja realmente limpar todo o histórico de uso?", () => {
-        const historyKey = typeof HISTORY_KEY !== 'undefined' ? HISTORY_KEY : "ficha_rpg_historico";
-        localStorage.removeItem(historyKey);
+        localStorage.removeItem(HISTORY_KEY);
         if (typeof showNotification === 'function') showNotification("Histórico limpo com sucesso!", "success");
         abrirModalHistorico(); // Atualiza a visualização para mostrar que está vazio
     }, () => { }, "Limpar Histórico");
@@ -223,13 +255,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal de Detalhes de Nota (Diário)
     const notaModalHtml = `
-        <div id="modal-nota" class="modal-overlay" style="display: none;">
+        <div id="modal-nota" class="modal-overlay" style="display: none; z-index: 2000; position: fixed; top: 0; left: 0; width: 100%; height: 100%;">
             <div class="modal-content" style="max-width: 600px;">
                 <div class="modal-header">
                     <h3 id="modal-nota-title" class="modal-title" style="color: var(--primary-color)">Diário</h3>
                     <button type="button" class="btn-remove-class" onclick="this.closest('.modal-overlay').style.display = 'none'">×</button>
                 </div>
                 <div class="modal-body" id="modal-nota-body"></div>
+            </div>
+        </div>
+    `;
+
+    // Modal de Editor de Texto Expandido
+    const textEditorModalHtml = `
+        <div id="modal-text-editor" class="modal-overlay" style="display: none; z-index: 5000; position: fixed; top: 0; left: 0; width: 100%; height: 100%;">
+            <div class="modal-content" style="max-width: 800px; width: 95%;">
+                <div class="modal-header">
+                    <h3 id="modal-text-editor-title" class="modal-title" style="color: var(--primary-color)">Editor de Texto</h3>
+                    <button type="button" class="btn-remove-class" onclick="fecharEditorTexto()">×</button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="modal-text-editor-textarea" class="inv-input diario-escrita" style="min-height: 50vh; width: 100%;" placeholder="Escreva aqui os detalhes..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-save-modal" onclick="confirmarEdicaoTexto()" style="width: 100%">Confirmar e Salvar</button>
+                </div>
             </div>
         </div>
     `;
@@ -341,6 +391,61 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
+    // Modal de Gerenciamento de Imagem (Zoom, Posição, Remover)
+    const imageManagerModalHtml = `
+        <div id="modal-image-manager" class="modal-overlay" style="display: none;">
+            <div class="modal-content" style="max-width: 400px;">
+                <div class="modal-header">
+                    <h3 class="modal-title" style="color: var(--primary-color)">Ajustar Imagem</h3>
+                    <button type="button" class="btn-remove-class" onclick="fecharModalGerenciarImagem()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div id="image-manager-preview-container" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid var(--primary-color); overflow: hidden; margin: 0 auto 20px; background: #000;">
+                        <img id="image-manager-preview" src="" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label style="font-size: 0.7rem;">Zoom</label>
+                        <input type="range" id="img-manager-zoom" min="0.5" max="3" step="0.1" value="1" oninput="atualizarPreviewAjuste()">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label style="font-size: 0.7rem;">Posição Horizontal (X)</label>
+                        <input type="range" id="img-manager-x" min="0" max="100" value="50" oninput="atualizarPreviewAjuste()">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 20px;">
+                        <label style="font-size: 0.7rem;">Posição Vertical (Y)</label>
+                        <input type="range" id="img-manager-y" min="0" max="100" value="50" oninput="atualizarPreviewAjuste()">
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button type="button" class="btn-qty" style="width: 100%; height: 40px; border-color: #ef4444; color: #ef4444;" onclick="removerImagem()">Remover</button>
+                    <button type="button" class="btn-save-modal" style="width: 100%;" onclick="salvarAjustesImagem()">Salvar</button>
+                    <button type="button" class="btn-add-class" style="grid-column: span 2; margin-top: 0;" onclick="trocarImagemDesdeModal()">Trocar Foto</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Modal de Buffs de Aliados para o Dono
+    const allyBuffsModalHtml = `
+        <div id="modal-ally-buffs" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-ally-buffs-title" class="modal-title" style="color: var(--primary-color)">Buffs de Aliado</h3>
+                    <button type="button" class="btn-remove-class" onclick="this.closest('.modal-overlay').style.display = 'none'">×</button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px; text-align: center;">Defina os bônus que este aliado concede ao personagem principal quando está ativo.</p>
+                    <div id="ally-buffs-container"></div>
+                    <button type="button" class="btn-add-class" style="width: 100%; margin-top: 10px;" onclick="adicionarLinhaBuffAliado()">+ Adicionar Bônus de Aliado</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-save-modal" style="width: 100%" onclick="salvarBuffsAliado()">Salvar Buffs</button>
+                </div>
+            </div>
+        </div>
+    `;
+
     // Elemento de Notificação Global
     const notificationHtml = `
         <div id="global-notification">
@@ -358,27 +463,33 @@ document.addEventListener('DOMContentLoaded', () => {
     body.insertAdjacentHTML('beforeend', magModalHtml);
     body.insertAdjacentHTML('beforeend', atkModalHtml);
     body.insertAdjacentHTML('beforeend', notaModalHtml);
+    body.insertAdjacentHTML('beforeend', textEditorModalHtml);
     body.insertAdjacentHTML('beforeend', cientistaModalHtml);
     body.insertAdjacentHTML('beforeend', uniqueClassModalHtml);
     body.insertAdjacentHTML('beforeend', racePowersModalHtml);
     body.insertAdjacentHTML('beforeend', statusModalHtml);
     body.insertAdjacentHTML('beforeend', buffsModalHtml);
     body.insertAdjacentHTML('beforeend', levelUpModalHtml);
+    body.insertAdjacentHTML('beforeend', imageManagerModalHtml);
+    body.insertAdjacentHTML('beforeend', allyBuffsModalHtml);
 
     // Injeta a notificação se ela ainda não existir na página
     if (!document.getElementById('global-notification')) {
         body.insertAdjacentHTML('beforeend', notificationHtml);
     }
 
-    // Adiciona o botão de engrenagem flutuante no canto superior
-    // Aumentamos o z-index para 2000 para garantir que ele fique ACIMA do menu (que é 1000)
-    const btnConfig = `
-        <button id="btn-open-config" 
-                onclick="const m = document.getElementById('modal-config'); if(m) m.style.display = 'flex'"
-                title="Configurações de Aparência"
-                style="position: fixed; top: 12px; right: 80px; z-index: 2000; background: rgba(0,0,0,0.6); border: 1px solid var(--primary-color); color: var(--primary-color); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.3s; box-shadow: 0 0 10px rgba(0,0,0,0.5); padding: 0 !important; line-height: 1;">
-            ⚙
-        </button>
-    `;
-    body.insertAdjacentHTML('beforeend', btnConfig);
+    // Adiciona o botão de engrenagem apenas se NÃO estivermos no contexto de um aliado
+    if (!allyId) {
+        // Adiciona o botão de engrenagem flutuante no canto superior
+        // Aumentamos o z-index para 2000 para garantir que ele fique ACIMA do menu (que é 1000)
+        const btnConfig = `
+            <button id="btn-open-config" 
+                    onclick="const m = document.getElementById('modal-config'); if(m) m.style.display = 'flex'"
+                    title="Configurações de Aparência"
+                    style="position: fixed; top: 12px; right: 80px; z-index: 2000; background: rgba(0,0,0,0.6); border: 1px solid var(--primary-color); color: var(--primary-color); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.3s; box-shadow: 0 0 10px rgba(0,0,0,0.5); padding: 0 !important; line-height: 1;">
+                ⚙
+            </button>
+        `;
+        body.insertAdjacentHTML('beforeend', btnConfig);
+    }
 });
