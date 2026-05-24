@@ -161,9 +161,10 @@ function verificarStatusInicial(mods) {
 function atualizarMovimento(mods, dadosObj, bonusItens = {}, breakdown = null) {
     const state = getSheetState(dadosObj);
     const modDes = mods['destreza'] || 0;
-    const penalidadeManual = parseInt(document.getElementById("defesa_penalidade")?.value || 0);
+    const penArmadura = parseInt(document.getElementById("defesa_penalidade")?.value || 0);
+    const penMovManual = parseInt(document.getElementById("movimento_penalidade")?.value || 0);
     const extraRaca = parseInt(dadosObj.movimento_extra_raca) || 0;
-    const totalCalculado = (modDes * 3) + (bonusItens['movimentacao'] || 0) - penalidadeManual;
+    const totalCalculado = (modDes * 3) + (bonusItens['movimentacao'] || 0) - penArmadura - penMovManual;
     const racaMov = state.racaData.movimentoBonus || 0;
     let bonusMorcego = (state.isVampiro && state.formaMorcego) ? 9 : 0;
 
@@ -189,7 +190,8 @@ function atualizarMovimento(mods, dadosObj, bonusItens = {}, breakdown = null) {
         if (racaMov !== 0) details.push(`Raça: ${racaMov >= 0 ? '+' : ''}${racaMov}`);
         if (extraRaca !== 0) details.push(`Bônus Raça: ${extraRaca >= 0 ? '+' : ''}${extraRaca}`);
         if (bonusMorcego !== 0) details.push(`Forma Morcego: +${bonusMorcego}`);
-        if (penalidadeManual !== 0) details.push(`Penalidade: -${penalidadeManual}`);
+        if (penArmadura !== 0) details.push(`Pen. Armadura: -${penArmadura}`);
+        if (penMovManual !== 0) details.push(`Penalidade: -${penMovManual}`);
 
         if (breakdown) {
             const sources = [

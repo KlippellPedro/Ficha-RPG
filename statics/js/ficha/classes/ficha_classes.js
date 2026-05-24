@@ -174,17 +174,18 @@ function atualizarEstiloClasse(selectEl) {
     }
 
     // Limpa todos os estilos possíveis antes de aplicar o novo
-    row.classList.remove('special-class-row', 'ceifeiro-class-row', 'anjo-class-row', 'demonio-class-row', 'cientista-lvl5-row');
+    row.classList.remove('special-class-row', 'ceifeiro-class-row', 'anjo-class-row', 'demonio-class-row', 'cientista-lvl5-row', 'olimpo-class-row');
 
     const classesDB = window.CLASSES_DATA || {};
     const classData = selectEl.value ? classesDB[selectEl.value] : null;
 
-    const isSpecialName = ['ceifeiro_almas', 'anjo', 'demonio'].includes(selectEl.value);
+    const isSpecialName = ['ceifeiro_almas', 'anjo', 'demonio', 'campeão'].includes(selectEl.value);
     if (classData?.isSpecial || isSpecialName) {
         row.classList.add('special-class-row');
         if (selectEl.value === 'ceifeiro_almas') row.classList.add('ceifeiro-class-row');
         else if (selectEl.value === 'anjo') row.classList.add('anjo-class-row');
         else if (selectEl.value === 'demonio') row.classList.add('demonio-class-row');
+        else if (classData?.dlc === 'olimpo') row.classList.add('olimpo-class-row');
     }
 }
 
@@ -194,14 +195,16 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
     const index = idIndex !== null ? idIndex : Date.now();
 
     const classesDB = window.CLASSES_DATA || {};
-    const options = Object.keys(classesDB).map(key => {
-        const classData = classesDB[key];
-        let label = classData.nome || key;
-        if (key === 'cientista' && sub && lvl >= 5) {
-            label = `Cientista (${sub.charAt(0).toUpperCase() + sub.slice(1)})`;
-        }
-        return `<option value="${key}" ${nome === key ? 'selected' : ''}>${label}</option>`;
-    }).join('');
+    const options = Object.keys(classesDB)
+        .filter(key => !classesDB[key].dlc || isDlcAtiva(classesDB[key].dlc))
+        .map(key => {
+            const classData = classesDB[key];
+            let label = classData.nome || key;
+            if (key === 'cientista' && sub && lvl >= 5) {
+                label = `Cientista (${sub.charAt(0).toUpperCase() + sub.slice(1)})`;
+            }
+            return `<option value="${key}" ${nome === key ? 'selected' : ''}>${label}</option>`;
+        }).join('');
 
     let rowClasses = 'class-row';
     const currentClassData = classesDB[nome];
@@ -212,6 +215,7 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
     if (nome === 'ceifeiro_almas') rowClasses += ' ceifeiro-class-row';
     else if (nome === 'anjo') rowClasses += ' anjo-class-row';
     else if (nome === 'demonio') rowClasses += ' demonio-class-row';
+    else if (currentClassData?.dlc === 'olimpo') rowClasses += ' olimpo-class-row';
     const maxAttr = nome === 'ceifeiro_almas' ? '' : 'max="20"';
 
     const row = document.createElement('div');

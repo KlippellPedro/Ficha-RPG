@@ -11,9 +11,11 @@ function initRaces() {
     const salvo = JSON.parse(localStorage.getItem(storageKey)) || {};
 
     if (racaSelect) {
-        racaSelect.innerHTML = Object.keys(racasDB).map(key =>
-            `<option value="${key}">${racasDB[key].nome}</option>`
-        ).join('');
+        racaSelect.innerHTML = Object.keys(racasDB)
+            .filter(key => !racasDB[key].dlc || isDlcAtiva(racasDB[key].dlc))
+            .map(key =>
+                `<option value="${key}">${racasDB[key].nome}</option>`
+            ).join('');
         if (salvo.raca) racaSelect.value = salvo.raca;
     }
 
@@ -169,7 +171,7 @@ function verificarExtraHibrido(dados) { // dados is already passed
 
 function verificarExtraDeusEscolhido(dados) {
     const racasComBonusExtra = ["deus", "escolhido", "corrompido", "anjo", "demonio", "semideus"];
-    
+
     // Força a verificação tanto da raça base quanto de híbridos
     const activeRaca = dados.raca || document.getElementById("raca")?.value || "nenhuma";
     const isSpecialRaca = racasComBonusExtra.some(raca => isRacaAtiva(raca, dados));

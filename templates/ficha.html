@@ -40,6 +40,9 @@
     </div>
 
     <div class="container">
+      <!-- Seletor de DLCs -->
+      <div id="dlc-selector-container" class="dlc-selector-box"></div>
+
       <!-- Identidade do Personagem -->
       <header class="ficha-header-main">
         <div class="char-header">
@@ -332,7 +335,11 @@
               >
                 ?
               </button>
-              <input type="number" id="movimentacao" class="save-input header-input" value="0" />
+              <input type="number" id="movimentacao" class="save-input header-input" value="0" readonly />
+            </div>
+            <div class="input-group">
+              <label>Penalidade</label>
+              <input type="number" id="movimento_penalidade" class="save-input header-input" value="0" oninput="atualizarTudo()" />
             </div>
             <div class="input-group" style="position: relative">
               <label>Status</label>

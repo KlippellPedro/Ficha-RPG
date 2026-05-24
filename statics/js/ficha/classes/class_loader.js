@@ -25,7 +25,9 @@
         'multiclasse',
         'avatar',
         'demonio',
-        'anjo'
+        'anjo',
+        'olimpo',
+        '../classes_olimpo_data/campeao'
     ];
 
     // 2. RESOLUÇÃO DE CAMINHO: Detecta se está em /templates ou na raiz

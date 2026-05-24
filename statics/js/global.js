@@ -2,6 +2,7 @@ const STORAGE_KEY = "ficha_rpg_dados";
 const HISTORY_KEY = "ficha_rpg_historico";
 const BACKUP_KEY = "ficha_rpg_backup";
 const THEME_KEY = "ficha_rpg_tema";
+const DLCS_KEY = "ficha_rpg_dlcs";
 
 window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
     ficha: [
@@ -746,6 +747,70 @@ function aplicarCorTema(cor) {
     document.documentElement.style.setProperty('--primary-glow', `rgba(${r}, ${g}, ${b}, 0.3)`);
     localStorage.setItem(THEME_KEY, cor);
 }
+
+/**
+ * Verifica se uma DLC específica está ativa
+ */
+window.isDlcAtiva = function(dlcId) {
+    if (!dlcId || dlcId === 'normalidade') return true;
+    const activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY)) || ['normalidade'];
+    return activeDlcs.includes(dlcId);
+};
+
+/**
+ * Alterna o estado de uma DLC e atualiza a interface
+ */
+window.toggleDlc = function(input) {
+    let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY)) || ['normalidade'];
+    if (input.checked) {
+        if (!activeDlcs.includes(input.value)) activeDlcs.push(input.value);
+    } else {
+        activeDlcs = activeDlcs.filter(id => id !== input.value);
+    }
+    localStorage.setItem(DLCS_KEY, JSON.stringify(activeDlcs));
+
+    // Atualiza Raças
+    if (typeof initRaces === 'function') initRaces();
+    
+    // Atualiza todos os seletores de classe existentes na tela
+    document.querySelectorAll('[id^="class_name_"]').forEach(select => {
+        const currentVal = select.value;
+        const classesDB = window.CLASSES_DATA || {};
+        const options = Object.keys(classesDB)
+            .filter(key => !classesDB[key].dlc || isDlcAtiva(classesDB[key].dlc))
+            .map(key => `<option value="${key}" ${currentVal === key ? 'selected' : ''}>${classesDB[key].nome || key}</option>`)
+            .join('');
+        select.innerHTML = '<option value="">Selecione...</option>' + options;
+    });
+
+    if (typeof atualizarTudo === 'function') atualizarTudo();
+    showNotification("Configuração de DLCs atualizada!", "info", 2000);
+};
+
+window.initDlcs = function() {
+    const container = document.getElementById('dlc-selector-container');
+    if (!container) return;
+
+    let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY)) || ['normalidade'];
+    const dlcs = [
+        { id: 'normalidade', nome: 'Normalidade' },
+        { id: 'passado', nome: 'Passado' },
+        { id: 'futuro', nome: 'Futuro' },
+        { id: 'olimpo', nome: 'Olimpo' }
+    ];
+
+    container.innerHTML = `
+        <label class="dlc-label">Módulos de Expansão (DLCs)</label>
+        <div class="dlc-checkbox-grid">
+            ${dlcs.map(dlc => `
+                <label class="dlc-checkbox-item">
+                    <input type="checkbox" value="${dlc.id}" ${activeDlcs.includes(dlc.id) ? 'checked' : ''} onchange="toggleDlc(this)">
+                    <span>${dlc.nome}</span>
+                </label>
+            `).join('')}
+        </div>
+    `;
+};
 
 // Carregamento Inicial Genérico
 document.addEventListener('DOMContentLoaded', () => {

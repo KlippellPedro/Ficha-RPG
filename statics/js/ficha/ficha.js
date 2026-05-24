@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initRaces();
     }
 
+    // Inicializa o seletor de DLCs
+    if (typeof initDlcs === 'function') {
+        initDlcs();
+    }
+
     // Inicializa a lógica de classes (restauração de classes salvas e UI dinâmica)
     if (typeof initClasses === 'function') {
         initClasses();
