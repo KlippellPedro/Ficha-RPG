@@ -91,11 +91,20 @@ function removerAtaqueAutomatico(itemName, originId) {
     document.querySelectorAll('#ataques-container .item-row').forEach(row => {
         const id = row.dataset.index;
         const originInput = document.getElementById(`atk_origin_${id}`);
-        // Verifica pelo ID de origem primeiro, depois pelo nome como fallback
-        if ((originInput && originInput.value == originId) || (document.getElementById(`atk_nome_${id}`)?.value === itemName)) {
-            removerAtaque(row.querySelector('.btn-remove-class')); // Reutiliza a função de remover existente
+        const nomeAtk = document.getElementById(`atk_nome_${id}`)?.value;
+
+        // Prioridade absoluta para o ID de origem (vínculo direto)
+        const matchId = (originInput && originId && originInput.value == originId);
+        // Fallback apenas se não houver ID (ataques manuais), mas com cautela
+        const matchNome = (!originInput?.value && itemName && nomeAtk === itemName);
+
+        if (matchId || matchNome) {
+            // Chama a função de remover passando o botão ou simulando o clique
+            const btnRemover = row.querySelector('.btn-remove-class');
+            if (btnRemover) row.remove(); // Remove da UI imediatamente
         }
     });
+    atualizarTudo();
 }
 
 /**

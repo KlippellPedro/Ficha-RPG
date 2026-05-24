@@ -7,7 +7,7 @@ const OPTIONS_ATTR = [
     { v: "constituicao", t: "CON" }, { v: "inteligencia", t: "INT" }, { v: "sabedoria", t: "SAB" },
     { v: "carisma", t: "CAR" }, { v: "aura", t: "AUR" }, { v: "pv_max", t: "Vida Máx" },
     { v: "pm_max", t: "Mana Máx" }, { v: "defesa", t: "Defesa" }, { v: "movimentacao", t: "Movimento" },
-    { v: "sanidade", t: "Sanidade" }, { v: "status_info", t: "Status" },
+    { v: "sanidade_max", t: "Sanidade Máx" }, { v: "status_info", t: "Status" },
     { v: "dano", t: "Arma: Dano" }, { v: "critico", t: "Arma: Crítico" }, { v: "alcance", t: "Arma: Alcance" },
     { v: "todas", t: "P: TODAS as Perícias" },
     { v: "acrobacia", t: "P: Acrobacia" }, { v: "adestramento", t: "P: Adestramento" },

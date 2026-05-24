@@ -80,9 +80,14 @@ function limparMagias() {
  * Reseta todos os campos de busca e filtros para o estado inicial
  */
 function resetarFiltrosMagia() {
-    document.getElementById('search-magia').value = '';
-    document.getElementById('filter-magia-tipo').value = 'todos';
-    document.getElementById('filter-magia-nivel').value = 'todos';
+    const search = document.getElementById('search-magia');
+    const tipo = document.getElementById('filter-magia-tipo');
+    const nivel = document.getElementById('filter-magia-nivel');
+
+    if (search) search.value = '';
+    if (tipo) tipo.value = 'todos';
+    if (nivel) nivel.value = 'todos';
+
     filtrarMagias();
     showNotification("Filtros limpos", "info", 2000);
 }

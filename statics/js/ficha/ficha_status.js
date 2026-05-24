@@ -164,14 +164,17 @@ function atualizarMovimento(mods, dadosObj, bonusItens = {}, breakdown = null) {
     const penalidadeManual = parseInt(document.getElementById("defesa_penalidade")?.value || 0);
     const extraRaca = parseInt(dadosObj.movimento_extra_raca) || 0;
     const total = (modDes * 3) + (bonusItens['movimentacao'] || 0) - penalidadeManual;
+    const baseHumano = (state.racaKey === "humano" ? 3 : 0);
     const racaMov = state.racaData.movimentoBonus || 0;
     let bonusMorcego = (state.isVampiro && state.formaMorcego) ? 9 : 0;
     const el = document.getElementById("movimentacao");
     if (el) {
-        const finalTotal = Math.max(state.racaKey === "humano" ? 3 : 0, total + racaMov + bonusMorcego);
+        const finalTotal = Math.max(0, baseHumano + total + racaMov + bonusMorcego);
         el.value = finalTotal;
 
-        let details = [`Base (DESx3): ${modDes * 3}`];
+        let details = [];
+        if (baseHumano > 0) details.push(`Base Humano: ${baseHumano}`);
+        details.push(`Base (DESx3): ${modDes * 3}`);
         if (racaMov !== 0) details.push(`Raça: ${racaMov >= 0 ? '+' : ''}${racaMov}`);
         if (extraRaca !== 0) details.push(`Bônus Raça: ${extraRaca >= 0 ? '+' : ''}${extraRaca}`);
         if (bonusMorcego !== 0) details.push(`Forma Morcego: +${bonusMorcego}`);

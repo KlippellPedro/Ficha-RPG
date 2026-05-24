@@ -258,6 +258,27 @@
                 </div>
               </div>
             </div>
+            <!-- Barra de Sanidade -->
+            <div id="sanidade-stat-group" class="stat-group">
+              <div class="stat-labels">
+                <label>SANIDADE</label>
+                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculoGenerico('sanidade_max')" title="Ver cálculo de Sanidade">
+                  ?
+                </button>
+              </div>
+              <div class="bar-controls">
+                <button type="button" class="btn-qty" onclick="alterarValor('sanidade_atual', -1)">-</button>
+                <div class="bar-outer">
+                  <div id="bar-sanidade" class="bar-inner sanidade-color"></div>
+                  <div class="bar-text">
+                    <input type="number" id="sanidade_atual" class="save-input bar-value-input" value="100" oninput="atualizarTudo()" />
+                    <span>/</span>
+                    <input type="number" id="sanidade_max" class="save-input bar-value-input" value="100" oninput="atualizarTudo()" />
+                  </div>
+                </div>
+                <button type="button" class="btn-qty" onclick="alterarValor('sanidade_atual', 1)">+</button>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -314,18 +335,6 @@
               <input type="number" id="movimentacao" class="save-input header-input" value="0" />
             </div>
             <div class="input-group" style="position: relative">
-              <label>Sanidade</label>
-              <button
-                type="button"
-                class="btn-calc-ajuda"
-                onclick="mostrarAjudaCalculoGenerico('sanidade')"
-                style="position: absolute; right: 0; top: 0"
-              >
-                ?
-              </button>
-              <input type="text" id="sanidade" class="save-input header-input" value="100%" />
-            </div>
-            <div class="input-group" style="position: relative">
               <label>Status</label>
               <button
                 type="button"
@@ -379,20 +388,20 @@
       <div class="actions-hud-section">
         <div class="actions-container">
           <div class="action-item">
-            <label>Ação Padrão</label>
-            <div class="counter-control">
-              <button type="button" onclick="alterarValor('acao_padrao', -1)">-</button>
-              <input type="number" id="acao_padrao" class="save-input counter-input" value="1" />
-              <button type="button" onclick="alterarValor('acao_padrao', 1)">+</button>
-            </div>
-          </div>
-
-          <div class="action-item">
             <label>Ação Movimento</label>
             <div class="counter-control">
               <button type="button" onclick="alterarValor('acao_movimento', -1)">-</button>
               <input type="number" id="acao_movimento" class="save-input counter-input" value="1" />
               <button type="button" onclick="alterarValor('acao_movimento', 1)">+</button>
+            </div>
+          </div>
+
+          <div class="action-item">
+            <label>Ação Padrão</label>
+            <div class="counter-control">
+              <button type="button" onclick="alterarValor('acao_padrao', -1)">-</button>
+              <input type="number" id="acao_padrao" class="save-input counter-input" value="1" />
+              <button type="button" onclick="alterarValor('acao_padrao', 1)">+</button>
             </div>
           </div>
 

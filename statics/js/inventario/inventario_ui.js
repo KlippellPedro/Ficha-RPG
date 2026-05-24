@@ -63,6 +63,18 @@ function atualizarEstiloRaridade(index) {
     nomeInput.classList.add(`rarity-${effectiveRarity}`);
 }
 
+/**
+ * Reseta todos os campos de busca e filtros do inventário
+ */
+function resetarFiltrosInventario() {
+    const search = document.getElementById('search-item');
+    const cat = document.getElementById('filter-category');
+    if (search) search.value = '';
+    if (cat) cat.value = 'todos';
+    filtrarItens();
+    showNotification("Filtros do inventário limpos", "info", 2000);
+}
+
 function filtrarItens() {
     const filtroCat = document.getElementById('filter-category').value;
     const termoBusca = (document.getElementById('search-item')?.value || "").toLowerCase();
@@ -192,11 +204,13 @@ function verificarTipoItem(index) {
 
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
             } else {
-                // Remove o ataque se ele existir nos dados salvos
-                const atkKey = Object.keys(dados).find(k => k.startsWith('atk_nome_') && dados[k].trim().toLowerCase() === lowerNome);
-                if (atkKey) {
-                    const atkId = atkKey.replace('atk_nome_', '');
-                    Object.keys(dados).forEach(k => { if (k.endsWith(`_${atkId}`) && k.includes('atk_')) delete dados[k]; });
+                // Remove o ataque procurando pelo ID de origem vinculado
+                const originKey = Object.keys(dados).find(k => k.startsWith('atk_origin_') && dados[k] == index);
+                if (originKey) {
+                    const atkId = originKey.replace('atk_origin_', '');
+                    Object.keys(dados).forEach(k => {
+                        if (k.endsWith(`_${atkId}`) && k.includes('atk_')) delete dados[k];
+                    });
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
                 }
             }
@@ -231,16 +245,17 @@ function removerItemUI(index) {
             if (categoria === 'armas' && nome.trim() !== "") {
                 if (typeof removerAtaqueAutomatico === 'function') {
                     removerAtaqueAutomatico(nome, index);
-                } else {
-                    // Fallback manual para o localStorage (se não estiver na página de ataques)
-                    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-                    const lowerNome = nome.trim().toLowerCase();
-                    const atkKey = Object.keys(dados).find(k => k.startsWith('atk_nome_') && dados[k].trim().toLowerCase() === lowerNome);
-                    if (atkKey) {
-                        const atkId = atkKey.replace('atk_nome_', '');
-                        Object.keys(dados).forEach(k => { if (k.endsWith(`_${atkId}`) && k.includes('atk_')) delete dados[k]; });
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-                    }
+                }
+
+                // Limpeza profunda no localStorage baseada no ID de origem
+                let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+                const originKey = Object.keys(dados).find(k => k.startsWith('atk_origin_') && dados[k] == index);
+                if (originKey) {
+                    const atkId = originKey.replace('atk_origin_', '');
+                    Object.keys(dados).forEach(k => {
+                        if (k.endsWith(`_${atkId}`) && k.includes('atk_')) delete dados[k];
+                    });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
                 }
             }
         }

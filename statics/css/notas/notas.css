@@ -2,7 +2,52 @@
 .nota-header-grid,
 .nota-row-grid {
   display: grid !important;
-  grid-template-columns: 35px 2fr 1fr 50px 50px 40px !important;
+  grid-template-columns: 35px 2fr 1fr 45px 45px 40px !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+/* Info de cabeçalho (Título + Data) */
+.nota-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.nota-titulo-lista {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid transparent !important;
+  color: var(--text-main) !important;
+  font-weight: 600 !important;
+  padding: 2px 0 !important;
+  font-size: 0.95rem !important;
+  transition: border-color 0.2s !important;
+}
+
+.nota-titulo-lista:focus {
+  border-bottom-color: var(--primary-color) !important;
+}
+
+.nota-data-lista {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Estilo de Badge para a Tag */
+.nota-tag {
+  background: var(--primary-glow) !important;
+  border: 1px solid rgba(var(--primary-color-rgb), 0.2) !important;
+  color: var(--primary-color) !important;
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-size: 0.75rem !important;
+  text-align: center !important;
+  width: fit-content !important;
+  min-width: 80px;
 }
 
 /* Estilo do botão de favorito */

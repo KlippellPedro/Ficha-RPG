@@ -9,7 +9,7 @@ window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
         { v: "constituicao", t: "CON" }, { v: "inteligencia", t: "INT" }, { v: "sabedoria", t: "SAB" },
         { v: "carisma", t: "CAR" }, { v: "aura", t: "AUR" }, { v: "pv_max", t: "Vida Máx" },
         { v: "pm_max", t: "Mana Máx" }, { v: "defesa", t: "Defesa" }, { v: "movimentacao", t: "Movimento" },
-        { v: "sanidade", t: "Sanidade" }, { v: "status_info", t: "Status" }
+        { v: "sanidade_max", t: "Sanidade Máx" }, { v: "status_info", t: "Status" }
     ],
     pericia: [
         { v: "todas", t: "TODAS AS PERÍCIAS" },
@@ -153,7 +153,7 @@ function atualizarTudo() {
             'constituicao': 'constituicao_extra_raca', 'inteligencia': 'inteligencia_extra_raca',
             'sabedoria': 'sabedoria_extra_raca', 'carisma': 'carisma_extra_raca', 'aura': 'aura_extra_raca'
         };
-        
+
         Object.entries(manualFields).forEach(([key, inputId]) => {
             const val = parseInt(dados[inputId]) || 0;
             if (val !== 0) {
@@ -372,16 +372,16 @@ function calcularBonusItens(dados) {
  * Aplica bônus de itens em campos simples que não são atributos (ex: Movimentação)
  */
 function aplicarBonusVisuais(bonusItens, dadosObj, breakdown = null) {
-    const campos = ['movimentacao', 'defesa', 'sanidade', 'status_info'];
+    const campos = ['movimentacao', 'defesa', 'status_info'];
     campos.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             const bonus = bonusItens[id] || 0;
 
-            // Tooltip detalhado para Sanidade e Status (Defesa e Movimento já possuem tooltips em ficha_status.js)
-            if (id === 'sanidade' || id === 'status_info') {
+            // Tooltip detalhado para Status (Defesa e Movimento já possuem tooltips em ficha_status.js)
+            if (id === 'status_info') {
                 let details = [];
-                let baseValue = dadosObj[id] || (id === 'sanidade' ? "100%" : "0");
+                let baseValue = dadosObj[id] || "0";
                 details.push(`Base: ${baseValue}`);
                 if (bonus !== 0) details.push(`Bônus: ${bonus > 0 ? '+' : ''}${bonus}`);
 
@@ -412,6 +412,7 @@ function atualizarBarras(bonusItens = {}) {
     const stats = [
         { atual: 'pv_atual', max: 'pv_max', bar: 'bar-pv' },
         { atual: 'pm_atual', max: 'pm_max', bar: 'bar-pm' },
+        { atual: 'sanidade_atual', max: 'sanidade_max', bar: 'bar-sanidade' },
     ];
 
     const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
@@ -775,14 +776,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-        // Listener para fechar notificação ao clicar
-        document.body.addEventListener('click', (e) => {
-            const notificationEl = e.target.closest('#global-notification');
-            if (notificationEl && notificationEl.classList.contains('show')) {
-                clearTimeout(notificationTimeout);
-                notificationEl.classList.remove('show');
-            }
-        });
+    // Listener para fechar notificação ao clicar
+    document.body.addEventListener('click', (e) => {
+        const notificationEl = e.target.closest('#global-notification');
+        if (notificationEl && notificationEl.classList.contains('show')) {
+            clearTimeout(notificationTimeout);
+            notificationEl.classList.remove('show');
+        }
+    });
 
     // Inicia o sistema de backup automático (a cada 10 minutos)
     setInterval(realizarBackupAutomatico, 10 * 60 * 1000);
@@ -841,19 +842,22 @@ function restaurarBackupFicha() {
  * Reseta todos os atributos base para 10
  */
 function resetarAtributos() {
-    if (!confirm("Deseja resetar todos os valores base de atributos para 10?")) return;
+    showConfirm("Deseja resetar todos os valores base de atributos para 10? Isso ignorará bônus temporários e retornará a base ao valor padrão.", () => {
+        const attrs = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma", "aura"];
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
-    const attrs = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma", "aura"];
-    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        attrs.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.value = 10;
+            dados[id] = 10;
+        });
 
-    attrs.forEach(id => {
-        const input = document.getElementById(id);
-        if (input) input.value = 10;
-        dados[id] = 10;
-    });
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-    atualizarTudo();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        atualizarTudo();
+        showNotification("Atributos resetados para 10 com sucesso.", "success");
+    }, () => {
+        showNotification("Reset de atributos cancelado.", "info");
+    }, "Resetar Atributos");
 }
 
 /**

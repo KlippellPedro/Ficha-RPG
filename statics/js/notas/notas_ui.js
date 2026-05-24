@@ -2,11 +2,13 @@
  * Lógica de Interface das Notas (Lista, Filtros e Favoritos)
  */
 
-function adicionarNotaUI(titulo = "", tipo = "", desc = "", idIndex = null, camposCustom = "[]", favorito = false) {
+function adicionarNotaUI(titulo = "", tipo = "", desc = "", idIndex = null, camposCustom = "[]", favorito = false, data = "") {
     const container = document.getElementById('notas-container');
     if (!container) return;
 
     const index = idIndex !== null ? idIndex : Date.now();
+    // Gera a data atual se for uma nota nova
+    const dataFormatada = data || new Date().toLocaleDateString('pt-BR');
 
     const row = document.createElement('div');
     row.className = 'item-row nota-row-grid';
@@ -16,8 +18,13 @@ function adicionarNotaUI(titulo = "", tipo = "", desc = "", idIndex = null, camp
         <button type="button" id="btn_fav_${index}" class="btn-fav ${favorito ? 'active' : ''}" onclick="toggleFavorito('${index}')" title="Favoritar">
             ${favorito ? '★' : '☆'}
         </button>
-        <input type="text" id="nota_titulo_${index}" class="save-input inv-input" placeholder="Ex: Rumores da Taverna" value="${titulo}">
-        <input type="text" id="nota_tipo_${index}" class="save-input inv-input" placeholder="Ex: Missão" value="${tipo}">
+        <div class="nota-header-info">
+            <input type="text" id="nota_titulo_${index}" class="save-input inv-input nota-titulo-lista" placeholder="Título da Nota" value="${titulo}">
+            <small class="nota-data-lista">${dataFormatada}</small>
+        </div>
+        <div class="nota-tag-container">
+            <input type="text" id="nota_tipo_${index}" class="save-input inv-input nota-tag" placeholder="Tipo" value="${tipo}">
+        </div>
         
         <button type="button" class="btn-open-desc" onclick="abrirModalNota('${index}')">🔍</button>
         <button type="button" class="btn-open-desc" onclick="duplicarNota('${index}')" title="Duplicar">📋</button>
@@ -27,6 +34,7 @@ function adicionarNotaUI(titulo = "", tipo = "", desc = "", idIndex = null, camp
             <textarea id="nota_desc_${index}" class="save-input">${desc}</textarea>
             <textarea id="nota_campos_${index}" class="save-input">${camposCustom}</textarea>
             <input type="checkbox" id="nota_fav_${index}" class="save-input" ${favorito ? 'checked' : ''}>
+            <input type="hidden" id="nota_data_${index}" class="save-input" value="${dataFormatada}">
         </div>
     `;
 

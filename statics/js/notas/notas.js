@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .sort((a, b) => a - b);
 
     indices.forEach(idx => {
-        adicionarNotaUI(salvo[`nota_titulo_${idx}`], salvo[`nota_tipo_${idx}`], salvo[`nota_desc_${idx}`], idx, salvo[`nota_campos_${idx}`], salvo[`nota_fav_${idx}`] === true);
+        adicionarNotaUI(salvo[`nota_titulo_${idx}`], salvo[`nota_tipo_${idx}`], salvo[`nota_desc_${idx}`], idx, salvo[`nota_campos_${idx}`], salvo[`nota_fav_${idx}`] === true, salvo[`nota_data_${idx}`] || "");
     });
 
     atualizarTudo();

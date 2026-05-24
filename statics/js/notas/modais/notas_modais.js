@@ -9,6 +9,7 @@ function abrirModalNota(index) {
     const tipo = document.getElementById(`nota_tipo_${index}`).value;
     const desc = document.getElementById(`nota_desc_${index}`).value;
     const camposRaw = document.getElementById(`nota_campos_${index}`).value;
+    const data = document.getElementById(`nota_data_${index}`)?.value || "";
 
     let campos = [];
     try { campos = JSON.parse(camposRaw || "[]"); } catch (e) { campos = []; }
@@ -19,16 +20,21 @@ function abrirModalNota(index) {
 
     if (!titleEl || !bodyEl || !modalEl) return;
 
-    titleEl.innerText = `Diário: ${titulo || "Nova Nota"}`;
+    titleEl.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-right: 35px;">
+            <span>Diário: ${titulo || "Nova Nota"}</span>
+            <small style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">${data}</small>
+        </div>
+    `;
 
     bodyEl.innerHTML = `
         <div class="input-group">
-            <label>Tipo / Categoria</label>
+            <label style="color: var(--primary-color); font-size: 0.7rem; letter-spacing: 1px;">CATEGORIA / ETIQUETA</label>
             <input type="text" id="modal_nota_tipo" class="inv-input" value="${tipo}" placeholder="Ex: Lore, Personagem, Alvo...">
         </div>
         <div class="input-group">
-            <label>Anotações Gerais</label>
-            <textarea id="modal_nota_desc" class="inv-input" style="min-height: 150px">${desc}</textarea>
+            <label style="color: var(--primary-color); font-size: 0.7rem; letter-spacing: 1px;">ANOTAÇÃO</label>
+            <textarea id="modal_nota_desc" class="inv-input" style="min-height: 300px; line-height: 1.6; font-size: 1.05rem; padding: 15px; background: rgba(0,0,0,0.2);">${desc}</textarea>
         </div>
 
         <div class="section-divider">Campos Personalizados</div>

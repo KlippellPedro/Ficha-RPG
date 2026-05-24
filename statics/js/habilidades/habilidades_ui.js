@@ -114,7 +114,14 @@ function limparHabilidades() {
 }
 
 function resetarFiltrosHabilidades() {
-    document.getElementById('search-habilidade').value = '';
-    document.getElementById('filter-habilidade-tipo').value = 'todos';
+    const search = document.getElementById('search-habilidade');
+    const type = document.getElementById('filter-habilidade-tipo');
+    const source = document.getElementById('filter-habilidade-classe');
+
+    if (search) search.value = '';
+    if (type) type.value = 'todos';
+    if (source) source.value = 'todos';
+
     filtrarHabilidades();
+    showNotification("Filtros de habilidades limpos", "info", 2000);
 }

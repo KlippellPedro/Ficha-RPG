@@ -796,70 +796,117 @@
 }
 
 .particle-ember {
-  width: 5px;
-  height: 5px;
-  background: var(--primary-color);
-  box-shadow: 0 0 10px #ff8800;
-  border-radius: 2px;
+  width: 6px;
+  height: 6px;
+  background: #ff4444; /* Vermelho fixo para o efeito infernal */
+  box-shadow:
+    0 0 10px #ff0000,
+    0 0 5px #ff8800;
+  border-radius: 50%; /* Transforma o quadrado em bolinha */
+  filter: blur(0.3px);
+}
+
+/* Variante específica para quando o sistema chama o efeito 'demonio' */
+.particle-demonio {
+  width: 7px;
+  height: 7px;
+  background: #ff0000;
+  box-shadow:
+    0 0 10px #ff0000,
+    0 0 20px rgba(255, 0, 0, 0.4);
+  border-radius: 50%;
   filter: blur(0.5px);
 }
 .combat-status-section {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  margin: 20px auto; /* Centraliza o painel na página */
-  width: fit-content; /* Ajusta a largura ao conteúdo */
-  min-width: 200px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin: 30px auto;
+  width: 100%;
+  max-width: 600px;
+}
+
+.actions-hud-section {
+  margin: 25px 0;
   display: flex;
   justify-content: center;
 }
 
 .actions-container {
   display: flex;
-  flex-direction: row; /* Volta os campos para o layout horizontal */
-  gap: 30px; /* Espaçamento entre os grupos de ação */
-  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .action-item {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+  border: 1px solid var(--border-color);
+  border-bottom: 3px solid var(--primary-color);
+  padding: 12px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
+  min-width: 140px;
+  transition: transform 0.2s;
+}
+
+.action-item:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.action-item label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--primary-color);
+  font-weight: 800;
 }
 
 .counter-control {
   display: flex;
   align-items: center;
-  background: var(--bg-input);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
 }
 
 .counter-control button {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border: none;
-  color: white;
-  padding: 5px 12px;
+  color: var(--primary-color);
+  width: 32px;
+  height: 32px;
   cursor: pointer;
-  font-weight: bold;
+  font-size: 1.2rem;
   transition: 0.2s;
 }
 
 .counter-control button:hover {
-  background: var(--danger);
-  color: black;
+  background: var(--primary-color);
+  color: white;
 }
 
 .counter-input {
-  width: 45px;
+  width: 50px;
   text-align: center;
   border: none !important;
   background: transparent !important;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: bold;
+  color: white;
+  -moz-appearance: textfield;
+}
+
+.counter-input::-webkit-inner-spin-button,
+.counter-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 @keyframes float-up {
@@ -886,4 +933,9 @@
   100% {
     filter: brightness(1.2);
   }
+}
+
+.sanidade-color {
+  background: linear-gradient(180deg, #10b981 0%, #064e3b 100%) !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
 }
