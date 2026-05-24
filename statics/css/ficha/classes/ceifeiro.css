@@ -1,0 +1,44 @@
+/* Estilo Específico para o Ceifeiro (Verde Alma) */
+.ceifeiro-class-row {
+  border: 1px solid #00ffd2 !important;
+  background: rgba(0, 255, 210, 0.08) !important;
+  box-shadow: 0 0 20px rgba(0, 255, 210, 0.2);
+}
+
+.ceifeiro-class-row label {
+  color: #00ffd2 !important;
+}
+
+/* Partículas de Alma */
+.particle-soul {
+  width: 4px;
+  height: 12px;
+  background: linear-gradient(to top, transparent, #00ffd2);
+  border-radius: 50% 50% 0 0;
+}
+
+/* Efeito de Fumaça/Alma escapando */
+.smoke-particle {
+  position: fixed;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(0, 255, 200, 0.6) 0%, rgba(0, 50, 40, 0.8) 50%, transparent 100%);
+  border-radius: 50%;
+  z-index: 10001;
+  filter: blur(4px);
+  animation: soul-escape 2s ease-out forwards;
+}
+
+@keyframes soul-escape {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -300%) scale(2.5) rotate(180deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
+}

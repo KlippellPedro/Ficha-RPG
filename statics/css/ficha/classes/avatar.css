@@ -1,0 +1,145 @@
+/* Estilos para a Classe Avatar */
+.avatar-epic-modal {
+  border-top: 4px solid var(--primary-color); /* Mantido para compatibilidade, mas o box-shadow é mais dominante */
+  background: linear-gradient(180deg, #0a0a0c 0%, #111115 100%);
+  box-shadow:
+    0 0 30px rgba(0, 0, 0, 0.9),
+    0 0 20px var(--primary-glow),
+    inset 0 0 15px rgba(255, 255, 255, 0.05); /* Sombra interna para profundidade */
+  backdrop-filter: blur(8px); /* Efeito de vidro fosco */
+  -webkit-backdrop-filter: blur(8px); /* Para Safari */
+  border-radius: 15px; /* Cantos mais arredondados */
+  overflow: hidden; /* Garante que elementos internos não transbordem */
+}
+
+.modal-header .modal-title {
+  font-size: 2rem; /* Título maior */
+  text-shadow: 0 0 15px var(--primary-color); /* Brilho para o título */
+  color: var(--primary-color); /* Usa a cor primária para o título */
+}
+
+.avatar-desc {
+  font-size: 1.1rem !important; /* Descrição maior */
+  line-height: 1.5;
+}
+
+.avatar-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.element-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px 10px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.element-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.element-name {
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+}
+
+/* Cores dos Elementos baseados nas classes dinâmicas card-[elemento] */
+.card-fogo:hover {
+  border-color: #e92309;
+  color: #e92309;
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+}
+.card-agua:hover {
+  border-color: #0662f5;
+  color: #0662f5;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+.card-ar:hover {
+  border-color: #f8f8f8;
+  color: #f8f8f8;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+}
+.card-terra:hover {
+  border-color: #974a01;
+  color: #974a01;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+}
+.card-raio:hover {
+  border-color: #02ffff;
+  color: #02ffff;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+.card-vida:hover {
+  border-color: #12f1a7;
+  color: #12f1a7;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+.card-luz:hover {
+  border-color: #f3e737;
+  color: #f3e737;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Estilização Dinâmica da Linha da Classe baseada no Elemento */
+.row-element-fogo {
+  border: 1px solid #e92309 !important;
+  background: rgba(233, 35, 9, 0.1) !important;
+  box-shadow: 0 0 15px rgba(233, 35, 9, 0.2) !important;
+}
+.row-element-agua {
+  border: 1px solid #0662f5 !important;
+  background: rgba(6, 98, 245, 0.1) !important;
+  box-shadow: 0 0 15px rgba(6, 98, 245, 0.2) !important;
+}
+.row-element-ar {
+  border: 1px solid #f8f8f8 !important;
+  background: rgba(248, 248, 248, 0.1) !important;
+  box-shadow: 0 0 15px rgba(248, 248, 248, 0.2) !important;
+}
+.row-element-raio {
+  border: 1px solid #02ffff !important;
+  background: rgba(2, 255, 255, 0.05) !important;
+  box-shadow: 0 0 15px rgba(2, 255, 255, 0.2) !important;
+}
+
+/* Destaque para cards de evolução pura (Fogo Verdadeiro, Ar Puro, etc) */
+.card-evolution-pure {
+  border-style: double !important;
+  border-width: 3px !important;
+}
+
+/* Ajuste para as novas linhas dinâmicas de Avatar */
+.avatar-elemental-row {
+  margin-bottom: 20px;
+  padding: 18px !important; /* Adiciona o espaço interno para o conteúdo não grudar na borda */
+  border-radius: 12px;
+  border-top: 1px solid transparent !important; /* Remove a linha tracejada padrão para não conflitar com a cor elemental */
+  transition: all 0.3s ease;
+}
+.row-element-terra {
+  border: 1px solid #974a01 !important;
+  background: rgba(151, 74, 1, 0.1) !important;
+  box-shadow: 0 0 15px rgba(151, 74, 1, 0.2) !important;
+}
+.row-element-vida {
+  border: 1px solid #12f1a7 !important;
+  background: rgba(18, 241, 167, 0.1) !important;
+  box-shadow: 0 0 15px rgba(18, 241, 167, 0.2) !important;
+}
+.row-element-luz {
+  border: 1px solid #f3e737 !important;
+  background: rgba(243, 231, 55, 0.05) !important;
+  box-shadow: 0 0 15px rgba(243, 231, 55, 0.1) !important;
+}

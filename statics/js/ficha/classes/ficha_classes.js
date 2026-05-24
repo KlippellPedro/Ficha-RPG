@@ -35,10 +35,13 @@ function initClasses() {
 function verificarVisibilidadeClasses() {
     const ambientTypes = [];
     const visibilityMap = {
-        'section-extras': false, 'section-avatar': false, 'section-lutador': false,
+        'section-extras': false, 'section-lutador': false,
         'section-amante': false, 'section-deus': false, 'section-diplomata': false,
         'section-amigo': false, 'section-contrabandista': false, 'section-ceifeiro': false
     };
+
+    // Marca todas as seções dinâmicas de avatar como invisíveis antes da verificação
+    document.querySelectorAll('.avatar-elemental-row').forEach(row => row.dataset.visible = "false");
 
     document.querySelectorAll('[id^="class_name_"]').forEach(select => {
         const classesDB = window.CLASSES_DATA || {};
@@ -52,7 +55,9 @@ function verificarVisibilidadeClasses() {
             if (data.ambientType) ambientTypes.push(data.ambientType);
 
             Object.keys(visibilityMap).forEach(section => {
-                const key = "show" + section.split('-')[1].charAt(0).toUpperCase() + section.split('-')[1].slice(1);
+                const parts = section.split('-');
+                if (parts.length < 2) return;
+                const key = "show" + parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
                 if (data[key]) visibilityMap[section] = true;
             });
 
@@ -69,7 +74,18 @@ function verificarVisibilidadeClasses() {
                     row?.classList.add(data.rowStyleClass);
                 }
             }
+
+            // Trigger para Evolução de Avatar (50% Elemental)
+            if (select.value === 'avatar' && window.verificarEvolucaoSubelemento) {
+                if (data.showAvatar) renderizarInputsAvatar(index);
+                window.verificarEvolucaoSubelemento(index);
+            }
         }
+    });
+
+    // Remove seções de avatar que não estão mais ativas
+    document.querySelectorAll('.avatar-elemental-row').forEach(row => {
+        if (row.dataset.visible === "false") row.remove();
     });
 
     // Aplica visibilidade
@@ -162,6 +178,12 @@ function atualizarEstiloClasse(selectEl) {
     const row = selectEl.closest('.class-row');
     const index = selectEl.id.split('_').pop();
     const inputLvl = document.getElementById(`class_lvl_${index}`);
+    const className = selectEl.value;
+
+    // Sincroniza o atributo 'value' no HTML para que seletores CSS [value="..."] funcionem
+    selectEl.setAttribute('value', className);
+
+    if (className && typeof window.loadClassCSS === 'function') window.loadClassCSS(className);
 
     if (inputLvl) {
         if (selectEl.value === 'ceifeiro_almas') {
@@ -171,13 +193,39 @@ function atualizarEstiloClasse(selectEl) {
         }
     }
 
-    // Limpa todos os estilos possíveis antes de aplicar o novo
+    // Limpa todos os estilos possíveis e classes de elementos
     row.classList.remove('special-class-row', 'ceifeiro-class-row', 'anjo-class-row', 'demonio-class-row', 'cientista-lvl5-row', 'olimpo-class-row');
+    Array.from(row.classList).forEach(c => { if (c.startsWith('row-element-')) row.classList.remove(c); });
+
+    // Adiciona uma classe genérica para facilitar estilização futura (ex: class-row-avatar)
+    Array.from(row.classList).forEach(c => { if (c.startsWith('row-active-')) row.classList.remove(c); });
+    if (className) row.classList.add(`row-active-${className}`);
+
+    // Lógica específica para o Despertar do Avatar
+    if (className === 'avatar') {
+        const lvl = parseInt(inputLvl?.value) || 0;
+        const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        const elementoEscolhido = dados[`class_avatar_element_${index}`];
+
+        if (lvl >= 1 && window.verificarDespertarAvatar) window.verificarDespertarAvatar(index, lvl, 'avatar');
+
+        if (elementoEscolhido) {
+            row.classList.add(`row-element-${elementoEscolhido}`);
+
+            const subElemento = dados[`class_avatar_subelement_${index}`];
+            const elData = window.AVATAR_ELEMENTS_DATA?.[elementoEscolhido];
+            const subData = subElemento ? window.AVATAR_ELEMENTS_DATA?.[subElemento] : null;
+
+            const option = selectEl.querySelector('option[value="avatar"]');
+            const suffix = subData ? `${elData?.nome} - ${subData.nome}` : (elData?.nome || elementoEscolhido);
+            if (option) option.textContent = `Avatar (${suffix})`;
+        }
+    }
 
     const classesDB = window.CLASSES_DATA || {};
     const classData = selectEl.value ? classesDB[selectEl.value] : null;
 
-    const isSpecialName = ['ceifeiro_almas', 'anjo', 'demonio', 'campeão'].includes(selectEl.value);
+    const isSpecialName = ['ceifeiro_almas', 'anjo', 'demonio', 'campeao', 'avatar'].includes(selectEl.value);
     if (classData?.isSpecial || isSpecialName) {
         row.classList.add('special-class-row');
         if (selectEl.value === 'ceifeiro_almas') row.classList.add('ceifeiro-class-row');
@@ -229,10 +277,63 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
         <input type="hidden" id="class_sub_${index}" class="save-input" value="${sub}">
         <div class="input-group">
             <label>Lvl</label>
-            <input type="number" id="class_lvl_${index}" class="save-input header-input" value="${lvl}" min="0" ${maxAttr} />
+            <input type="number" id="class_lvl_${index}" class="save-input header-input" value="${lvl}" min="0" ${maxAttr} oninput="atualizarEstiloClasse(document.getElementById('class_name_${index}')); atualizarTudo();" />
         </div>
         <button type="button" class="btn-remove-class" onclick="removerClasseUI(this)">×</button>`;
     container.appendChild(row);
+
+    // Garante que o estilo e gatilhos especiais (como despertar do Avatar) 
+    // sejam aplicados imediatamente ao adicionar uma nova classe
+    const select = row.querySelector('select');
+    if (nome && select && typeof atualizarEstiloClasse === 'function') {
+        atualizarEstiloClasse(select);
+    }
+}
+
+/** Renderiza dinamicamente os campos de porcentagem e manifestação para cada instância de Avatar */
+function renderizarInputsAvatar(index) {
+    const container = document.getElementById('avatar-sections-container');
+    if (!container) return;
+
+    let row = document.getElementById(`section-avatar-${index}`);
+    const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    const elemento = dados[`class_avatar_element_${index}`] || "???";
+    const elData = window.AVATAR_ELEMENTS_DATA?.[elemento];
+    const nomeMostrar = elData ? elData.nome : elemento;
+
+    if (!row) {
+        const html = `
+          <div id="section-avatar-${index}" class="combat-header-row avatar-elemental-row row-element-${elemento}">
+            <div class="input-group">
+              <label>Porcentagem (${nomeMostrar})</label>
+              <input type="text" id="avatar_porcentagem_${index}" class="save-input header-input" placeholder="0%" oninput="if(window.verificarEvolucaoSubelemento) window.verificarEvolucaoSubelemento('${index}')" />
+            </div>
+            <div class="input-group">
+              <label>Manifestação (${nomeMostrar})</label>
+              <input type="text" id="avatar_manifestacao_${index}" class="save-input header-input" placeholder="Linhas de Conhecimento" />
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+        row = document.getElementById(`section-avatar-${index}`);
+        
+        // Popula valores salvos no LocalStorage
+        const pctInput = document.getElementById(`avatar_porcentagem_${index}`);
+        const manInput = document.getElementById(`avatar_manifestacao_${index}`);
+        if (pctInput) pctInput.value = dados[`avatar_porcentagem_${index}`] || "";
+        if (manInput) manInput.value = dados[`avatar_manifestacao_${index}`] || "";
+    } else {
+        // Atualiza labels caso o elemento mude
+        const labels = row.querySelectorAll('label');
+        if (labels[0]) labels[0].textContent = `Porcentagem (${nomeMostrar})`;
+        if (labels[1]) labels[1].textContent = `Manifestação (${nomeMostrar})`;
+        
+        // Sincroniza o estilo visual do elemento na linha oculta
+        Array.from(row.classList).forEach(c => { if(c.startsWith('row-element-')) row.classList.remove(c); });
+        row.classList.add(`row-element-${elemento}`);
+    }
+    
+    row.dataset.visible = "true";
 }
 
 function removerClasseUI(btn) {

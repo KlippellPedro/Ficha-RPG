@@ -95,6 +95,26 @@ function renderizarAliados() {
         card.querySelector('.ally-defesa-input').value = dados.defesa || 0;
         card.querySelector('.ally-movimentacao-input').value = dados.movimentacao || 0;
 
+        // Adiciona botão de visualização rápida de ataques ao rodapé
+        const footer = card.querySelector('.ally-footer');
+        if (footer) {
+            const btnAtk = document.createElement('button');
+            btnAtk.className = 'btn-export-ally';
+            btnAtk.innerHTML = '⚔';
+            btnAtk.title = 'Ver Ataques';
+            btnAtk.onclick = () => window.abrirModalAtaquesAliado(btnAtk);
+            footer.insertBefore(btnAtk, footer.firstChild);
+        }
+
+        if (footer) {
+            const btnMag = document.createElement('button');
+            btnMag.className = 'btn-export-ally';
+            btnMag.innerHTML = '🪄';
+            btnMag.title = 'Ver Magias';
+            btnMag.onclick = () => window.abrirModalMagiasAliado(btnMag);
+            footer.insertBefore(btnMag, footer.firstChild);
+        }
+
         atualizarBarrasCard(card);
         container.appendChild(clone);
     });
@@ -150,6 +170,311 @@ function salvarStatusAliado(input) {
     atualizarBarrasCard(card);
     localStorage.setItem(id, JSON.stringify(dados));
 }
+
+/** Abre o modal de visualização de ataques do aliado */
+window.abrirModalAtaquesAliado = function (btn) {
+    const card = btn.closest('.ally-card');
+    const id = card.dataset.id;
+    const dados = JSON.parse(localStorage.getItem(id)) || {};
+
+    let modal = document.getElementById('modal-ally-attacks');
+    if (!modal) {
+        const html = `
+            <div id="modal-ally-attacks" class="modal-overlay" style="display: none; z-index: 3000;">
+                <div class="modal-content" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3 id="modal-ally-attacks-title" class="modal-title">Ataques</h3>
+                        <button type="button" class="btn-remove-class" onclick="document.getElementById('modal-ally-attacks').style.display='none'">×</button>
+                    </div>
+                    <div class="modal-body" id="ally-attacks-container" style="max-height: 500px; overflow-y: auto;">
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', html);
+        modal = document.getElementById('modal-ally-attacks');
+    }
+
+    document.getElementById('modal-ally-attacks-title').innerText = `Ataques: ${dados.nome || 'Aliado'}`;
+    const container = document.getElementById('ally-attacks-container');
+    container.innerHTML = '';
+
+    // Filtra os ataques nos dados do aliado (padrão atk_nome_IDX)
+    const ataques = Object.keys(dados)
+        .filter(k => k.startsWith('atk_nome_'))
+        .map(key => {
+            const index = key.replace('atk_nome_', '');
+            return {
+                index: index,
+                nome: dados[key],
+                dano: dados[`atk_dano_${index}`] || '0',
+                teste: dados[`atk_teste_${index}`] || '0',
+                critico: dados[`atk_critico_${index}`] || 'x2',
+                alcance: dados[`atk_alcance_${index}`] || '-',
+                especial: dados[`atk_especial_${index}`] || ''
+            };
+        });
+
+    if (ataques.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding: 20px; color: var(--text-muted);">Nenhum ataque configurado para este aliado.</p>';
+    } else {
+        container.innerHTML = ataques.map(a => `
+            <div class="ally-attack-item">
+                <div class="atk-header-row">
+                    <strong class="atk-title">${a.nome}</strong>
+                    <div class="atk-actions">
+                        <span class="atk-bonus">Teste: ${a.teste}</span>
+                        <button class="btn-use-atk" onclick="window.usarAtaqueAliado('${id}', '${a.index}')">Atacar</button>
+                    </div>
+                </div>
+                <div class="atk-stats-row">
+                    <span>Dano: <strong>${a.dano}</strong></span>
+                    <span>Crítico: ${a.critico}</span>
+                    <span>Alcance: ${a.alcance}</span>
+                </div>
+                ${a.especial ? `<p class="atk-special-desc">${a.especial}</p>` : ''}
+            </div>
+        `).join('');
+    }
+
+    modal.style.display = 'flex';
+}
+
+/** 
+ * Registra o uso de um ataque do aliado no log de combate.
+ */
+window.usarAtaqueAliado = function (id, index) {
+    const dados = JSON.parse(localStorage.getItem(id)) || {};
+    const nomeAtk = dados[`atk_nome_${index}`];
+    const dano = dados[`atk_dano_${index}`] || '0';
+
+    if (typeof window.registrarLogAliado === 'function') {
+        window.registrarLogAliado(dados.nome || 'Aliado', `atacou com ${nomeAtk}`, `(Dano: ${dano})`, "#ff4444");
+    }
+
+    if (typeof showNotification === 'function') {
+        showNotification(`${dados.nome || 'Aliado'} atacou com ${nomeAtk}!`, "success");
+    }
+};
+
+/** Abre o modal de visualização de magias do aliado */
+window.abrirModalMagiasAliado = function (btn) {
+    const card = btn.closest('.ally-card');
+    const id = card.dataset.id;
+    const dados = JSON.parse(localStorage.getItem(id)) || {};
+
+    let modal = document.getElementById('modal-ally-spells');
+    if (!modal) {
+        const html = `
+            <div id="modal-ally-spells" class="modal-overlay" style="display: none; z-index: 3000;">
+                <div class="modal-content" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3 id="modal-ally-spells-title" class="modal-title">Magias</h3>
+                        <button type="button" class="btn-remove-class" onclick="document.getElementById('modal-ally-spells').style.display='none'">×</button>
+                    </div>
+                    <div class="modal-body" id="ally-spells-container" style="max-height: 500px; overflow-y: auto;">
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', html);
+        modal = document.getElementById('modal-ally-spells');
+    }
+
+    document.getElementById('modal-ally-spells-title').innerText = `Magias: ${dados.nome || 'Aliado'}`;
+    const container = document.getElementById('ally-spells-container');
+    container.innerHTML = '';
+
+    // Filtra as magias nos dados do aliado (padrão mag_nome_IDX)
+    const magias = Object.keys(dados)
+        .filter(k => k.startsWith('mag_nome_'))
+        .map(key => {
+            const index = key.replace('mag_nome_', '');
+            return {
+                index: index,
+                nome: dados[key],
+                custo: dados[`mag_custo_${index}`] || '0',
+                tipoCusto: dados[`mag_tipo_custo_${index}`] || 'PM',
+                circulo: dados[`mag_circulo_${index}`] || '1º',
+                tempo: dados[`mag_tempo_${index}`] || 'Padrão',
+                alcance: dados[`mag_alcance_${index}`] || '-',
+                descricao: dados[`mag_descricao_${index}`] || ''
+            };
+        });
+
+    if (magias.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding: 20px; color: var(--text-muted);">Nenhuma magia configurada para este aliado.</p>';
+    } else {
+        container.innerHTML = magias.map(m => `
+            <div class="ally-spell-item">
+                <div class="spell-header-row">
+                    <strong class="spell-title">${m.nome}</strong>
+                    <div class="spell-actions">
+                        <span class="spell-cost">${m.custo} ${m.tipoCusto}</span>
+                        <button class="btn-use-spell" onclick="window.usarMagiaAliado('${id}', '${m.index}')">Usar</button>
+                    </div>
+                </div>
+                <div class="spell-stats-row">
+                    <span>Círculo: ${m.circulo}</span>
+                    <span>Tempo: ${m.tempo}</span>
+                    <span>Alcance: ${m.alcance}</span>
+                </div>
+                ${m.descricao ? `<p class="spell-desc">${m.descricao}</p>` : ''}
+            </div>
+        `).join('');
+    }
+
+    modal.style.display = 'flex';
+}
+
+/** 
+ * Executa a magia do aliado e consome os recursos automaticamente.
+ * Garante que os valores sejam numéricos e a UI seja sincronizada.
+ */
+window.usarMagiaAliado = function (id, index) {
+    const dados = JSON.parse(localStorage.getItem(id)) || {};
+    const nomeMagia = dados[`mag_nome_${index}`];
+    const custo = parseInt(dados[`mag_custo_${index}`]) || 0;
+    const tipoCusto = dados[`mag_tipo_custo_${index}`] || "PM";
+
+    // Conversão de segurança para garantir que temos números
+    let pvAtual = parseInt(dados.pv_atual) || 0;
+    let pmAtual = parseInt(dados.pm_atual) || 0;
+
+    if (tipoCusto === "PM") {
+        if (pmAtual < custo) {
+            if (typeof showNotification === 'function') showNotification("Mana insuficiente!", "error");
+            return;
+        }
+        pmAtual -= custo;
+        dados.pm_atual = pmAtual;
+    } else {
+        if (pvAtual < custo) {
+            if (typeof showNotification === 'function') showNotification("Vida insuficiente!", "error");
+            return;
+        }
+        pvAtual -= custo;
+        dados.pv_atual = pvAtual;
+    }
+
+    localStorage.setItem(id, JSON.stringify(dados));
+
+    const card = document.querySelector(`.ally-card[data-id="${id}"]`);
+    if (card) {
+        const pvInput = card.querySelector('.ally-pv-atual');
+        const pmInput = card.querySelector('.ally-pm-atual');
+        if (pvInput) pvInput.value = pvAtual;
+        if (pmInput) pmInput.value = pmAtual;
+        if (typeof atualizarBarrasCard === 'function') atualizarBarrasCard(card);
+    }
+
+    const btnRefresh = card?.querySelector('.btn-export-ally[title="Ver Magias"]');
+    if (btnRefresh) window.abrirModalMagiasAliado(btnRefresh);
+
+    // Registra no log de combate
+    if (typeof window.registrarLogAliado === 'function') {
+        window.registrarLogAliado(dados.nome || 'Aliado', `usou ${nomeMagia}`, `(-${custo} ${tipoCusto})`, "#a855f7");
+    }
+
+    if (typeof showNotification === 'function') {
+        showNotification(`${dados.nome || 'Aliado'} usou ${nomeMagia}! (-${custo} ${tipoCusto})`, "success");
+    }
+};
+
+const LOG_ALIADOS_KEY = "ficha_rpg_aliados_log";
+
+/**
+ * Registra uma entrada no log de combate dos aliados.
+ * O container é criado dinamicamente caso não exista no HTML.
+ */
+window.registrarLogAliado = function (nome, acao, detalhe, cor = "var(--primary-color)") {
+    let logContainer = document.getElementById('aliados-log-container');
+
+    if (!logContainer) {
+        const modal = document.createElement('div');
+        modal.id = 'modal-aliados-log';
+        modal.className = 'modal-overlay';
+        modal.style.display = 'none';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h3 class="modal-title" style="color: var(--primary-color)">Log de Combate</h3>
+                    <button type="button" class="btn-remove-class" onclick="document.getElementById('modal-aliados-log').style.display='none'">×</button>
+                </div>
+                <div class="modal-body" id="aliados-log-container" style="max-height: 400px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-save-modal" style="background: transparent; border: 1px dashed var(--primary-color); color: var(--primary-color); width: 100%" onclick="window.limparLogAliados()">Limpar Log</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        logContainer = document.getElementById('aliados-log-container');
+
+        // Carrega logs salvos ao criar o container para garantir persistência após F5
+        const logsSalvos = JSON.parse(localStorage.getItem(LOG_ALIADOS_KEY)) || [];
+        logContainer.innerHTML = logsSalvos.map(h => `
+            <div class="ally-log-entry">
+                <span class="log-time">[${h.hora}]</span>
+                <strong style="color: ${h.cor}">${h.nome}</strong> 
+                <span>${h.acao}</span> 
+                <small>${h.detalhe}</small>
+            </div>
+        `).join('');
+    }
+
+    const agora = new Date();
+    const hora = agora.getHours().toString().padStart(2, '0') + ':' + agora.getMinutes().toString().padStart(2, '0');
+
+    const logData = { hora, nome, acao, detalhe, cor };
+
+    // Salva no LocalStorage mantendo o limite de 50 mensagens
+    let logs = JSON.parse(localStorage.getItem(LOG_ALIADOS_KEY)) || [];
+    logs.unshift(logData);
+    if (logs.length > 50) logs.pop();
+    localStorage.setItem(LOG_ALIADOS_KEY, JSON.stringify(logs));
+
+    const entrada = document.createElement('div');
+    entrada.className = 'ally-log-entry';
+    entrada.innerHTML = `
+        <span class="log-time">[${hora}]</span>
+        <strong style="color: ${cor}">${nome}</strong> 
+        <span>${acao}</span> 
+        <small>${detalhe}</small>
+    `;
+
+    logContainer.prepend(entrada);
+
+    if (logContainer.children.length > 50) {
+        logContainer.lastElementChild.remove();
+    }
+};
+
+/** Limpa o log no DOM e no LocalStorage */
+window.limparLogAliados = function () {
+    const logContainer = document.getElementById('aliados-log-container');
+    if (logContainer) logContainer.innerHTML = '';
+    localStorage.removeItem(LOG_ALIADOS_KEY);
+};
+
+/**
+ * Garante a exibição do log de combate, mesmo que nenhuma ação tenha sido tomada ainda.
+ */
+window.mostrarLogAliados = function () {
+    let modal = document.getElementById('modal-aliados-log');
+    if (!modal) {
+        // Se não houver logs salvos, inicializa com uma mensagem, caso contrário carrega o histórico
+        const logsSalvos = JSON.parse(localStorage.getItem(LOG_ALIADOS_KEY)) || [];
+        if (logsSalvos.length === 0) {
+            window.registrarLogAliado("Sistema", "Log de combate inicializado.", "", "var(--text-muted)");
+        } else {
+            window.registrarLogAliado("Sistema", "Histórico recuperado.", "", "var(--text-muted)");
+        }
+        modal = document.getElementById('modal-aliados-log');
+    }
+
+    if (modal) modal.style.display = 'flex';
+};
 
 let currentAllyBuffId = null;
 

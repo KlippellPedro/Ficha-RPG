@@ -61,8 +61,17 @@
       <header class="ficha-header-main">
         <div class="char-header">
           <div class="char-avatar-container" onclick="triggerCharImageInput(this)">
-            <img id="char-avatar-img" class="char-avatar-img" src="https://ui-avatars.com/api/?name=?&background=0d0d0f&color=ff4444" alt="Avatar" onerror="this.onerror=null;this.src='';">
-            <input type="file" id="char-image-input" style="display: none" onchange="salvarImagemPersonagem(this)" accept="image/*">
+            <img
+              id="char-avatar-img"
+              class="char-avatar-img"
+              src="https://ui-avatars.com/api/?name=?&background=0d0d0f&color=ff4444"
+              alt="Avatar"
+              onerror="
+                this.onerror = null;
+                this.src = '';
+              "
+            />
+            <input type="file" id="char-image-input" style="display: none" onchange="salvarImagemPersonagem(this)" accept="image/*" />
           </div>
           <div class="input-group flex-2">
             <label>Nome do Personagem</label>
@@ -545,20 +554,7 @@
       </div>
 
       <!-- Seção Avatar (Oculta por padrão) -->
-      <div id="section-avatar" class="combat-header-row" style="display: none">
-        <div class="input-group">
-          <label>Elemento</label>
-          <input type="text" id="avatar_elemento" class="save-input header-input" placeholder="Ex: Água" />
-        </div>
-        <div class="input-group">
-          <label>Porcentagem Elemental</label>
-          <input type="text" id="avatar_porcentagem" class="save-input header-input" placeholder="0%" />
-        </div>
-        <div class="input-group">
-          <label>Manifestação</label>
-          <input type="text" id="avatar_manifestacao" class="save-input header-input" placeholder="Linhas de Conhecimento" />
-        </div>
-      </div>
+      <div id="avatar-sections-container" style="display: contents"></div>
 
       <!-- Seção de Extras (Oculta por padrão) -->
       <div id="section-extras" class="details-grid" style="display: none">

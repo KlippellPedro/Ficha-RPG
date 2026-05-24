@@ -187,6 +187,13 @@ function processarLevelUp(idx) {
         const atualXP = parseInt(xpAtualEl.value) || 0;
 
         inputLvl.value = (parseInt(inputLvl.value) || 0) + 1;
+
+        // Dispara a atualização de estilo e verifica gatilhos (como o despertar do Avatar)
+        const selectName = document.getElementById(`class_name_${idx}`);
+        if (selectName && typeof atualizarEstiloClasse === 'function') {
+            atualizarEstiloClasse(selectName);
+        }
+
         document.getElementById('modal-level-up').style.display = 'none';
 
         // Desconta exatamente o XP necessário para o nível que o personagem estava

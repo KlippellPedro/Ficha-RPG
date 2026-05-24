@@ -20,6 +20,19 @@
         ],
         "classes_olimpo_data": [
             'campeao', 'necromante'
+        ],
+        ".": [ // Ponto indica arquivos que estão na raiz da pasta /classes/
+            'css_loader'
+        ],
+        "avatar_data": [
+            'fogo', 'fogo_verdadeiro', 'fumaca', 'lava',
+            'agua', 'agua_sub', 'gelo', 'sangue',
+            'ar', 'ar_sub', 'gas', 'atm',
+            'raio', 'energia',
+            'terra', 'terra_sub', 'metal', 'cristal',
+            'vida', 'morte',
+            'luz', 'escuridao',
+            'avatar_ui'
         ]
     };
 
@@ -31,7 +44,9 @@
     // 3. INJEÇÃO: Carrega os scripts de forma síncrona para garantir a ordem
     Object.entries(classRegistry).forEach(([folder, files]) => {
         files.forEach(file => {
-            const path = `${baseRoot}${folder}/${file}.js`;
+            // Se o folder for '.', carregamos o arquivo sem adicionar uma subpasta no caminho
+            const folderPath = folder === "." ? "" : `${folder}/`;
+            const path = `${baseRoot}${folderPath}${file}.js`;
             document.write(`<script src="${path}"></script>`);
         });
     });

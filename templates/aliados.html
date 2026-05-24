@@ -36,6 +36,7 @@
 
       <div class="aliados-actions">
         <button class="btn-add-card" onclick="adicionarNovoAliado()">+ Criar Novo Aliado</button>
+        <button class="btn-history" onclick="window.mostrarLogAliados()">📜 Log de Combate</button>
         <div class="import-export-group">
           <label for="import-ally-json" class="btn-history">+ Importar Aliado </label>
           <input type="file" id="import-ally-json" style="display: none" onchange="importarFichaComoAliado(event)" />
@@ -55,7 +56,15 @@
       <div class="ally-card" data-id="">
         <div class="ally-header">
           <div class="ally-avatar-container" onclick="triggerAllyImageInput(this)">
-            <img class="ally-avatar-img" src="https://ui-avatars.com/api/?name=?&background=0d0d0f&color=ff4444" alt="Avatar" onerror="this.onerror=null;this.src='';" />
+            <img
+              class="ally-avatar-img"
+              src="https://ui-avatars.com/api/?name=?&background=0d0d0f&color=ff4444"
+              alt="Avatar"
+              onerror="
+                this.onerror = null;
+                this.src = '';
+              "
+            />
             <input type="file" class="ally-image-input" style="display: none" onchange="salvarImagemAliado(this)" accept="image/*" />
           </div>
           <div class="ally-level-box">

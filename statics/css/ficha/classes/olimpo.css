@@ -1,0 +1,39 @@
+/* Estilo Épico para Classe do Olimpo */
+.olimpo-class-row {
+  border: 2px solid #f59e0b !important;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.02) 100%) !important;
+  box-shadow:
+    0 0 20px rgba(245, 158, 11, 0.2),
+    inset 0 0 15px rgba(245, 158, 11, 0.1) !important;
+  animation: divine-pulse 3s infinite ease-in-out !important;
+}
+
+.olimpo-class-row label {
+  color: #f59e0b !important;
+  text-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
+  font-weight: 900 !important;
+}
+
+/* Partículas de Relâmpago/Ouro */
+.particle-olimpo {
+  width: 2px;
+  height: 15px;
+  background: #fff;
+  box-shadow:
+    0 0 10px #f59e0b,
+    0 0 20px #fff;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+@keyframes divine-pulse {
+  0%,
+  100% {
+    border-color: #f59e0b;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+  }
+  50% {
+    border-color: #fff;
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+  }
+}

@@ -1,0 +1,71 @@
+/* Efeito de Dualidade (Anjo + Demônio) no Container principal */
+.container-dual-alignment {
+  border-image: linear-gradient(to right, #f59e0b, #ff4444) 1 !important;
+  box-shadow:
+    0 10px 60px rgba(245, 158, 11, 0.15),
+    0 10px 60px rgba(255, 68, 68, 0.15) !important;
+  animation: dual-pulse 4s infinite alternate ease-in-out;
+}
+
+/* Estilo Específico para Anjo (Ouro Divino) */
+.anjo-class-row {
+  border: 1px solid #f59e0b !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+}
+.anjo-class-row label {
+  color: #f59e0b !important;
+}
+
+/* Estilo Específico para Demônio (Vermelho Infernal) */
+.demonio-class-row {
+  border: 1px solid #ef4444 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+}
+.demonio-class-row label {
+  color: #ef4444 !important;
+}
+
+/* Partículas: Penas (Anjo) */
+.particle-feather {
+  width: 8px;
+  height: 15px;
+  background: white;
+  border-radius: 50% 10% 50% 10%;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+  transform: rotate(45deg);
+}
+
+/* Partículas: Brasas (Demônio) */
+.particle-ember {
+  width: 6px;
+  height: 6px;
+  background: #ff4444;
+  box-shadow:
+    0 0 10px #ff0000,
+    0 0 5px #ff8800;
+  border-radius: 50%;
+  filter: blur(0.3px);
+}
+
+/* Variante específica para efeito demoníaco intenso */
+.particle-demonio {
+  width: 7px;
+  height: 7px;
+  background: #ff0000;
+  box-shadow:
+    0 0 10px #ff0000,
+    0 0 20px rgba(255, 0, 0, 0.4);
+  border-radius: 50%;
+  filter: blur(0.5px);
+}
+
+@keyframes dual-pulse {
+  0% {
+    filter: brightness(1);
+  }
+  100% {
+    filter: brightness(1.2);
+  }
+}

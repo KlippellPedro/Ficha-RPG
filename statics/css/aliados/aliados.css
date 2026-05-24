@@ -368,3 +368,215 @@
 .btn-remove-class:hover {
   opacity: 1;
 }
+
+/* Estilização da lista de ataques no modal de aliados */
+.ally-attack-item {
+  background: linear-gradient(135deg, rgba(30, 30, 35, 0.9) 0%, rgba(10, 10, 15, 0.95) 100%);
+  border: 1px solid rgba(255, 68, 68, 0.2);
+  border-left: 4px solid #ff4444;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.ally-attack-item:hover {
+  border-color: rgba(255, 68, 68, 0.5);
+  transform: translateX(5px);
+  background: linear-gradient(135deg, rgba(40, 20, 20, 0.8) 0%, rgba(20, 10, 10, 0.9) 100%);
+}
+
+.atk-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+.atk-title {
+  color: #ff4444;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.atk-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.atk-bonus {
+  font-size: 0.85rem;
+  color: #aaa;
+  font-weight: 800;
+}
+
+.btn-use-atk {
+  background: linear-gradient(180deg, #ff4444, #cc0000);
+  color: white;
+  border: none;
+  padding: 6px 15px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-use-atk:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+.btn-use-atk:active {
+  transform: scale(0.95);
+}
+
+.atk-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  font-size: 0.85rem;
+  color: #eee;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.atk-special-desc {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 8px;
+  font-style: italic;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-top: 5px;
+}
+
+/* Estilização da lista de magias no modal de aliados */
+.ally-spell-item {
+  background: linear-gradient(135deg, rgba(30, 30, 35, 0.9) 0%, rgba(10, 10, 15, 0.95) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-left: 4px solid #a855f7;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.ally-spell-item:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+  transform: translateX(5px);
+  background: linear-gradient(135deg, rgba(35, 30, 45, 0.8) 0%, rgba(20, 15, 25, 0.9) 100%);
+}
+
+.spell-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+.spell-title {
+  color: #a855f7;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+.spell-cost {
+  font-size: 0.85rem;
+  color: #4ade80;
+  font-weight: 900;
+  background: rgba(74, 222, 128, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.spell-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  font-size: 0.75rem;
+  color: #bbb;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.spell-desc {
+  font-size: 0.85rem;
+  color: #ccc;
+  line-height: 1.4;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+.btn-use-spell {
+  background: linear-gradient(180deg, #a855f7, #7e22ce);
+  color: white;
+  border: none;
+  padding: 6px 15px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-use-spell:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+/* Estilização das entradas do Log de Combate */
+#aliados-log-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  scrollbar-width: thin;
+}
+
+.ally-log-entry {
+  font-size: 0.85rem;
+  padding: 5px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  animation: logFadeIn 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.log-time {
+  color: #666;
+  font-family: monospace;
+  font-size: 0.75rem;
+}
+
+.ally-log-entry small {
+  color: #4ade80;
+  font-weight: bold;
+  background: rgba(74, 222, 128, 0.05);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+@keyframes logFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
