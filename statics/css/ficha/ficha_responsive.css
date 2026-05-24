@@ -9,6 +9,15 @@
     grid-column: auto !important;
   }
 
+  /* DLCs e Configuração de Sessão no Topo */
+  html body .container > div:first-child {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  html body .dlc-selector-box {
+    width: 100% !important;
+  }
+
   /* Atributos: 2 por linha no celular */
   html body .atributos-grid {
     display: grid !important;
@@ -37,5 +46,40 @@
   /* Grades de especialidades */
   html body .grid-span-2 {
     grid-column: auto !important;
+  }
+
+  /* Seção de Ações HUD */
+  html body .actions-container {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* 2 por linha */
+    gap: 10px !important;
+  }
+  html body .action-item:last-child {
+    grid-column: span 2 !important; /* Turnos ocupa a linha toda */
+  }
+  html body .action-item {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Barra de XP e Labels */
+  html body .xp-hud-section {
+    padding: 15px !important;
+    margin: 20px 0 !important;
+  }
+  html body .xp-hud-section .stat-labels {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 5px !important;
+    margin-bottom: 10px !important;
+    text-align: center !important;
+  }
+
+  /* Seção de Bônus de Evento */
+  html body .event-grid-row {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
+  }
+  html body .event-section-theme p {
+    font-size: 0.75rem !important;
   }
 }

@@ -133,6 +133,34 @@ h1 {
   box-shadow: 0 0 8px var(--primary-glow);
 }
 
+/* Estilização Customizada para Checkboxes de Lista (Equipado) */
+.inv-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.inv-checkbox:hover {
+  border-color: var(--primary-color) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.inv-checkbox:checked {
+  background: var(--primary-glow) !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
 /* Dividores de Seção (Usados dentro de modais ou páginas) */
 .section-divider {
   margin: 25px 0 10px 0;
@@ -235,6 +263,11 @@ h1 {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.2s ease;
   background: rgba(255, 255, 255, 0.02);
+}
+
+.item-row.equipped-row {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-left: 3px solid var(--primary-color) !important;
 }
 
 /* Animações Globais */

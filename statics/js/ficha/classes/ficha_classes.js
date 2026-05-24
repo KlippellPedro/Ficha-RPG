@@ -169,7 +169,7 @@ function atualizarEstiloClasse(selectEl) {
         if (selectEl.value === 'ceifeiro_almas') {
             inputLvl.removeAttribute('max');
         } else {
-            inputLvl.setAttribute('max', '20');
+            inputLvl.setAttribute('max', '99'); // Aumentado o limite visual para 99
         }
     }
 
@@ -216,7 +216,7 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
     else if (nome === 'anjo') rowClasses += ' anjo-class-row';
     else if (nome === 'demonio') rowClasses += ' demonio-class-row';
     else if (currentClassData?.dlc === 'olimpo') rowClasses += ' olimpo-class-row';
-    const maxAttr = nome === 'ceifeiro_almas' ? '' : 'max="20"';
+    const maxAttr = nome === 'ceifeiro_almas' ? '' : 'max="99"';
 
     const row = document.createElement('div');
     row.className = rowClasses;

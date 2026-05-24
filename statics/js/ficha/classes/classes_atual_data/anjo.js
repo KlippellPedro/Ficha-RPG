@@ -1,5 +1,6 @@
 window.CLASSES_DATA["anjo"] = {
     nome: "Anjo",
+    dlc: "atual",
     pv_lvl: 5,
     pm_lvl: 5,
     isSpecial: true,

@@ -1,5 +1,6 @@
 window.CLASSES_DATA["cientista"] = {
     nome: "Cientista",
+    dlc: "atual",
     pv_lvl: 2,
     pm_lvl: 2,
     subclassAt: 5, // Nível que libera subclasse

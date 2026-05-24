@@ -44,40 +44,10 @@ h1 {
 }
 
 #search-pericia {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid var(--border-color) !important;
-  border-bottom: 2px solid var(--primary-color) !important;
-  padding: 12px 18px !important;
-  font-size: 1rem !important;
-  border-radius: 6px !important;
-  transition: all 0.3s ease !important;
-  color: white !important;
-}
-
-#search-pericia:focus {
-  background: rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 0 15px var(--primary-glow) !important;
-  outline: none;
-}
-
-.btn-clear-skills {
-  background: var(--primary-glow);
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-}
-
-.btn-clear-skills:hover {
-  background: var(--primary-color);
-  color: black;
-  box-shadow: 0 0 15px var(--primary-glow);
+  /* Agora utiliza o estilo herdado de .inv-input das outras listas */
+  height: 45px;
+  font-size: 1rem;
+  padding: 0 15px;
 }
 
 .skills-section {

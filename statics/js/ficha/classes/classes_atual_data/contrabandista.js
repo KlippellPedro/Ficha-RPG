@@ -1,5 +1,6 @@
 window.CLASSES_DATA["contrabandista"] = {
     nome: "Contrabandista",
+    dlc: "atual",
     pv_lvl: 2,
     pm_lvl: 2,
     showContrabandista: true,

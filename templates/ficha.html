@@ -13,11 +13,12 @@
     <link rel="stylesheet" href="../statics/css/responsive.css" />
     <script src="../statics/js/global.js"></script>
     <script src="../statics/js/global_modals.js"></script>
+    <script src="../statics/js/ficha/xp.js"></script>
     <script src="../statics/js/menu.js"></script>
     <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/ficha/classes/classes_data.js"></script>
     <script src="../statics/js/ficha/classes/class_loader.js"></script>
-    <script src="../statics/js/ficha/racas/racas_data.js"></script>
+    <script src="../statics/js/ficha/racas/raca_loader.js"></script>
     <script src="../statics/js/ficha/modais/ficha_modais.js"></script>
     <script src="../statics/js/ficha/ficha_efeitos.js"></script>
     <script src="../statics/js/ficha/classes/ficha_classes.js"></script>
@@ -41,7 +42,16 @@
 
     <div class="container">
       <!-- Seletor de DLCs -->
-      <div id="dlc-selector-container" class="dlc-selector-box"></div>
+      <div style="display: flex; gap: 20px; flex-wrap: wrap">
+        <div id="dlc-selector-container" class="dlc-selector-box" style="flex: 1; margin-bottom: 0"></div>
+        <div class="dlc-selector-box" style="min-width: 200px; margin-bottom: 0">
+          <label class="dlc-label">Configuração de Sessão</label>
+          <label class="dlc-checkbox-item event-toggle">
+            <input type="checkbox" id="modo_evento" class="save-input" onchange="atualizarTudo()" />
+            <span>⚠️ Modo de Evento</span>
+          </label>
+        </div>
+      </div>
 
       <!-- Identidade do Personagem -->
       <header class="ficha-header-main">
@@ -423,6 +433,28 @@
         </div>
       </div>
 
+      <!-- Seção de Experiência (XP) -->
+      <div class="xp-hud-section">
+        <div class="stat-group" style="max-width: 600px; margin: 0 auto; width: 100%">
+          <div class="stat-labels">
+            <label>EXPERIÊNCIA (XP)</label>
+            <small id="xp-needed-label" style="color: #888">Próximo nível requer: <span id="xp_max_display">1000</span></small>
+          </div>
+          <div class="bar-controls">
+            <button type="button" class="btn-qty" onclick="alterarXP(-100)">-</button>
+            <div class="bar-outer" style="height: 26px">
+              <div id="bar-xp" class="bar-inner xp-color"></div>
+              <div class="bar-text">
+                <input type="number" id="xp_atual" class="save-input bar-value-input" value="0" oninput="validarXP()" style="width: 70px" />
+                <span>/</span>
+                <span id="xp_max">1000</span>
+              </div>
+            </div>
+            <button type="button" class="btn-qty" onclick="alterarXP(100)">+</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Seções Específicas de Classes -->
       <div id="section-lutador" class="combat-header-row" style="display: none">
         <div class="input-group">
@@ -693,6 +725,68 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
         <button type="button" class="btn-add-class" onclick="document.getElementById('modal-poder-espirito').style.display = 'flex'">
           Escolher Poder
         </button>
+      </div>
+
+      <!-- Seção de Customização de Evento (Oculta por padrão) -->
+      <div id="section-event-bonuses" class="extra-section-block event-section-theme" style="display: none; margin-top: 40px">
+        <label class="extra-section-label">MODIFICADORES DE EVENTO ATIVOS</label>
+        <p style="text-align: center; color: #888; font-size: 0.8rem; margin-bottom: 15px">
+          Estes valores são somados ao total apenas enquanto o Modo de Evento estiver ligado.
+        </p>
+
+        <!-- Atributos de Evento -->
+        <div class="event-grid-row">
+          <div class="input-group">
+            <label>FOR</label><input type="number" id="event_forca" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>DES</label><input type="number" id="event_destreza" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>CON</label><input type="number" id="event_constituicao" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>INT</label><input type="number" id="event_inteligencia" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>SAB</label><input type="number" id="event_sabedoria" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>CAR</label><input type="number" id="event_carisma" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>AUR</label><input type="number" id="event_aura" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+        </div>
+
+        <!-- Status de Evento -->
+        <div class="event-grid-row" style="margin-top: 15px">
+          <div class="input-group">
+            <label>Vida Máx</label>
+            <input type="number" id="event_pv_max" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>Mana Máx</label>
+            <input type="number" id="event_pm_max" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>Sanidade Máx</label>
+            <input type="number" id="event_sanidade_max" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>Defesa</label>
+            <input type="number" id="event_defesa" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+          <div class="input-group">
+            <label>Movimento</label>
+            <input type="number" id="event_movimentacao" class="save-input header-input" value="0" oninput="atualizarTudo()" />
+          </div>
+        </div>
+
+        <div class="input-group" style="margin-top: 20px">
+          <label>Descrição/Motivo do Evento</label>
+          <textarea id="event_motivo" class="save-input detail-textarea" placeholder="Ex: Maldito Halloween, Páscoa e etc."></textarea>
+        </div>
       </div>
 
       <!-- Controles da Ficha -->

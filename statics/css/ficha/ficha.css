@@ -21,69 +21,69 @@
 
 /* Seletor de DLCs */
 .dlc-selector-box {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 15px 20px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    backdrop-filter: blur(5px);
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(5px);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .dlc-label {
-    font-size: 0.65rem;
-    color: var(--primary-color);
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
-    display: block;
-    opacity: 0.8;
+  font-size: 0.65rem;
+  color: var(--primary-color);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  display: block;
+  opacity: 0.8;
 }
 
 .dlc-checkbox-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .dlc-checkbox-item {
-    position: relative;
-    cursor: pointer;
-    user-select: none;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
 }
 
 .dlc-checkbox-item input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
 }
 
 .dlc-checkbox-item span {
-    display: block;
-    padding: 6px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    transition: all 0.3s ease;
-    font-weight: 600;
+  display: block;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  font-weight: 600;
 }
 
 .dlc-checkbox-item input:checked + span {
-    background: var(--primary-glow);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    box-shadow: 0 0 10px var(--primary-glow);
+  background: var(--primary-glow);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 .dlc-checkbox-item:hover span {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Ajuste específico para o Nome e Nível no cabeçalho */
@@ -968,6 +968,7 @@
   font-size: 1.2rem;
   font-weight: bold;
   color: white;
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -995,8 +996,12 @@
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes dual-pulse {
@@ -1012,7 +1017,9 @@
 .olimpo-class-row {
   border: 2px solid #f59e0b !important;
   background: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.02) 100%) !important;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2), inset 0 0 15px rgba(245, 158, 11, 0.1) !important;
+  box-shadow:
+    0 0 20px rgba(245, 158, 11, 0.2),
+    inset 0 0 15px rgba(245, 158, 11, 0.1) !important;
   animation: divine-pulse 3s infinite ease-in-out !important;
 }
 
@@ -1027,17 +1034,74 @@
   width: 2px;
   height: 15px;
   background: #fff;
-  box-shadow: 0 0 10px #f59e0b, 0 0 20px #fff;
+  box-shadow:
+    0 0 10px #f59e0b,
+    0 0 20px #fff;
   border-radius: 2px;
   opacity: 0.8;
 }
 
 @keyframes divine-pulse {
-  0%, 100% { border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
-  50% { border-color: #fff; box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); }
+  0%,
+  100% {
+    border-color: #f59e0b;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+  }
+  50% {
+    border-color: #fff;
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+  }
 }
 
 .sanidade-color {
   background: linear-gradient(180deg, #10b981 0%, #064e3b 100%) !important;
   box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
+}
+
+.xp-hud-section {
+  margin: 40px 0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.xp-color {
+  background: linear-gradient(180deg, #bdfd00 0%, #5ead00 100%) !important;
+  box-shadow:
+    0 0 15px rgba(189, 253, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Variante Dourada para o XP quando o Level Up está próximo */
+.xp-near-level-up {
+  background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%) !important;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+  animation: dual-pulse 1s infinite alternate !important;
+}
+
+/* Estilos para o Modo de Evento */
+.event-toggle span {
+  border-style: dashed !important;
+  color: #a855f7 !important; /* Roxo para indicar algo místico/especial */
+}
+
+.event-toggle input:checked + span {
+  background: rgba(168, 85, 247, 0.2) !important;
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+  animation: dual-pulse 2s infinite alternate;
+}
+
+.event-section-theme {
+  border: 2px dashed #a855f7 !important;
+  background: rgba(168, 85, 247, 0.05) !important;
+}
+
+.event-grid-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
 }

@@ -1,5 +1,6 @@
 window.CLASSES_DATA["lutador_nato"] = {
     nome: "Lutador Nato",
+    dlc: "atual",
     pv_lvl: 5,
     pm_lvl: 3,
     showLutador: true,

@@ -326,6 +326,21 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
+    // Modal de Level Up (Escolha de Classe)
+    const levelUpModalHtml = `
+        <div id="modal-level-up" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" style="color: #f59e0b">LEVEL UP!</h3>
+                </div>
+                <div class="modal-body">
+                    <p style="text-align: center; color: #ccc; margin-bottom: 20px;">Você alcançou o XP necessário! Escolha qual classe deseja evoluir:</p>
+                    <div id="level-up-class-list" class="modal-selection-list"></div>
+                </div>
+            </div>
+        </div>
+    `;
+
     // Elemento de Notificação Global
     const notificationHtml = `
         <div id="global-notification">
@@ -348,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
     body.insertAdjacentHTML('beforeend', racePowersModalHtml);
     body.insertAdjacentHTML('beforeend', statusModalHtml);
     body.insertAdjacentHTML('beforeend', buffsModalHtml);
+    body.insertAdjacentHTML('beforeend', levelUpModalHtml);
 
     // Injeta a notificação se ela ainda não existir na página
     if (!document.getElementById('global-notification')) {

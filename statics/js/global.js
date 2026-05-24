@@ -77,6 +77,43 @@ function atualizarTudo() {
     dados.nivel = nivelTotal;
     if (document.getElementById("nivel")) document.getElementById("nivel").value = nivelTotal;
 
+    // 4. Resolve XP Máximo baseado no nível (Verifica se xp.js está carregado)
+    const xpMax = typeof getXPNecessario === 'function' ? getXPNecessario(nivelTotal) : 1000;
+    dados.xp_max = xpMax;
+    const xpMaxEl = document.getElementById('xp_max');
+    const xpMaxDisp = document.getElementById('xp_max_display');
+    if (xpMaxEl) xpMaxEl.innerText = xpMax;
+    if (xpMaxDisp) xpMaxDisp.innerText = xpMax;
+    if (typeof validarXP === 'function') validarXP(); // Verifica se atingiu o limite
+
+    // 1.5 Lógica de Modo de Evento
+    const modoEventoAtivo = document.getElementById('modo_evento')?.checked || false;
+    const sectionEvento = document.getElementById('section-event-bonuses');
+    if (sectionEvento) sectionEvento.style.display = modoEventoAtivo ? 'block' : 'none';
+
+    const eventBonuses = {};
+    const eventSources = {};
+
+    if (modoEventoAtivo) {
+        const eventFields = {
+            'pv_max': 'event_pv_max', 'pm_max': 'event_pm_max',
+            'defesa': 'event_defesa', 'movimentacao': 'event_movimentacao',
+            'forca': 'event_forca', 'destreza': 'event_destreza',
+            'constituicao': 'event_constituicao', 'inteligencia': 'event_inteligencia',
+            'sabedoria': 'event_sabedoria', 'carisma': 'event_carisma', 'aura': 'event_aura',
+            'sanidade_max': 'event_sanidade_max'
+        };
+
+        Object.entries(eventFields).forEach(([key, inputId]) => {
+            const val = parseInt(dados[inputId]) || 0;
+            if (val !== 0) {
+                eventBonuses[key] = val;
+                if (!eventSources[key]) eventSources[key] = [];
+                eventSources[key].push(`Evento (${val > 0 ? '+' : ''}${val})`);
+            }
+        });
+    }
+
     const resultadoItens = calcularBonusItens(dados);
     const bonusItensPuros = resultadoItens.totals;
     const bonusPoderes = {};
@@ -130,7 +167,7 @@ function atualizarTudo() {
 
     // Consolida tudo em um único objeto de bônus para manter compatibilidade com outras funções
     const bonusItens = { ...bonusItensPuros };
-    [bonusPoderes, bonusHabilidades].forEach(src => {
+    [bonusPoderes, bonusHabilidades, eventBonuses].forEach(src => {
         Object.keys(src).forEach(k => bonusItens[k] = (bonusItens[k] || 0) + src[k]);
     });
 
@@ -138,7 +175,8 @@ function atualizarTudo() {
         itens: resultadoItens.sources,
         poderes: fontesPoderes,
         habilidades: fontesHabilidades,
-        racaManual: {}
+        racaManual: {},
+        event: eventSources
     };
 
     // Coleta bônus manuais para as raças especiais (Deus, Anjo, Demônio, etc)
@@ -391,7 +429,8 @@ function aplicarBonusVisuais(bonusItens, dadosObj, breakdown = null) {
                         ...(breakdown.itens[id] || []),
                         ...(breakdown.poderes[id] || []),
                         ...(breakdown.habilidades[id] || []),
-                        ...(breakdown.racaManual[id] || [])
+                        ...(breakdown.racaManual[id] || []),
+                        ...(breakdown.event[id] || [])
                     ];
                     sources.forEach(s => details.push(s));
                 }
@@ -409,14 +448,15 @@ function aplicarBonusVisuais(bonusItens, dadosObj, breakdown = null) {
 /**
  * Atualiza visualmente as larguras das barras de status (PV/PM)
  */
-function atualizarBarras(bonusItens = {}) {
+function atualizarBarras(bonusItens = {}, dadosObj = null) {
     const stats = [
         { atual: 'pv_atual', max: 'pv_max', bar: 'bar-pv' },
         { atual: 'pm_atual', max: 'pm_max', bar: 'bar-pm' },
         { atual: 'sanidade_atual', max: 'sanidade_max', bar: 'bar-sanidade' },
+        { atual: 'xp_atual', max: 'xp_max', bar: 'bar-xp' },
     ];
 
-    const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    const dados = dadosObj || (JSON.parse(localStorage.getItem(STORAGE_KEY)) || {});
 
     const racaKey = dados.raca || "nenhuma";
     const h1 = dados.hibrido_raca_1 || "";
@@ -429,7 +469,15 @@ function atualizarBarras(bonusItens = {}) {
 
         // Se os elementos não existem na página (ex: no Inventário), busca no localStorage
         const current = elAtual ? (parseInt(elAtual.value) || 0) : (parseInt(dados[s.atual]) || 0);
-        let maxTotal = elMax ? (parseInt(elMax.value) || 1) : (parseInt(dados[s.max]) || 1);
+        
+        let maxTotal;
+        if (elMax) {
+            // Se for input (PV/PM), usa .value. Se for span (XP), usa .innerText. 
+            // Fallback para o objeto de dados caso o DOM ainda não tenha processado o texto.
+            maxTotal = parseInt(elMax.tagName === 'INPUT' ? elMax.value : elMax.innerText) || parseInt(dados[s.max]) || 1;
+        } else {
+            maxTotal = parseInt(dados[s.max]) || 1;
+        }
 
         // Se estamos em uma página sem os inputs (como Inventário), 
         // precisamos garantir que o bônus de item seja somado ao valor base salvo
@@ -447,6 +495,13 @@ function atualizarBarras(bonusItens = {}) {
             if (s.bar === 'bar-pv') {
                 barEl.classList.toggle('pv-corrompido-color', isCorrompido);
                 barEl.classList.toggle('pv-color', !isCorrompido);
+            }
+
+            // Lógica para XP Dourado: muda a cor quando atingir 90% de progresso
+            if (s.bar === 'bar-xp') {
+                const isNearLevel = porcentagem >= 90;
+                barEl.classList.toggle('xp-near-level-up', isNearLevel);
+                barEl.classList.toggle('xp-color', !isNearLevel);
             }
         }
 
@@ -470,11 +525,10 @@ function calcularNivelTotalEngine(dados) {
     const classes = getClassesAtivas(dados);
     let soma = 0;
     classes.forEach(c => {
-        let lvl = c.lvl;
-        if (c.name !== 'ceifeiro_almas' && lvl > 20) lvl = 20;
-        soma += lvl;
+        // Removemos a trava de nível 20 para permitir progressões maiores
+        soma += c.lvl;
     });
-    return soma || 1;
+    return soma;
 }
 
 /**
@@ -561,10 +615,12 @@ function engineCalcularAtributos(dadosObj, bonusItens = {}, racaKey, breakdown =
                     const pods = breakdown.poderes[input.id] || [];
                     const habs = breakdown.habilidades[input.id] || [];
                     const racaM = breakdown.racaManual[input.id] || [];
+                    const evts = breakdown.event[input.id] || [];
                     itms.forEach(s => details.push(s));
                     pods.forEach(s => details.push(s));
                     habs.forEach(s => details.push(s));
                     racaM.forEach(s => details.push(s));
+                    evts.forEach(s => details.push(s));
                 } else if (bonusItens[input.id]) {
                     details.push(`Outros Bônus: ${bonusItens[input.id] > 0 ? '+' : ''}${bonusItens[input.id]}`);
                 }
@@ -752,8 +808,9 @@ function aplicarCorTema(cor) {
  * Verifica se uma DLC específica está ativa
  */
 window.isDlcAtiva = function(dlcId) {
-    if (!dlcId || dlcId === 'normalidade') return true;
-    const activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY)) || ['normalidade'];
+    if (!dlcId) return true;
+    let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY));
+    if (!activeDlcs || !Array.isArray(activeDlcs) || activeDlcs.length === 0) activeDlcs = ['atual'];
     return activeDlcs.includes(dlcId);
 };
 
@@ -761,7 +818,8 @@ window.isDlcAtiva = function(dlcId) {
  * Alterna o estado de uma DLC e atualiza a interface
  */
 window.toggleDlc = function(input) {
-    let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY)) || ['normalidade'];
+    let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY));
+    if (!activeDlcs || !Array.isArray(activeDlcs) || activeDlcs.length === 0) activeDlcs = ['atual'];
     if (input.checked) {
         if (!activeDlcs.includes(input.value)) activeDlcs.push(input.value);
     } else {
@@ -791,8 +849,10 @@ window.initDlcs = function() {
     const container = document.getElementById('dlc-selector-container');
     if (!container) return;
 
-    let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY)) || ['normalidade'];
+    let activeDlcs = JSON.parse(localStorage.getItem(DLCS_KEY));
+    if (!activeDlcs || !Array.isArray(activeDlcs) || activeDlcs.length === 0) activeDlcs = ['atual'];
     const dlcs = [
+        { id: 'atual', nome: 'Atual' },
         { id: 'normalidade', nome: 'Normalidade' },
         { id: 'passado', nome: 'Passado' },
         { id: 'futuro', nome: 'Futuro' },

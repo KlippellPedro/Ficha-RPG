@@ -41,7 +41,8 @@ function atualizarDefesa(mods, dadosObj, bonusItens = {}, breakdown = null) {
             const sources = [
                 ...(breakdown.itens['defesa'] || []),
                 ...(breakdown.poderes['defesa'] || []),
-                ...(breakdown.habilidades['defesa'] || [])
+                ...(breakdown.habilidades['defesa'] || []),
+                ...(breakdown.event['defesa'] || [])
             ];
             sources.forEach(s => details.push(s));
         }
@@ -68,7 +69,8 @@ function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
         const sources = [
             ...(breakdown.itens['pv_max'] || []),
             ...(breakdown.poderes['pv_max'] || []),
-            ...(breakdown.habilidades['pv_max'] || [])
+            ...(breakdown.habilidades['pv_max'] || []),
+            ...(breakdown.event['pv_max'] || [])
         ];
         sources.forEach(s => details.push(s));
     }
@@ -115,7 +117,8 @@ function atualizarMana(mods, dados, bonusItens = {}, breakdown = null) {
         const sources = [
             ...(breakdown.itens['pm_max'] || []),
             ...(breakdown.poderes['pm_max'] || []),
-            ...(breakdown.habilidades['pm_max'] || [])
+            ...(breakdown.habilidades['pm_max'] || []),
+            ...(breakdown.event['pm_max'] || [])
         ];
         sources.forEach(s => details.push(s));
     }
@@ -197,7 +200,8 @@ function atualizarMovimento(mods, dadosObj, bonusItens = {}, breakdown = null) {
             const sources = [
                 ...(breakdown.itens['movimentacao'] || []),
                 ...(breakdown.poderes['movimentacao'] || []),
-                ...(breakdown.habilidades['movimentacao'] || [])
+                ...(breakdown.habilidades['movimentacao'] || []),
+                ...(breakdown.event['movimentacao'] || [])
             ];
             sources.forEach(s => details.push(s));
         }
