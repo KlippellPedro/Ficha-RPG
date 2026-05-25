@@ -90,15 +90,23 @@ function fecharModalBuffPod() {
 function adicionarLinhaBuffPod(attr = 'nenhum', mod = 0, isAdv = false) {
     const container = document.getElementById('pod-buffs-container');
     if (!container) return;
+
+    // Identifica a categoria correta para restaurar o estado visual do modal
+    let cat = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && attr !== 'nenhum') {
+        if (window.OPTIONS_CATEGORIZADAS.pericia.some(o => o.v === attr)) cat = 'pericia';
+        else if (window.OPTIONS_CATEGORIZADAS.arma && window.OPTIONS_CATEGORIZADAS.arma.some(o => o.v === attr)) cat = 'arma';
+    }
+
     const row = document.createElement('div');
     row.className = 'material-attr-row';
     row.style = "display: flex; gap: 10px; margin-bottom: 10px;";
 
     row.innerHTML = `
         <select class="inv-input pod-cat-select" style="flex: 1;">
-            <option value="ficha">Ficha</option>
-            <option value="pericia">Perícia</option>
-            <option value="arma">Arma</option>
+            <option value="ficha" ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia" ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma" ${cat === 'arma' ? 'selected' : ''}>Arma</option>
             <option value="vantagem" ${isAdv ? 'selected' : ''}>Vantagem</option>
         </select>
         <select class="inv-input pod-buff-attr" style="flex: 1.5;"></select>
