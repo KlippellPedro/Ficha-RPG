@@ -135,17 +135,28 @@ function atualizarBarrasCard(card) {
     if (barPv) {
         const pctPv = Math.min(100, Math.max(0, (pvAtual / pvMax) * 100));
         barPv.style.width = pctPv + '%';
-        barPv.style.filter = pctPv < 25 ? 'brightness(1.5) drop-shadow(0 0 5px red)' : 'none';
+
+        const barOuter = barPv.closest('.ally-bar-outer');
+        if (pctPv <= 35) barOuter.classList.add('critical-pulse');
+        else barOuter.classList.remove('critical-pulse');
     }
 
     if (barPm) {
         const pctPm = Math.min(100, Math.max(0, (pmAtual / pmMax) * 100));
         barPm.style.width = pctPm + '%';
+
+        const barOuter = barPm.closest('.ally-bar-outer');
+        if (pctPm <= 35) barOuter.classList.add('mana-unstable');
+        else barOuter.classList.remove('mana-unstable');
     }
 
     if (barSan) {
         const pctSan = Math.min(100, Math.max(0, (sanAtual / sanMax) * 100));
         barSan.style.width = pctSan + '%';
+
+        const barOuter = barSan.closest('.ally-bar-outer');
+        if (pctSan <= 35) barOuter.classList.add('sanity-unstable');
+        else barOuter.classList.remove('sanity-unstable');
     }
 }
 

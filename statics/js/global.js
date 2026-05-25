@@ -49,6 +49,50 @@ window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
 };
 
 /**
+ * Gerencia estados visuais críticos para PV, PM e Sanidade
+ */
+function gerenciarEstadosCriticos() {
+    const getVal = (id) => parseInt(document.getElementById(id)?.value) || 0;
+    const porcentagem = (atual, max) => (atual / Math.max(1, max)) * 100;
+
+    const pv_at = getVal('pv_atual');
+    const pv_mx = getVal('pv_max');
+    const pm_at = getVal('pm_atual');
+    const pm_mx = getVal('pm_max');
+    const san_at = getVal('sanidade_atual');
+    const san_mx = getVal('sanidade_max');
+
+    // PV Crítico
+    const pctPv = porcentagem(pv_at, pv_mx);
+    const pvBar = document.getElementById('pv_atual')?.closest('.bar-outer');
+    if (pvBar) {
+        if (pctPv <= 35) {
+            pvBar.classList.add('critical-pulse');
+            document.body.classList.add('hp-critical');
+        } else {
+            pvBar.classList.remove('critical-pulse');
+            document.body.classList.remove('hp-critical');
+        }
+    }
+
+    // PM Crítico
+    const pctPm = porcentagem(pm_at, pm_mx);
+    const pmBar = document.getElementById('pm_atual')?.closest('.bar-outer');
+    if (pmBar) {
+        if (pctPm <= 35) pmBar.classList.add('mana-unstable');
+        else pmBar.classList.remove('mana-unstable');
+    }
+
+    // Sanidade Crítica
+    const pctSan = porcentagem(san_at, san_mx);
+    const sanBar = document.getElementById('sanidade_atual')?.closest('.bar-outer');
+    if (sanBar) {
+        if (pctSan <= 35) sanBar.classList.add('sanity-unstable');
+        else sanBar.classList.remove('sanity-unstable');
+    }
+}
+
+/**
  * Core Engine - Sincroniza dados e dispara atualizações de UI se existirem na página
  */
 function atualizarTudo() {
@@ -312,10 +356,15 @@ function atualizarTudo() {
     if (typeof atualizarPericias === 'function') {
         atualizarPericias(nivelTotal, infoAttr.mods, bonusItens, dados, breakdown);
     }
+
     if (typeof atualizarAtaques === 'function') atualizarAtaques(nivelTotal, infoAttr.mods, bonusItens);
     if (typeof atualizarRacaUI === 'function') atualizarRacaUI(racaKey); // Nova chamada para atualizar campos de raça
     if (typeof atualizarCarga === 'function') atualizarCarga(infoAttr, dados);
     atualizarBarras(bonusItens);
+
+    // Agora chama o gerenciador por último, garantindo que os elementos já tenham os valores finais
+    gerenciarEstadosCriticos();
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
 }
 

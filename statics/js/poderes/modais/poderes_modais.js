@@ -127,7 +127,7 @@ function salvarBuffsPoder() {
         const mod = row.querySelector('.pod-buff-val').value;
         if (attr !== 'nenhum') modsArr.push({ attr, mod: isNaN(parseInt(mod)) ? mod : parseInt(mod), isAdv: cat === 'vantagem' });
     });
-    document.getElementById(`pod_mods_${currentPodModEditIdx}`).value = JSON.stringify(modsArr);
+    document.getElementById(`poder_mods_${currentPodModEditIdx}`).value = JSON.stringify(modsArr);
     fecharModalBuffPod();
     atualizarTudo();
 }
