@@ -704,11 +704,11 @@ let draggedItem = null;
 document.addEventListener('DOMContentLoaded', () => {
     // Mapeia os containers e suas chaves de salvamento correspondentes
     const containers = [
-        { id: 'items-container', key: 'inventory_order' },
+        { id: 'items-container', key: typeof STORAGE_KEY_INVENTORY_ORDER !== 'undefined' ? STORAGE_KEY_INVENTORY_ORDER : 'inventory_order' },
         { id: 'habilidades-container', key: 'habilidades_order' },
         { id: 'poderes-container', key: 'poderes_order' },
         { id: 'magias-container', key: 'magias_order' },
-        { id: 'ataques-container', key: 'ataques_order' }
+        { id: 'ataques-container', key: typeof STORAGE_KEY_ATAQUES_ORDER !== 'undefined' ? STORAGE_KEY_ATAQUES_ORDER : 'ataques_order' }
     ];
 
     containers.forEach(cfg => {
@@ -758,17 +758,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.classList.remove('drag-insert-top', 'drag-insert-bottom', 'dragging')
             );
         });
-    });
 
-    itemsContainer.addEventListener('dragend', () => {
-        if (draggedItem) {
-            draggedItem.classList.remove('dragging');
-            draggedItem = null;
-        }
-        document.querySelectorAll('.drag-insert-top, .drag-insert-bottom').forEach(el => 
-            el.classList.remove('drag-insert-top', 'drag-insert-bottom')
-        );
+        // Tenta carregar a ordem salva para este container específico se ele existir
+        loadInventoryOrder(cfg.id, cfg.key);
     });
+});
+
+// Evento global de finalização do arraste para limpar classes de estilo
+document.addEventListener('dragend', () => {
+    if (draggedItem) {
+        draggedItem.classList.remove('dragging');
+        draggedItem = null;
+    }
+    document.querySelectorAll('.drag-insert-top, .drag-insert-bottom').forEach(el => 
+        el.classList.remove('drag-insert-top', 'drag-insert-bottom')
+    );
 });
 
 // New functions for saving and loading inventory order

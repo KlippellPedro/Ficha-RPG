@@ -189,35 +189,6 @@ function atualizarAtaques(nivel, mods, bonusItens) {
         row.classList.remove('drag-insert-top', 'drag-insert-bottom')
     );
 }
-
-// Funções para Salvar e Carregar a Ordem Personalizada dos Ataques
-function saveAtaquesOrder() {
-    const container = document.getElementById('ataques-container');
-    if (!container) return;
-    const order = Array.from(container.children)
-        .filter(child => child.classList.contains('atk-row-grid'))
-        .map(row => row.dataset.index);
-    localStorage.setItem(STORAGE_KEY_ATAQUES_ORDER, JSON.stringify(order));
-}
-
-function loadAtaquesOrder() {
-    const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_ATAQUES_ORDER));
-    const container = document.getElementById('ataques-container');
-    if (!savedOrder || !container) return;
-
-    const items = new Map();
-    Array.from(container.children).forEach(row => {
-        if (row.dataset.index) items.set(row.dataset.index, row);
-    });
-
-    const fragment = document.createDocumentFragment();
-    savedOrder.forEach(id => {
-        const item = items.get(id);
-        if (item) fragment.appendChild(item);
-    });
-    container.appendChild(fragment);
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
     const indices = Object.keys(salvo)
@@ -240,7 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     });
 
-    loadAtaquesOrder();
+    // Agora utiliza a função genérica do inventario.js
+    if (typeof loadInventoryOrder === 'function') {
+        loadInventoryOrder('ataques-container', STORAGE_KEY_ATAQUES_ORDER);
+    }
 
 
     // Adiciona listener para sincronizar mudanças manuais na lista de ataques de volta para o inventário
