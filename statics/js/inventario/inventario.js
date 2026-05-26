@@ -255,6 +255,10 @@ function salvarDetalhesModificacoes() {
 
     document.getElementById(`inv_mods_item_${idx}`).value = JSON.stringify({ attributes });
     fecharModalModificacoes();
+
+    // Atualiza o modal de detalhes para refletir as novas modificações (como CD)
+    abrirModalItem(idx);
+
     if (typeof verificarTipoItem === 'function') verificarTipoItem(idx);
     if (typeof atualizarTudo === 'function') atualizarTudo();
 }
@@ -404,6 +408,10 @@ function salvarDetalhesRaridade() {
     }
 
     fecharModalRaridade();
+
+    // Atualiza o modal de detalhes para refletir a nova raridade
+    abrirModalItem(idx);
+
     if (typeof atualizarEstiloRaridade === 'function') atualizarEstiloRaridade(idx);
     if (typeof atualizarTudo === 'function') atualizarTudo();
 }
@@ -488,7 +496,7 @@ function abrirModalMaterial(index, tipo) {
             if (matInfo.attributes && Array.isArray(matInfo.attributes)) {
                 attrs = matInfo.attributes;
             } else if (matInfo.attributes && typeof matInfo.attributes === 'object') {
-                if (catItem === 'armas') {
+                if (catItem === 'armas' || catItem === 'ataques') {
                     attrs = matInfo.attributes['armas'] || [];
                 } else if (catItem === 'itens' || catItem === 'item_magico') {
                     attrs = matInfo.attributes['itens'] || [];
@@ -681,6 +689,10 @@ function salvarDetalhesMaterial() {
     document.getElementById(fieldId).value = JSON.stringify({ nome, attributes });
 
     fecharModalMaterial();
+
+    // Atualiza o modal de detalhes para refletir o novo material (como CD do Ouro)
+    abrirModalItem(idx);
+
     if (typeof verificarTipoItem === 'function') verificarTipoItem(idx);
     if (typeof atualizarEstiloRaridade === 'function') atualizarEstiloRaridade(idx);
     if (typeof atualizarTudo === 'function') atualizarTudo();
