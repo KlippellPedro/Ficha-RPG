@@ -143,310 +143,310 @@ window.MATERIALS_DATABASE = {
                 }
             }
         },
-        naturais: {
-            comum: {
-                "madeira": {
-                    nome: "Madeira",
-                    desc: "Madeira comum que pode ser usado para criações no geral, não dá nenhum bônus.",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "madeira_boa": {
-                    nome: "Madeira Boa",
-                    desc: "Uma madeira tratada de boa qualidade. Em Armas: +1 no acerto. Em Itens: +1 na perícia principal. No Geral: +5 de CD.",
-                    attributes: {
-                        armas: [
-                            { attr: "teste", mod: 1 }
-                        ],
-                        itens: [
-                            { attr: "nenhum", mod: 1 }
-                        ],
-                        geral: [
-                            { attr: "cd_max", mod: 5 }
-                        ]
-                    }
-                },
-                "madeira_excelente": {
-                    nome: "Madeira Excelente",
-                    desc: "Madeira de alta densidade e resistência. Em Armas: +3 no acerto com Vantagem. Em Itens: +3 e Vantagem na perícia principal. No Geral: +10 de CD.",
-                    attributes: {
-                        armas: [
-                            { attr: "teste", mod: 3, isAdv: true }
-                        ],
-                        itens: [
-                            { attr: "nenhum", mod: 3, isAdv: true }
-                        ],
-                        geral: [
-                            { attr: "cd_max", mod: 10 }
-                        ]
-                    }
-                },
-                "madeira_cerejeira": {
-                    nome: "Madeira de Cerejeira",
-                    desc: "Uma madeira rosada e leve, equilibrada e silenciosa. Em Armas: +5 no acerto (Vantagem), +2 em Intimidação e +3 em Furtividade. Em Itens: +5 e Vantagem na perícia principal que afeta. No Geral: +15 de CD.",
-                    attributes: {
-                        armas: [
-                            { attr: "teste", mod: 5, isAdv: true },
-                            { attr: "intimidação", mod: 2 },
-                            { attr: "furtividade", mod: 3 }
-                        ],
-                        itens: [
-                            { attr: "nenhum", mod: 5, isAdv: true }
-                        ],
-                        geral: [
-                            { attr: "cd_max", mod: 15 }
-                        ]
-                    }
-                },
-                "trepadeira_jade": {
-                    nome: "Trepadeira Jade",
-                    desc: "Uma planta mística que potencializa efeitos regenerativos. Geral: Caso adicionado à composição de itens/Kits ou artefatos, a cura de vida ou mana aumenta em 1 dado. Não conta como um material na construção. Custo: 1K por tamanho do item.",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "pico_de_paloma": {
-                    nome: "Pico de Paloma",
-                    desc: "Uma flor de pétalas ardentes. Em Armas ou Itens que causem dano: +1d10 de dano de fogo comum. Caso consumida por um ser ou Avatar de fogo, concede +1% de maestria (funciona apenas uma vez). Custo: 2K por tamanho do item.",
-                    attributes: {
-                        armas: [
-                            { attr: "dano", mod: "1d10" }
-                        ],
-                        itens: [
-                            { attr: "dano", mod: "1d10" }
-                        ],
-                        geral: []
-                    }
-                },
-                "dragon_scale": {
-                    nome: "Dragon Scale",
-                    desc: "Antigos dizem que ao consumir essa planta sua pele se tornará mais resistente, recebendo 5 de RD a danos comuns (aplica-se apenas uma vez). Esse bônus pode ser aplicado novamente se adicionado em um escudo ou armadura.",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: [
-                            { attr: "defesa", mod: 5 }
-                        ]
-                    }
-                },
-                "raiz_mandragora": {
-                    nome: "Raiz de Mandrágora",
-                    desc: "Uma raiz mística. Itens (Apenas Mágicos): Adicionar esta raiz à composição concede a magia 'Grito de Mandrágora'. Geral: Aumenta a CD do item em 5.",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: [
-                            { attr: "cd_max", mod: 5 }
-                        ]
-                    }
+    },
+    naturais: {
+        comum: {
+            "madeira": {
+                nome: "Madeira",
+                desc: "Madeira comum que pode ser usado para criações no geral, não dá nenhum bônus.",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
                 }
             },
-            marcial: {
-                "argorwood": {
-                    nome: "Argorwood",
-                    desc: "Uma madeira rara com fragrância mística. Em Armas: +8 no acerto (Vantagem), +4 em Intimidação e Furtividade. Em Itens: +8 e Vantagem na perícia principal. No Geral: +20 de CD e +1 no Mod. de Carisma.",
-                    attributes: {
-                        armas: [
-                            { attr: "teste", mod: 8, isAdv: true },
-                            { attr: "intimidação", mod: 4 },
-                            { attr: "furtividade", mod: 4 }
-                        ],
-                        itens: [
-                            { attr: "nenhum", mod: 8, isAdv: true }
-                        ],
-                        geral: [
-                            { attr: "cd_max", mod: 20 },
-                            { attr: "carisma", mod: 1 }
-                        ]
-                    }
-                },
-                "palo_santo": {
-                    nome: "Palo Santo",
-                    desc: "Madeira sagrada usada em rituais. Em Armas: +8 no acerto (Vantagem), +4 em Intimidação e Furtividade. Em Itens: +8 e Vantagem na perícia principal. No Geral: +20 de CD e +1 no Mod. de Carisma.",
-                    attributes: {
-                        armas: [
-                            { attr: "teste", mod: 8, isAdv: true },
-                            { attr: "intimidação", mod: 4 },
-                            { attr: "furtividade", mod: 4 }
-                        ],
-                        itens: [
-                            { attr: "nenhum", mod: 8, isAdv: true }
-                        ],
-                        geral: [
-                            { attr: "cd_max", mod: 20 },
-                            { attr: "carisma", mod: 1 }
-                        ]
-                    }
-                },
-                "pau_brasil": {
-                    nome: "Pau Brasil",
-                    desc: "Madeira extremamente densa e de cor brasa. Em Armas: +15 no acerto (Vantagem), +4 em Intimidação e Furtividade. Em Itens: +15 e Vantagem na perícia principal. No Geral: +30 de CD e +2 no Mod. de Carisma.",
-                    attributes: {
-                        armas: [
-                            { attr: "teste", mod: 15, isAdv: true },
-                            { attr: "intimidação", mod: 4 },
-                            { attr: "furtividade", mod: 4 }
-                        ],
-                        itens: [
-                            { attr: "nenhum", mod: 15, isAdv: true }
-                        ],
-                        geral: [
-                            { attr: "cd_max", mod: 30 },
-                            { attr: "carisma", mod: 2 }
-                        ]
-                    }
-                },
-                "arvore_da_vida": {
-                    nome: "Árvore da Vida",
-                    desc: "Uma madeira ancestral que pulsa com vitalidade. Em Armas: +25 no acerto (Vantagem), +4 em Intimidação e Furtividade. Em Itens: +25 e Vantagem na perícia principal. No Geral: +40 de CD, +2 no Mod. de Carisma e +10 de Vida Máxima.",
-                    attributes: {
-                        armas: [
-                            { attr: "teste", mod: 25, isAdv: true },
-                            { attr: "intimidação", mod: 4 },
-                            { attr: "furtividade", mod: 4 }
-                        ],
-                        itens: [
-                            { attr: "nenhum", mod: 25, isAdv: true }
-                        ],
-                        geral: [
-                            { attr: "cd_max", mod: 40 },
-                            { attr: "carisma", mod: 2 },
-                            { attr: "pv_max", mod: 10 }
-                        ]
-                    }
-                },
-                "chifres_da_natureza": {
-                    nome: "Chifres da Natureza",
-                    desc: "Chifres imponentes que canalizam a força da mãe natureza. Geral: +25 e Vantagem no acerto ou na perícia principal que afeta, +1 de Alcance (Limite Multiversal), +6 em todas as perícias. Concede o poder 'Olhos da Natureza', 'Evolução Natural', Imunidade a danos comuns e 4 Vantagens em testes na natureza.",
-                    attributes: {
-                        armas: [
-                            { attr: "teste", mod: 25, isAdv: true },
-                            { attr: "alcance", mod: 1 }
-                        ],
-                        itens: [
-                            { attr: "nenhum", mod: 25, isAdv: true }
-                        ],
-                        geral: [
-                            { attr: "todas", mod: 6 }
-                        ]
-                    }
+            "madeira_boa": {
+                nome: "Madeira Boa",
+                desc: "Uma madeira tratada de boa qualidade. Em Armas: +1 no acerto. Em Itens: +1 na perícia principal. No Geral: +5 de CD.",
+                attributes: {
+                    armas: [
+                        { attr: "teste", mod: 1 }
+                    ],
+                    itens: [
+                        { attr: "nenhum", mod: 1 }
+                    ],
+                    geral: [
+                        { attr: "cd_max", mod: 5 }
+                    ]
+                }
+            },
+            "madeira_excelente": {
+                nome: "Madeira Excelente",
+                desc: "Madeira de alta densidade e resistência. Em Armas: +3 no acerto com Vantagem. Em Itens: +3 e Vantagem na perícia principal. No Geral: +10 de CD.",
+                attributes: {
+                    armas: [
+                        { attr: "teste", mod: 3, isAdv: true }
+                    ],
+                    itens: [
+                        { attr: "nenhum", mod: 3, isAdv: true }
+                    ],
+                    geral: [
+                        { attr: "cd_max", mod: 10 }
+                    ]
+                }
+            },
+            "madeira_cerejeira": {
+                nome: "Madeira de Cerejeira",
+                desc: "Uma madeira rosada e leve, equilibrada e silenciosa. Em Armas: +5 no acerto (Vantagem), +2 em Intimidação e +3 em Furtividade. Em Itens: +5 e Vantagem na perícia principal que afeta. No Geral: +15 de CD.",
+                attributes: {
+                    armas: [
+                        { attr: "teste", mod: 5, isAdv: true },
+                        { attr: "intimidação", mod: 2 },
+                        { attr: "furtividade", mod: 3 }
+                    ],
+                    itens: [
+                        { attr: "nenhum", mod: 5, isAdv: true }
+                    ],
+                    geral: [
+                        { attr: "cd_max", mod: 15 }
+                    ]
+                }
+            },
+            "trepadeira_jade": {
+                nome: "Trepadeira Jade",
+                desc: "Uma planta mística que potencializa efeitos regenerativos. Geral: Caso adicionado à composição de itens/Kits ou artefatos, a cura de vida ou mana aumenta em 1 dado. Não conta como um material na construção. Custo: 1K por tamanho do item.",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "pico_de_paloma": {
+                nome: "Pico de Paloma",
+                desc: "Uma flor de pétalas ardentes. Em Armas ou Itens que causem dano: +1d10 de dano de fogo comum. Caso consumida por um ser ou Avatar de fogo, concede +1% de maestria (funciona apenas uma vez). Custo: 2K por tamanho do item.",
+                attributes: {
+                    armas: [
+                        { attr: "dano", mod: "1d10" }
+                    ],
+                    itens: [
+                        { attr: "dano", mod: "1d10" }
+                    ],
+                    geral: []
+                }
+            },
+            "dragon_scale": {
+                nome: "Dragon Scale",
+                desc: "Antigos dizem que ao consumir essa planta sua pele se tornará mais resistente, recebendo 5 de RD a danos comuns (aplica-se apenas uma vez). Esse bônus pode ser aplicado novamente se adicionado em um escudo ou armadura.",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: [
+                        { attr: "defesa", mod: 5 }
+                    ]
+                }
+            },
+            "raiz_mandragora": {
+                nome: "Raiz de Mandrágora",
+                desc: "Uma raiz mística. Itens (Apenas Mágicos): Adicionar esta raiz à composição concede a magia 'Grito de Mandrágora'. Geral: Aumenta a CD do item em 5.",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: [
+                        { attr: "cd_max", mod: 5 }
+                    ]
                 }
             }
         },
-        animais: {
-            comum: {
-                "alma_comum": {
-                    nome: "Alma Comum",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "alma_de_deus": {
-                    nome: "Alma de Deus",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "residuo_fontes": {
-                    nome: "Resíduo de Fontes",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "residuo_golens": {
-                    nome: "Resíduo de Golens",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "sangue": {
-                    nome: "Sangue",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "sangue_fundido": {
-                    nome: "Sangue Fundido",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "goma_branca": {
-                    nome: "Goma Branca",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "goma_branca_melhorada": {
-                    nome: "Goma Branca Melhorada",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
+        marcial: {
+            "argorwood": {
+                nome: "Argorwood",
+                desc: "Uma madeira rara com fragrância mística. Em Armas: +8 no acerto (Vantagem), +4 em Intimidação e Furtividade. Em Itens: +8 e Vantagem na perícia principal. No Geral: +20 de CD e +1 no Mod. de Carisma.",
+                attributes: {
+                    armas: [
+                        { attr: "teste", mod: 8, isAdv: true },
+                        { attr: "intimidação", mod: 4 },
+                        { attr: "furtividade", mod: 4 }
+                    ],
+                    itens: [
+                        { attr: "nenhum", mod: 8, isAdv: true }
+                    ],
+                    geral: [
+                        { attr: "cd_max", mod: 20 },
+                        { attr: "carisma", mod: 1 }
+                    ]
                 }
             },
-            marcial: {
-                "alma_crianca_pura": {
-                    nome: "Alma de Criança Pura",
-                    desc: "Uma alma de pureza inabalável. No Geral: +10 de Aura e Vantagem em todas as perícias.",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: [
-                            { attr: "aura", mod: 10 },
-                            { attr: "todas", mod: 0, isAdv: true }
-                        ]
-                    }
-                },
-                "alma_escolhido": {
-                    nome: "Alma de Escolhido",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
-                },
-                "alma_top_10": {
-                    nome: "Alma do Top 10",
-                    desc: "",
-                    attributes: {
-                        armas: [],
-                        itens: [],
-                        geral: []
-                    }
+            "palo_santo": {
+                nome: "Palo Santo",
+                desc: "Madeira sagrada usada em rituais. Em Armas: +8 no acerto (Vantagem), +4 em Intimidação e Furtividade. Em Itens: +8 e Vantagem na perícia principal. No Geral: +20 de CD e +1 no Mod. de Carisma.",
+                attributes: {
+                    armas: [
+                        { attr: "teste", mod: 8, isAdv: true },
+                        { attr: "intimidação", mod: 4 },
+                        { attr: "furtividade", mod: 4 }
+                    ],
+                    itens: [
+                        { attr: "nenhum", mod: 8, isAdv: true }
+                    ],
+                    geral: [
+                        { attr: "cd_max", mod: 20 },
+                        { attr: "carisma", mod: 1 }
+                    ]
+                }
+            },
+            "pau_brasil": {
+                nome: "Pau Brasil",
+                desc: "Madeira extremamente densa e de cor brasa. Em Armas: +15 no acerto (Vantagem), +4 em Intimidação e Furtividade. Em Itens: +15 e Vantagem na perícia principal. No Geral: +30 de CD e +2 no Mod. de Carisma.",
+                attributes: {
+                    armas: [
+                        { attr: "teste", mod: 15, isAdv: true },
+                        { attr: "intimidação", mod: 4 },
+                        { attr: "furtividade", mod: 4 }
+                    ],
+                    itens: [
+                        { attr: "nenhum", mod: 15, isAdv: true }
+                    ],
+                    geral: [
+                        { attr: "cd_max", mod: 30 },
+                        { attr: "carisma", mod: 2 }
+                    ]
+                }
+            },
+            "arvore_da_vida": {
+                nome: "Árvore da Vida",
+                desc: "Uma madeira ancestral que pulsa com vitalidade. Em Armas: +25 no acerto (Vantagem), +4 em Intimidação e Furtividade. Em Itens: +25 e Vantagem na perícia principal. No Geral: +40 de CD, +2 no Mod. de Carisma e +10 de Vida Máxima.",
+                attributes: {
+                    armas: [
+                        { attr: "teste", mod: 25, isAdv: true },
+                        { attr: "intimidação", mod: 4 },
+                        { attr: "furtividade", mod: 4 }
+                    ],
+                    itens: [
+                        { attr: "nenhum", mod: 25, isAdv: true }
+                    ],
+                    geral: [
+                        { attr: "cd_max", mod: 40 },
+                        { attr: "carisma", mod: 2 },
+                        { attr: "pv_max", mod: 10 }
+                    ]
+                }
+            },
+            "chifres_da_natureza": {
+                nome: "Chifres da Natureza",
+                desc: "Chifres imponentes que canalizam a força da mãe natureza. Geral: +25 e Vantagem no acerto ou na perícia principal que afeta, +1 de Alcance (Limite Multiversal), +6 em todas as perícias. Concede o poder 'Olhos da Natureza', 'Evolução Natural', Imunidade a danos comuns e 4 Vantagens em testes na natureza.",
+                attributes: {
+                    armas: [
+                        { attr: "teste", mod: 25, isAdv: true },
+                        { attr: "alcance", mod: 1 }
+                    ],
+                    itens: [
+                        { attr: "nenhum", mod: 25, isAdv: true }
+                    ],
+                    geral: [
+                        { attr: "todas", mod: 6 }
+                    ]
+                }
+            }
+        }
+    },
+    animais: {
+        comum: {
+            "alma_comum": {
+                nome: "Alma Comum",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "alma_de_deus": {
+                nome: "Alma de Deus",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "residuo_fontes": {
+                nome: "Resíduo de Fontes",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "residuo_golens": {
+                nome: "Resíduo de Golens",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "sangue": {
+                nome: "Sangue",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "sangue_fundido": {
+                nome: "Sangue Fundido",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "goma_branca": {
+                nome: "Goma Branca",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "goma_branca_melhorada": {
+                nome: "Goma Branca Melhorada",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
                 }
             }
         },
-    }
+        marcial: {
+            "alma_crianca_pura": {
+                nome: "Alma de Criança Pura",
+                desc: "Uma alma de pureza inabalável. No Geral: +10 de Aura e Vantagem em todas as perícias.",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: [
+                        { attr: "aura", mod: 10 },
+                        { attr: "todas", mod: 0, isAdv: true }
+                    ]
+                }
+            },
+            "alma_escolhido": {
+                nome: "Alma de Escolhido",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            },
+            "alma_top_10": {
+                nome: "Alma do Top 10",
+                desc: "",
+                attributes: {
+                    armas: [],
+                    itens: [],
+                    geral: []
+                }
+            }
+        }
+    },
 };
 
 /**

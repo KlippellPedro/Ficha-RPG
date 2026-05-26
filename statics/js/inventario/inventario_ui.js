@@ -100,18 +100,34 @@ function ordenarItens() {
     const container = document.getElementById('items-container');
     if (!container) return;
 
+    const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_INVENTORY_ORDER));
     const rows = Array.from(container.querySelectorAll('.item-row'));
 
-    rows.sort((a, b) => {
-        const isEqA = a.querySelector('.inv-checkbox')?.checked || false;
-        const isEqB = b.querySelector('.inv-checkbox')?.checked || false;
+    if (savedOrder && savedOrder.length > 0) {
+        // Se houver uma ordem manual salva, respeita ela
+        rows.sort((a, b) => {
+            let idxA = savedOrder.indexOf(a.dataset.index);
+            let idxB = savedOrder.indexOf(b.dataset.index);
 
-        if (isEqA !== isEqB) return isEqA ? -1 : 1;
+            // Itens novos (que não estão na ordem salva) vão para o fim
+            if (idxA === -1) idxA = 9999;
+            if (idxB === -1) idxB = 9999;
 
-        const nomeA = a.querySelector('[id^="inv_nome_"]')?.value.toLowerCase() || "";
-        const nomeB = b.querySelector('[id^="inv_nome_"]')?.value.toLowerCase() || "";
-        return nomeA.localeCompare(nomeB);
-    });
+            return idxA - idxB;
+        });
+    } else {
+        // Caso contrário, usa a ordenação padrão (Equipado + Nome)
+        rows.sort((a, b) => {
+            const isEqA = a.querySelector('.inv-checkbox')?.checked || false;
+            const isEqB = b.querySelector('.inv-checkbox')?.checked || false;
+
+            if (isEqA !== isEqB) return isEqA ? -1 : 1;
+
+            const nomeA = a.querySelector('[id^="inv_nome_"]')?.value.toLowerCase() || "";
+            const nomeB = b.querySelector('[id^="inv_nome_"]')?.value.toLowerCase() || "";
+            return nomeA.localeCompare(nomeB);
+        });
+    }
 
     rows.forEach(row => container.appendChild(row));
 }
@@ -281,6 +297,8 @@ function removerItemUI(index) {
         const row = document.querySelector(`.item-row[data-index="${index}"]`);
         if (row) row.remove();
 
+        // Atualiza a ordem salva para remover o índice deletado
+        if (typeof saveInventoryOrder === 'function') saveInventoryOrder();
         atualizarTudo();
         showNotification(`"${nomeItem}" removido com sucesso.`, "success");
     }, () => {

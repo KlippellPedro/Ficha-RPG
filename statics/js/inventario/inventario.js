@@ -50,7 +50,7 @@ function abrirModalItem(index) {
             try {
                 const parsed = JSON.parse(val);
                 (parsed.attributes || []).forEach(a => { if (a.attr === 'cd_max') cdBonus += parseInt(a.mod) || 0; });
-            } catch (e) {}
+            } catch (e) { }
         }
     });
 
@@ -278,7 +278,7 @@ function salvarDetalhesItem() {
             try {
                 const parsed = JSON.parse(val);
                 (parsed.attributes || []).forEach(a => { if (a.attr === 'cd_max') cdBonus += parseInt(a.mod) || 0; });
-            } catch (e) {}
+            } catch (e) { }
         }
     });
     const baseCdMax = cdMaxTotal - cdBonus;
@@ -463,15 +463,15 @@ function abrirModalMaterial(index, tipo) {
         descContainer.id = 'modal_material_desc_info';
         descContainer.style = "font-size: 0.8rem; color: #888; font-style: italic; margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 4px; display: none;";
         nomeInput.parentNode.insertBefore(descContainer, nomeInput.nextSibling);
-
-        // Adiciona listeners para os novos selects
-        selectCategory.onchange = updateSubcategorySelect;
-        selectSubcategory.onchange = updateMaterialSelect;
-        selectMat.onchange = handleMaterialSelection;
     } else {
         selectSubcategory = document.getElementById('modal_material_subcategory_selector');
         selectMat = document.getElementById('modal_material_selector');
     }
+
+    // Reatribui os listeners toda vez que o modal abre para garantir que usem o contexto (matData) do item atual
+    selectCategory.onchange = updateSubcategorySelect;
+    selectSubcategory.onchange = updateMaterialSelect;
+    selectMat.onchange = handleMaterialSelection;
 
     // Atualiza o comportamento do botão para o item atual toda vez que o modal abre
     const btnAplicar = document.getElementById('btn_aplicar_bonus_material');
@@ -479,7 +479,7 @@ function abrirModalMaterial(index, tipo) {
         btnAplicar.onclick = () => {
             const matInfo = buscarMaterial(selectMat.value);
             if (!matInfo) return;
-            
+
             const catEl = document.getElementById(`inv_cat_${index}`);
             // Garante que a categoria seja lida corretamente mesmo que o select mude
             const catItem = (catEl ? catEl.value : "outros").toLowerCase().trim();
@@ -542,7 +542,8 @@ function abrirModalMaterial(index, tipo) {
         } else {
             selectSubcategory.style.display = 'none';
         }
-        selectSubcategory.value = preselectedSub;
+        // Só aplica o valor se for uma string (chamada inicial), evita sobrescrever com o objeto de Evento no onchange
+        if (typeof preselectedSub === 'string') selectSubcategory.value = preselectedSub;
         updateMaterialSelect();
     }
 
@@ -578,7 +579,7 @@ function abrirModalMaterial(index, tipo) {
             nomeInput.style.display = 'none';
             nomeInput.value = matVal;
             const matInfo = buscarMaterial(matVal);
-            
+
             if (btn) btn.style.display = matInfo ? 'flex' : 'none';
 
             if (matInfo) {
@@ -708,14 +709,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = e.target.closest('.item-row');
         if (target && target !== draggedItem) {
             // Remove indicadores de outros itens para evitar confusão
-            itemsContainer.querySelectorAll('.item-row').forEach(row => 
+            itemsContainer.querySelectorAll('.item-row').forEach(row =>
                 row.classList.remove('drag-insert-top', 'drag-insert-bottom')
             );
 
             // Detecta se o mouse está na metade superior ou inferior do item alvo
             const rect = target.getBoundingClientRect();
             const isAfter = e.clientY > rect.top + rect.height / 2;
-            
+
             target.classList.add(isAfter ? 'drag-insert-bottom' : 'drag-insert-top');
         }
     });
@@ -739,12 +740,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Insere antes ou depois conforme detectado pelo mouse
                 if (isAfter) dropTarget.after(draggedItem);
                 else dropTarget.before(draggedItem);
-                
+
                 saveInventoryOrder(); // Save the new order
             }
         }
         // Limpa todos os indicadores visuais ao soltar
-        itemsContainer.querySelectorAll('.item-row').forEach(row => 
+        itemsContainer.querySelectorAll('.item-row').forEach(row =>
             row.classList.remove('drag-insert-top', 'drag-insert-bottom')
         );
     });
