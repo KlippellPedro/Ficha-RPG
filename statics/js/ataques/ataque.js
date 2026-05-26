@@ -242,52 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadAtaquesOrder();
 
-    // Lógica de Drag and Drop para Ataques
-    const container = document.getElementById('ataques-container');
-    let draggedItem = null;
-
-    container.addEventListener('dragstart', (e) => {
-        draggedItem = e.target.closest('.draggable');
-        if (draggedItem) {
-            e.dataTransfer.effectAllowed = 'move';
-            setTimeout(() => draggedItem.classList.add('dragging'), 0);
-        }
-    });
-
-    container.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        const target = e.target.closest('.draggable');
-        if (target && target !== draggedItem) {
-            container.querySelectorAll('.draggable').forEach(row =>
-                row.classList.remove('drag-insert-top', 'drag-insert-bottom')
-            );
-            const rect = target.getBoundingClientRect();
-            const isAfter = e.clientY > rect.top + rect.height / 2;
-            target.classList.add(isAfter ? 'drag-insert-bottom' : 'drag-insert-top');
-        }
-    });
-
-    container.addEventListener('drop', (e) => {
-        e.preventDefault();
-        if (draggedItem) {
-            const dropTarget = e.target.closest('.draggable');
-            if (dropTarget && dropTarget !== draggedItem) {
-                const rect = dropTarget.getBoundingClientRect();
-                const isAfter = e.clientY > rect.top + rect.height / 2;
-                if (isAfter) dropTarget.after(draggedItem);
-                else dropTarget.before(draggedItem);
-                saveAtaquesOrder();
-            }
-        }
-        container.querySelectorAll('.draggable').forEach(row =>
-            row.classList.remove('drag-insert-top', 'drag-insert-bottom')
-        );
-    });
-
-    container.addEventListener('dragend', () => {
-        if (draggedItem) draggedItem.classList.remove('dragging');
-        draggedItem = null;
-    });
 
     // Adiciona listener para sincronizar mudanças manuais na lista de ataques de volta para o inventário
     document.body.addEventListener('change', (e) => {

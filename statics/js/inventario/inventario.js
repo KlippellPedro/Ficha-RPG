@@ -702,64 +702,62 @@ function salvarDetalhesMaterial() {
 let draggedItem = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const itemsContainer = document.getElementById('items-container');
-    if (!itemsContainer) return;
+    // Mapeia os containers e suas chaves de salvamento correspondentes
+    const containers = [
+        { id: 'items-container', key: 'inventory_order' },
+        { id: 'habilidades-container', key: 'habilidades_order' },
+        { id: 'poderes-container', key: 'poderes_order' },
+        { id: 'magias-container', key: 'magias_order' },
+        { id: 'ataques-container', key: 'ataques_order' }
+    ];
 
-    itemsContainer.addEventListener('dragstart', (e) => {
-        draggedItem = e.target.closest('.item-row');
-        if (draggedItem) {
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', draggedItem.dataset.index);
-            setTimeout(() => {
-                draggedItem.classList.add('dragging');
-            }, 0);
-        }
-    });
+    containers.forEach(cfg => {
+        const container = document.getElementById(cfg.id);
+        if (!container) return;
 
-    itemsContainer.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Allow drop
-        const target = e.target.closest('.item-row');
-        if (target && target !== draggedItem) {
-            // Remove indicadores de outros itens para evitar confusão
-            itemsContainer.querySelectorAll('.item-row').forEach(row =>
-                row.classList.remove('drag-insert-top', 'drag-insert-bottom')
-            );
+        container.addEventListener('dragstart', (e) => {
+            draggedItem = e.target.closest('.draggable') || e.target.closest('[draggable="true"]');
+            if (draggedItem) {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', draggedItem.dataset.index);
+                setTimeout(() => draggedItem.classList.add('dragging'), 0);
+            }
+        });
 
-            // Detecta se o mouse está na metade superior ou inferior do item alvo
-            const rect = target.getBoundingClientRect();
-            const isAfter = e.clientY > rect.top + rect.height / 2;
+        container.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Permite o drop e remove o ícone de bloqueado
+            const target = e.target.closest('.draggable') || e.target.closest('[draggable="true"]');
+            if (target && target !== draggedItem) {
+                container.querySelectorAll('.draggable, [draggable="true"]').forEach(row =>
+                    row.classList.remove('drag-insert-top', 'drag-insert-bottom')
+                );
 
-            target.classList.add(isAfter ? 'drag-insert-bottom' : 'drag-insert-top');
-        }
-    });
+                const rect = target.getBoundingClientRect();
+                const isAfter = e.clientY > rect.top + rect.height / 2;
+                target.classList.add(isAfter ? 'drag-insert-bottom' : 'drag-insert-top');
+            }
+        });
 
-    itemsContainer.addEventListener('dragleave', (e) => {
-        const target = e.target.closest('.item-row');
-        if (target) {
-            target.classList.remove('drag-insert-top', 'drag-insert-bottom');
-        }
-    });
+        container.addEventListener('dragleave', (e) => {
+            const target = e.target.closest('.draggable') || e.target.closest('[draggable="true"]');
+            if (target) target.classList.remove('drag-insert-top', 'drag-insert-bottom');
+        });
 
-    itemsContainer.addEventListener('drop', (e) => {
-        e.preventDefault();
-
-        if (draggedItem) {
-            const dropTarget = e.target.closest('.item-row');
-            if (dropTarget && dropTarget !== draggedItem) {
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const dropTarget = e.target.closest('.draggable') || e.target.closest('[draggable="true"]');
+            if (draggedItem && dropTarget && dropTarget !== draggedItem) {
                 const rect = dropTarget.getBoundingClientRect();
                 const isAfter = e.clientY > rect.top + rect.height / 2;
-
-                // Insere antes ou depois conforme detectado pelo mouse
                 if (isAfter) dropTarget.after(draggedItem);
                 else dropTarget.before(draggedItem);
-
-                saveInventoryOrder(); // Save the new order
+                
+                saveInventoryOrder(cfg.id, cfg.key);
             }
-        }
-        // Limpa todos os indicadores visuais ao soltar
-        itemsContainer.querySelectorAll('.item-row').forEach(row =>
-            row.classList.remove('drag-insert-top', 'drag-insert-bottom')
-        );
+            container.querySelectorAll('.draggable, [draggable="true"]').forEach(row =>
+                row.classList.remove('drag-insert-top', 'drag-insert-bottom', 'dragging')
+            );
+        });
     });
 
     itemsContainer.addEventListener('dragend', () => {
@@ -767,28 +765,30 @@ document.addEventListener('DOMContentLoaded', () => {
             draggedItem.classList.remove('dragging');
             draggedItem = null;
         }
-        document.querySelectorAll('.item-row').forEach(row => row.classList.remove('drag-over'));
+        document.querySelectorAll('.drag-insert-top, .drag-insert-bottom').forEach(el => 
+            el.classList.remove('drag-insert-top', 'drag-insert-bottom')
+        );
     });
 });
 
 // New functions for saving and loading inventory order
-function saveInventoryOrder() {
-    const container = document.getElementById('items-container');
+function saveInventoryOrder(containerId = 'items-container', storageKey = 'inventory_order') {
+    const container = document.getElementById(containerId);
     if (!container) return;
     const order = Array.from(container.children)
-        .filter(child => child.classList.contains('item-row'))
+        .filter(child => child.dataset && child.dataset.index)
         .map(row => row.dataset.index);
-    localStorage.setItem(STORAGE_KEY_INVENTORY_ORDER, JSON.stringify(order));
+    localStorage.setItem(storageKey, JSON.stringify(order));
 }
 
-function loadInventoryOrder() {
-    const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_INVENTORY_ORDER));
+function loadInventoryOrder(containerId = 'items-container', storageKey = 'inventory_order') {
+    const savedOrder = JSON.parse(localStorage.getItem(storageKey));
     if (savedOrder && savedOrder.length > 0) {
-        const container = document.getElementById('items-container');
+        const container = document.getElementById(containerId);
         if (!container) return;
         const items = new Map();
         Array.from(container.children).forEach(row => {
-            if (row.classList.contains('item-row')) {
+            if (row.dataset && row.dataset.index) {
                 items.set(row.dataset.index, row);
             }
         });
