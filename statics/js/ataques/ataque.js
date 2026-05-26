@@ -184,6 +184,38 @@ function atualizarAtaques(nivel, mods, bonusItens) {
         });
         danoInput.title = infoDano ? "Bônus de Atributo: " + infoDano : "";
     });
+    // Limpeza final para garantir que estados de hover de drag não persistam
+    container.querySelectorAll('.draggable').forEach(row =>
+        row.classList.remove('drag-insert-top', 'drag-insert-bottom')
+    );
+}
+
+// Funções para Salvar e Carregar a Ordem Personalizada dos Ataques
+function saveAtaquesOrder() {
+    const container = document.getElementById('ataques-container');
+    if (!container) return;
+    const order = Array.from(container.children)
+        .filter(child => child.classList.contains('atk-row-grid'))
+        .map(row => row.dataset.index);
+    localStorage.setItem(STORAGE_KEY_ATAQUES_ORDER, JSON.stringify(order));
+}
+
+function loadAtaquesOrder() {
+    const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_ATAQUES_ORDER));
+    const container = document.getElementById('ataques-container');
+    if (!savedOrder || !container) return;
+
+    const items = new Map();
+    Array.from(container.children).forEach(row => {
+        if (row.dataset.index) items.set(row.dataset.index, row);
+    });
+
+    const fragment = document.createDocumentFragment();
+    savedOrder.forEach(id => {
+        const item = items.get(id);
+        if (item) fragment.appendChild(item);
+    });
+    container.appendChild(fragment);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -206,6 +238,55 @@ document.addEventListener('DOMContentLoaded', () => {
             salvo[`atk_tipo_dano_${idx}`],
             salvo[`atk_origin_${idx}`]
         );
+    });
+
+    loadAtaquesOrder();
+
+    // Lógica de Drag and Drop para Ataques
+    const container = document.getElementById('ataques-container');
+    let draggedItem = null;
+
+    container.addEventListener('dragstart', (e) => {
+        draggedItem = e.target.closest('.draggable');
+        if (draggedItem) {
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => draggedItem.classList.add('dragging'), 0);
+        }
+    });
+
+    container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const target = e.target.closest('.draggable');
+        if (target && target !== draggedItem) {
+            container.querySelectorAll('.draggable').forEach(row =>
+                row.classList.remove('drag-insert-top', 'drag-insert-bottom')
+            );
+            const rect = target.getBoundingClientRect();
+            const isAfter = e.clientY > rect.top + rect.height / 2;
+            target.classList.add(isAfter ? 'drag-insert-bottom' : 'drag-insert-top');
+        }
+    });
+
+    container.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedItem) {
+            const dropTarget = e.target.closest('.draggable');
+            if (dropTarget && dropTarget !== draggedItem) {
+                const rect = dropTarget.getBoundingClientRect();
+                const isAfter = e.clientY > rect.top + rect.height / 2;
+                if (isAfter) dropTarget.after(draggedItem);
+                else dropTarget.before(draggedItem);
+                saveAtaquesOrder();
+            }
+        }
+        container.querySelectorAll('.draggable').forEach(row =>
+            row.classList.remove('drag-insert-top', 'drag-insert-bottom')
+        );
+    });
+
+    container.addEventListener('dragend', () => {
+        if (draggedItem) draggedItem.classList.remove('dragging');
+        draggedItem = null;
     });
 
     // Adiciona listener para sincronizar mudanças manuais na lista de ataques de volta para o inventário

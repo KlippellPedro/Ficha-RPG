@@ -30,7 +30,8 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
     const index = idIndex !== null ? idIndex : Date.now();
 
     const row = document.createElement('div');
-    row.className = 'item-row hab-row-grid';
+    row.className = 'item-row hab-row-grid draggable';
+    row.draggable = true;
     row.dataset.index = index;
     row.innerHTML = `
         <input type="text" id="hab_nome_${index}" class="save-input inv-input" placeholder="Nome" value="${nome}">

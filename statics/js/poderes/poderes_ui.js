@@ -30,7 +30,8 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
     const index = idIndex !== null ? idIndex : Date.now();
 
     const row = document.createElement('div');
-    row.className = 'item-row pod-row-grid';
+    row.className = 'item-row pod-row-grid draggable';
+    row.draggable = true;
     row.dataset.index = index;
     row.innerHTML = `
         <input type="text" id="poder_nome_${index}" class="save-input inv-input" placeholder="Nome do Poder" value="${nome}">

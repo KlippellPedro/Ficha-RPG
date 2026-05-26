@@ -107,7 +107,7 @@ function adicionarLinhaBuffPod(attr = 'nenhum', mod = 0, isAdv = false) {
             <option value="ficha" ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
             <option value="pericia" ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
             <option value="arma" ${cat === 'arma' ? 'selected' : ''}>Arma</option>
-            <option value="vantagem" ${isAdv ? 'selected' : ''}>Vantagem</option>
+            <option value="vantagem" ${cat === 'vantagem' ? 'selected' : ''}>Vantagem</option>
         </select>
         <select class="inv-input pod-buff-attr" style="flex: 1.5;"></select>
         <input type="text" class="inv-input pod-buff-val" style="flex: 0.8;" value="${mod}" placeholder="Val">
@@ -117,6 +117,10 @@ function adicionarLinhaBuffPod(attr = 'nenhum', mod = 0, isAdv = false) {
 
     const catSel = row.querySelector('.pod-cat-select');
     const attrSel = row.querySelector('.pod-buff-attr');
+
+    // Força a atualização do valor do select de categoria para garantir a carga correta dos atributos
+    catSel.value = cat;
+
     const update = (val = "nenhum") => {
         const options = window.OPTIONS_CATEGORIZADAS[catSel.value] || [];
         attrSel.innerHTML = options.map(o => `<option value="${o.v}" ${o.v === val ? 'selected' : ''}>${o.t}</option>`).join('');

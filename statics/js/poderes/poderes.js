@@ -61,6 +61,34 @@ function usarPoderCorrompido(index, custo) {
     return true;
 }
 
+// Funções para Salvar e Carregar a Ordem Personalizada
+function savePoderesOrder() {
+    const container = document.getElementById('poderes-container');
+    if (!container) return;
+    const order = Array.from(container.children)
+        .filter(child => child.classList.contains('pod-row-grid'))
+        .map(row => row.dataset.index);
+    localStorage.setItem(STORAGE_KEY_PODERES_ORDER, JSON.stringify(order));
+}
+
+function loadPoderesOrder() {
+    const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_PODERES_ORDER));
+    const container = document.getElementById('poderes-container');
+    if (!savedOrder || !container) return;
+
+    const items = new Map();
+    Array.from(container.children).forEach(row => {
+        if (row.dataset.index) items.set(row.dataset.index, row);
+    });
+
+    const fragment = document.createDocumentFragment();
+    savedOrder.forEach(id => {
+        const item = items.get(id);
+        if (item) fragment.appendChild(item);
+    });
+    container.appendChild(fragment);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 

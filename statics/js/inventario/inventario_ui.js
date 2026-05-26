@@ -124,31 +124,39 @@ function verificarTipoItem(index) {
     const isEquipped = document.getElementById(`inv_eqp_${index}`)?.checked || false;
     row.classList.toggle('equipped-row', isEquipped);
 
-    // Sincronização automática com a página de Ataques (Armas Equipadas)
+    // 1. Cálculo de bônus acumulados intrínsecos do item (Dano, Crítico, Alcance, CD Máx)
+    let b = { dano: 0, critico: 0, alcance: 0, cd_max: 0, tipo_dano: "" };
+    const sources = [`inv_cabo_${index}`, `inv_base_${index}`, `inv_mods_item_${index}`, `inv_raro_${index}`];
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    sources.forEach(s => {
+        let raw = (document.getElementById(s) ? document.getElementById(s).value : dados[s]);
+        if (raw && typeof raw === 'string' && raw.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(raw);
+                (parsed.attributes || []).forEach(attr => {
+                    if (b.hasOwnProperty(attr.attr)) b[attr.attr] += parseInt(attr.mod) || 0;
+                    if (attr.attr === 'tipo_dano' && attr.mod) b.tipo_dano = attr.mod;
+                });
+            } catch (e) { }
+        }
+    });
+
+    const cdAtual = parseInt(document.getElementById(`inv_cd_atual_${index}`)?.value) || 0;
+    const baseCdMax = parseInt(document.getElementById(`inv_cd_max_${index}`)?.value) || 10;
+    const totalCdMax = baseCdMax + b.cd_max;
+
+    const isBroken = cdAtual <= 0;
+    row.classList.toggle('broken-item', isBroken);
+
+    const isDamaged = cdAtual > 0 && (cdAtual / totalCdMax) < 0.3;
+    row.classList.toggle('damaged-item', isDamaged);
+
+    // 2. Sincronização automática com a página de Ataques (Armas Equipadas)
     const categoria = catEl.value;
     const nome = document.getElementById(`inv_nome_${index}`)?.value || "";
 
     if (categoria === 'armas' && nome.trim() !== "") {
-        const lowerNome = nome.trim().toLowerCase();
-
-        // Cálculo de bônus acumulados do item (Dano, Crítico, Alcance)
-        let b = { dano: 0, critico: 0, alcance: 0, tipo_dano: "" };
-        const sources = [`inv_cabo_${index}`, `inv_base_${index}`, `inv_mods_item_${index}`, `inv_raro_${index}`];
-        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-
-        sources.forEach(s => {
-            let raw = (document.getElementById(s) ? document.getElementById(s).value : dados[s]);
-            if (raw && typeof raw === 'string' && raw.startsWith('{')) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    (parsed.attributes || []).forEach(attr => {
-                        if (b.hasOwnProperty(attr.attr)) b[attr.attr] += parseInt(attr.mod) || 0;
-                        if (attr.attr === 'tipo_dano' && attr.mod) b.tipo_dano = attr.mod;
-                    });
-                } catch (e) { }
-            }
-        });
-
         const formatBonus = (val, bonus) => (bonus !== 0 && val) ? `${val}${bonus > 0 ? '+' : ''}${bonus}` : val;
         const baseTipoDano = document.getElementById(`inv_tipo_dano_${index}`)?.value || "";
 
@@ -280,7 +288,7 @@ function removerItemUI(index) {
     }, `Remover ${nomeItem}?`);
 }
 
-function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "outros", raridade = "comum", tipo = "simples_uma_mao", idIndex = null, equipado = false, attr_mod = "nenhum", val_mod = 0, alcance = "toque", dano = "", defesa_bonus = 0, efeito = "", cabo = "{}", base = "{}", defesa_penalidade = 0, modificacoes = "{}", critico = "", tipo_dano = "", teste = "", atk_tipo = "Corpo-a-Corpo") {
+function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "outros", raridade = "comum", tipo = "simples_uma_mao", idIndex = null, equipado = false, attr_mod = "nenhum", val_mod = 0, alcance = "toque", dano = "", defesa_bonus = 0, efeito = "", cabo = "{}", base = "{}", defesa_penalidade = 0, modificacoes = "{}", critico = "", tipo_dano = "", teste = "", atk_tipo = "Corpo-a-Corpo", cd_atual = 10, cd_max = 10) {
     const container = document.getElementById('items-container');
     if (!container) return;
 
@@ -291,12 +299,14 @@ function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "o
         { v: "armas", t: "Armas" },
         { v: "armaduras", t: "Armaduras" },
         { v: "consumiveis", t: "Consumíveis" },
+        { v: "item_magico", t: "Itens Mágicos" },
         { v: "itens", t: "Itens" },
         { v: "outros", t: "Outros" }
     ];
 
     const row = document.createElement('div');
-    row.className = 'item-row';
+    row.className = 'item-row draggable'; // Add draggable class
+    row.draggable = true; // Make the row draggable
     if (equipado) row.classList.add('equipped-row');
     row.dataset.index = index;
 
@@ -349,6 +359,8 @@ function adicionarItemUI(nome = "", peso = 0, qtd = 1, desc = "", categoria = "o
             <input type="hidden" id="inv_peso_${index}" class="save-input item-peso" value="${peso || 0}">
             <input type="hidden" id="inv_qtd_${index}" class="save-input item-qtd" value="${qtd || 1}">
             <input type="hidden" id="inv_desc_${index}" class="save-input" value="${desc || ''}">
+            <input type="hidden" id="inv_cd_atual_${index}" class="save-input" value="${cd_atual}">
+            <input type="hidden" id="inv_cd_max_${index}" class="save-input" value="${cd_max}">
         </div>
     `;
     container.appendChild(row);

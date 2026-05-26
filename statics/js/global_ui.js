@@ -7,13 +7,6 @@ window.aplicarBonusVisuais = function (bonusItens, dadosObj, breakdown = null) {
         const el = document.getElementById(id);
         if (!el) return;
         const bonus = bonusItens[id] || 0;
-        if (id === 'status_info' && breakdown) {
-            let details = [`Base: ${dadosObj[id] || "0"}`];
-            if (bonus !== 0) details.push(`Bônus: ${bonus > 0 ? '+' : ''}${bonus}`);
-            const src = [...(breakdown.itens[id] || []), ...(breakdown.poderes[id] || []), ...(breakdown.aliados[id] || [])];
-            src.forEach(s => details.push(s));
-            el.title = `Total: ${el.value} (${details.join(' | ')})`;
-        }
         el.style.color = bonus > 0 ? '#4ade80' : (bonus < 0 ? '#ef4444' : 'var(--text-main)');
     });
 }

@@ -173,6 +173,38 @@
   box-shadow: 0 0 10px var(--primary-glow);
 }
 
+/* Estilos para Drag and Drop */
+.draggable {
+  cursor: grab !important;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+.dragging {
+  opacity: 0.3 !important;
+  filter: grayscale(1) blur(1px);
+  border: 1px dashed var(--primary-color) !important;
+  transform: scale(0.98);
+}
+
+.hab-row-grid.drag-insert-top,
+.pod-row-grid.drag-insert-top,
+.mag-row-grid.drag-insert-top,
+.atk-row-grid.drag-insert-top {
+  border-top: 2px solid var(--primary-color) !important;
+  box-shadow: 0 -4px 8px var(--primary-glow);
+}
+
+.hab-row-grid.drag-insert-bottom,
+.pod-row-grid.drag-insert-bottom,
+.mag-row-grid.drag-insert-bottom,
+.atk-row-grid.drag-insert-bottom {
+  border-bottom: 2px solid var(--primary-color) !important;
+  box-shadow: 0 4px 8px var(--primary-glow);
+}
+
 /* --- Cores e Efeitos de Raridade de Itens --- */
 .rarity-comum {
   color: #ffffff !important;

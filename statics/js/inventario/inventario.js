@@ -38,6 +38,21 @@ function abrirModalItem(index) {
     const desc = document.getElementById(`inv_desc_${index}`)?.value || "";
     const raroRaw = document.getElementById(`inv_raro_${index}`)?.value || "{}";
     const categoria = document.getElementById(`inv_cat_${index}`)?.value || "outros";
+    const cdAtual = document.getElementById(`inv_cd_atual_${index}`)?.value || 10;
+    const cdMax = parseInt(document.getElementById(`inv_cd_max_${index}`)?.value) || 10;
+
+    // Calcula bônus de CD_MAX para exibição
+    let cdBonus = 0;
+    const sources = [`inv_cabo_${index}`, `inv_base_${index}`, `inv_mods_item_${index}`, `inv_raro_${index}`];
+    sources.forEach(s => {
+        const val = document.getElementById(s)?.value;
+        if (val && val.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(val);
+                (parsed.attributes || []).forEach(a => { if (a.attr === 'cd_max') cdBonus += parseInt(a.mod) || 0; });
+            } catch (e) {}
+        }
+    });
 
     let raroData = { raridade: 'comum' };
     try {
@@ -64,7 +79,15 @@ function abrirModalItem(index) {
             <div class="grid-2-cols" style="margin-bottom: 15px;">
                 <div class="input-group"><label>Tipo de Dano</label>
                     <select id="modal_item_tipo_dano" class="inv-input">
-                        ${OPTIONS_TIPO_DANO.map(opt => `<option value="${opt.v}" ${tipoDano === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
+                        <optgroup label="Comuns">
+                            ${OPTIONS_TIPO_DANO_CATEGORIZADO.comum.map(opt => `<option value="${opt.v}" ${tipoDano === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
+                        </optgroup>
+                        <optgroup label="Elementais">
+                            ${OPTIONS_TIPO_DANO_CATEGORIZADO.elemental.map(opt => `<option value="${opt.v}" ${tipoDano === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
+                        </optgroup>
+                        <optgroup label="Outros">
+                            ${OPTIONS_TIPO_DANO_CATEGORIZADO.outros.map(opt => `<option value="${opt.v}" ${tipoDano === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
+                        </optgroup>
                     </select>
                 </div>
                 <div class="input-group"><label>Alcance</label>
@@ -72,10 +95,6 @@ function abrirModalItem(index) {
                         ${OPTIONS_ALCANCE.map(opt => `<option value="${opt.v}" ${alcance === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
                     </select>
                 </div>
-            </div>
-            <div class="grid-2-cols" style="gap: 10px; margin-bottom: 15px;">
-                <button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'cabo')">⚙ Definir Centro</button>
-                <button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'base')">⚙ Definir Base</button>
             </div>
         `;
     } else if (categoria === 'armaduras') {
@@ -102,6 +121,18 @@ function abrirModalItem(index) {
             </div>
         </div>
 
+        <div class="section-divider">Durabilidade (CD)</div>
+        <div class="grid-2-cols" style="margin-bottom: 15px;">
+            <div class="input-group">
+                <label>CD Atual</label>
+                <input type="number" id="modal_item_cd_atual" class="inv-input" value="${cdAtual}">
+            </div>
+            <div class="input-group">
+                <label>CD Máxima</label>
+                <input type="number" id="modal_item_cd_max" class="inv-input" value="${cdMax + cdBonus}">
+            </div>
+        </div>
+
         <div class="section-divider">Qualidade e Propriedades</div>
         <div class="grid-2-cols" style="align-items: end; gap: 10px; margin-bottom: 20px;">
             <div class="input-group">
@@ -115,6 +146,12 @@ function abrirModalItem(index) {
             <button type="button" class="btn-material-edit" style="height: 38px;" onclick="abrirModalModificacoes('${index}')">
                 ⚙ Modificações
             </button>
+        </div>
+
+        <div class="section-divider">Materiais de Composição</div>
+        <div class="grid-2-cols" style="gap: 10px; margin-bottom: 20px;">
+            <button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'cabo')">⚙ Definir Centro</button>
+            <button type="button" class="btn-material-edit" onclick="abrirModalMaterial('${index}', 'base')">⚙ Definir Base</button>
         </div>
 
         ${weaponArmorHtml}
@@ -229,11 +266,29 @@ function salvarDetalhesItem() {
     const peso = document.getElementById('modal_item_peso').value;
     const qtd = document.getElementById('modal_item_qtd').value;
     const desc = document.getElementById('modal_item_desc').value;
+    const cdAtual = document.getElementById('modal_item_cd_atual').value;
+    const cdMaxTotal = parseInt(document.getElementById('modal_item_cd_max').value) || 10;
+
+    // Calcula o bônus atual para subtrair e salvar apenas o valor base
+    let cdBonus = 0;
+    const sources = [`inv_cabo_${idx}`, `inv_base_${idx}`, `inv_mods_item_${idx}`, `inv_raro_${idx}`];
+    sources.forEach(s => {
+        const val = document.getElementById(s)?.value;
+        if (val && val.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(val);
+                (parsed.attributes || []).forEach(a => { if (a.attr === 'cd_max') cdBonus += parseInt(a.mod) || 0; });
+            } catch (e) {}
+        }
+    });
+    const baseCdMax = cdMaxTotal - cdBonus;
 
     // Salva de volta nos inputs ocultos da linha
     document.getElementById(`inv_peso_${idx}`).value = peso;
     document.getElementById(`inv_qtd_${idx}`).value = qtd;
     document.getElementById(`inv_desc_${idx}`).value = desc;
+    document.getElementById(`inv_cd_atual_${idx}`).value = cdAtual;
+    document.getElementById(`inv_cd_max_${idx}`).value = baseCdMax;
 
     // Salva campos de combate/defesa se eles estiverem presentes no modal
     const danoInput = document.getElementById('modal_item_dano');
@@ -361,7 +416,8 @@ function abrirModalMaterial(index, tipo) {
     materialSendoEditadoTipo = tipo;
     const modal = document.getElementById('modal-material-details');
     const container = document.getElementById('material-attributes-container');
-    if (!modal || !container) return;
+    const nomeInput = document.getElementById('modal_material_nome');
+    if (!modal || !container || !nomeInput) return;
 
     const fieldId = tipo === 'cabo' ? `inv_cabo_${index}` : `inv_base_${index}`;
     const matRaw = document.getElementById(fieldId)?.value || "{}";
@@ -370,7 +426,181 @@ function abrirModalMaterial(index, tipo) {
         matData = matRaw.startsWith('{') ? JSON.parse(matRaw) : { nome: matRaw, attributes: [] };
     } catch (e) { }
 
-    document.getElementById('modal_material_nome').value = matData.nome || "";
+    // Elementos do modal
+    let selectorsWrapper = document.getElementById('modal_material_selectors_wrapper');
+    let selectCategory = document.getElementById('modal_material_category_selector'), selectSubcategory, selectMat;
+    let descContainer = document.getElementById('modal_material_desc_info');
+
+    // Cria o wrapper flexível e os selects se não existirem
+    if (!selectorsWrapper) {
+        selectorsWrapper = document.createElement('div');
+        selectorsWrapper.id = 'modal_material_selectors_wrapper';
+        selectorsWrapper.style = "display: flex; gap: 8px; margin-bottom: 12px; align-items: center;";
+        nomeInput.parentNode.insertBefore(selectorsWrapper, nomeInput);
+
+        const createSel = (id, flex) => {
+            const s = document.createElement('select');
+            s.id = id; s.className = 'inv-input'; s.style.flex = flex;
+            selectorsWrapper.appendChild(s);
+            return s;
+        };
+
+        selectCategory = createSel('modal_material_category_selector', '1');
+        selectSubcategory = createSel('modal_material_subcategory_selector', '1');
+        selectMat = createSel('modal_material_selector', '1.2');
+
+        // Botão para aplicar bônus padrão manualmente
+        const btnAplicar = document.createElement('button');
+        btnAplicar.id = 'btn_aplicar_bonus_material';
+        btnAplicar.type = 'button';
+        btnAplicar.className = 'btn-qty';
+        btnAplicar.title = "Aplicar bônus padrão deste material";
+        btnAplicar.innerHTML = '⚡';
+        btnAplicar.style.display = 'none';
+        selectorsWrapper.appendChild(btnAplicar);
+
+        descContainer = document.createElement('div');
+        descContainer.id = 'modal_material_desc_info';
+        descContainer.style = "font-size: 0.8rem; color: #888; font-style: italic; margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 4px; display: none;";
+        nomeInput.parentNode.insertBefore(descContainer, nomeInput.nextSibling);
+
+        // Adiciona listeners para os novos selects
+        selectCategory.onchange = updateSubcategorySelect;
+        selectSubcategory.onchange = updateMaterialSelect;
+        selectMat.onchange = handleMaterialSelection;
+    } else {
+        selectSubcategory = document.getElementById('modal_material_subcategory_selector');
+        selectMat = document.getElementById('modal_material_selector');
+    }
+
+    // Atualiza o comportamento do botão para o item atual toda vez que o modal abre
+    const btnAplicar = document.getElementById('btn_aplicar_bonus_material');
+    if (btnAplicar) {
+        btnAplicar.onclick = () => {
+            const matInfo = buscarMaterial(selectMat.value);
+            if (!matInfo) return;
+            
+            const catEl = document.getElementById(`inv_cat_${index}`);
+            // Garante que a categoria seja lida corretamente mesmo que o select mude
+            const catItem = (catEl ? catEl.value : "outros").toLowerCase().trim();
+
+            let attrs = [];
+            if (matInfo.attributes && Array.isArray(matInfo.attributes)) {
+                attrs = matInfo.attributes;
+            } else if (matInfo.attributes && typeof matInfo.attributes === 'object') {
+                if (catItem === 'armas') {
+                    attrs = matInfo.attributes['armas'] || [];
+                } else if (catItem === 'itens' || catItem === 'item_magico') {
+                    attrs = matInfo.attributes['itens'] || [];
+                } else {
+                    attrs = matInfo.attributes['geral'] || [];
+                }
+            }
+            if (attrs.length > 0) aplicarBuffsPredefinidos(attrs);
+        };
+    }
+
+    // Popula o select de categoria
+    selectCategory.innerHTML = `
+        <option value="">-- Categoria --</option>
+        <option value="geologicos">Geológicos</option>
+        <option value="naturais">Naturais</option>
+        <option value="animais">Animais</option>
+    `;
+
+    // Tenta pré-selecionar categoria e subcategoria se o material já estiver definido
+    let initialCategory = '';
+    let initialSubcategory = '';
+    if (matData.nome) {
+        const matInfo = getMaterialCategoryInfo(matData.nome);
+        if (matInfo) {
+            initialCategory = matInfo.category;
+            initialSubcategory = matInfo.subcategory;
+        } else if (!getListaTodosMateriais().includes(matData.nome)) {
+            // Se o material não está no banco de dados, assume que é "Outro"
+            selectCategory.value = ''; // Nenhuma categoria selecionada
+            selectSubcategory.value = ''; // Nenhuma subcategoria selecionada
+            selectMat.value = 'outro'; // Seleciona "Outro" no material
+            nomeInput.style.display = 'block';
+            nomeInput.value = matData.nome;
+        }
+    }
+
+    selectCategory.value = initialCategory;
+    updateSubcategorySelect(initialSubcategory || ""); // Atualiza subcategoria e materiais
+
+    // Função para atualizar o select de subcategoria
+    function updateSubcategorySelect(preselectedSub = '') {
+        const selectedCategory = selectCategory.value;
+        selectSubcategory.innerHTML = `<option value="">-- Tipo --</option>`;
+        if (selectedCategory) {
+            selectSubcategory.style.display = 'block';
+            selectSubcategory.innerHTML += `
+                <option value="comum">Comum</option>
+                <option value="marcial">Marcial</option>
+            `;
+        } else {
+            selectSubcategory.style.display = 'none';
+        }
+        selectSubcategory.value = preselectedSub;
+        updateMaterialSelect();
+    }
+
+    // Função para atualizar o select de materiais
+    function updateMaterialSelect() {
+        const selectedCategory = selectCategory.value, selectedSubcategory = selectSubcategory.value;
+        selectMat.innerHTML = `<option value="">-- Material --</option>`;
+
+        if (selectedCategory && selectedSubcategory) {
+            selectMat.style.display = 'block';
+            const materials = getMaterialsByCategoryAndSubcategory(selectedCategory, selectedSubcategory);
+            selectMat.innerHTML += materials.map(m => `<option value="${m.nome}" ${matData.nome === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('');
+            selectMat.innerHTML += `<option value="outro" ${matData.nome && !getListaTodosMateriais().includes(matData.nome) ? 'selected' : ''}>Outro...</option>`;
+            selectMat.value = matData.nome || (matData.nome && !getListaTodosMateriais().includes(matData.nome) ? 'outro' : "");
+        } else {
+            selectMat.style.display = 'none';
+            selectMat.value = "";
+        }
+        handleMaterialSelection(); // Garante que o estado do nomeInput e descContainer seja atualizado
+    }
+
+    // Função para lidar com a seleção final do material
+    function handleMaterialSelection() {
+        const matVal = selectMat.value;
+        const btn = document.getElementById('btn_aplicar_bonus_material');
+
+        if (matVal === 'outro') {
+            nomeInput.style.display = 'block';
+            if (descContainer) descContainer.style.display = 'none';
+            if (btn) btn.style.display = 'none';
+            nomeInput.focus();
+        } else {
+            nomeInput.style.display = 'none';
+            nomeInput.value = matVal;
+            const matInfo = buscarMaterial(matVal);
+            
+            if (btn) btn.style.display = matInfo ? 'flex' : 'none';
+
+            if (matInfo) {
+                if (matInfo.desc && descContainer) {
+                    descContainer.innerText = matInfo.desc;
+                    descContainer.style.display = 'block';
+                } else if (descContainer) {
+                    descContainer.style.display = 'none';
+                }
+            } else if (descContainer) {
+                descContainer.style.display = 'none';
+            }
+        }
+    }
+
+    // Define o valor inicial do nomeInput e sua visibilidade
+    nomeInput.value = matData.nome || "";
+    nomeInput.style.display = (selectMat.value === 'outro') ? 'block' : 'none';
+
+    // Estado inicial da descrição ao abrir
+    handleMaterialSelection(); // Chama para garantir que a descrição e o nomeInput estejam corretos no carregamento
+
     document.getElementById('modal-material-title').innerText = tipo === 'cabo' ? 'Detalhes do Centro (Cabo)' : 'Detalhes da Base (Lâmina/Corpo)';
 
     container.innerHTML = '';
@@ -379,6 +609,21 @@ function abrirModalMaterial(index, tipo) {
     }
 
     modal.style.display = 'flex';
+}
+
+/**
+ * Aplica automaticamente os buffs de um material predefinido após confirmação
+ */
+function aplicarBuffsPredefinidos(attributes) {
+    const container = document.getElementById('material-attributes-container');
+    if (!container) return;
+
+    showConfirm("Este material possui bônus padrão. Deseja aplicá-los agora? Isso substituirá os bônus atuais desta parte.", () => {
+        container.innerHTML = '';
+        attributes.forEach(a => {
+            adicionarAtributoMaterial(a.attr, a.mod, a.isAdv || false);
+        });
+    });
 }
 
 function fecharModalMaterial() {
@@ -440,6 +685,113 @@ function salvarDetalhesMaterial() {
     if (typeof atualizarTudo === 'function') atualizarTudo();
 }
 
+// Drag and Drop functionality for inventory items
+let draggedItem = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const itemsContainer = document.getElementById('items-container');
+    if (!itemsContainer) return;
+
+    itemsContainer.addEventListener('dragstart', (e) => {
+        draggedItem = e.target.closest('.item-row');
+        if (draggedItem) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedItem.dataset.index);
+            setTimeout(() => {
+                draggedItem.classList.add('dragging');
+            }, 0);
+        }
+    });
+
+    itemsContainer.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Allow drop
+        const target = e.target.closest('.item-row');
+        if (target && target !== draggedItem) {
+            // Remove indicadores de outros itens para evitar confusão
+            itemsContainer.querySelectorAll('.item-row').forEach(row => 
+                row.classList.remove('drag-insert-top', 'drag-insert-bottom')
+            );
+
+            // Detecta se o mouse está na metade superior ou inferior do item alvo
+            const rect = target.getBoundingClientRect();
+            const isAfter = e.clientY > rect.top + rect.height / 2;
+            
+            target.classList.add(isAfter ? 'drag-insert-bottom' : 'drag-insert-top');
+        }
+    });
+
+    itemsContainer.addEventListener('dragleave', (e) => {
+        const target = e.target.closest('.item-row');
+        if (target) {
+            target.classList.remove('drag-insert-top', 'drag-insert-bottom');
+        }
+    });
+
+    itemsContainer.addEventListener('drop', (e) => {
+        e.preventDefault();
+
+        if (draggedItem) {
+            const dropTarget = e.target.closest('.item-row');
+            if (dropTarget && dropTarget !== draggedItem) {
+                const rect = dropTarget.getBoundingClientRect();
+                const isAfter = e.clientY > rect.top + rect.height / 2;
+
+                // Insere antes ou depois conforme detectado pelo mouse
+                if (isAfter) dropTarget.after(draggedItem);
+                else dropTarget.before(draggedItem);
+                
+                saveInventoryOrder(); // Save the new order
+            }
+        }
+        // Limpa todos os indicadores visuais ao soltar
+        itemsContainer.querySelectorAll('.item-row').forEach(row => 
+            row.classList.remove('drag-insert-top', 'drag-insert-bottom')
+        );
+    });
+
+    itemsContainer.addEventListener('dragend', () => {
+        if (draggedItem) {
+            draggedItem.classList.remove('dragging');
+            draggedItem = null;
+        }
+        document.querySelectorAll('.item-row').forEach(row => row.classList.remove('drag-over'));
+    });
+});
+
+// New functions for saving and loading inventory order
+function saveInventoryOrder() {
+    const container = document.getElementById('items-container');
+    if (!container) return;
+    const order = Array.from(container.children)
+        .filter(child => child.classList.contains('item-row'))
+        .map(row => row.dataset.index);
+    localStorage.setItem(STORAGE_KEY_INVENTORY_ORDER, JSON.stringify(order));
+}
+
+function loadInventoryOrder() {
+    const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_INVENTORY_ORDER));
+    if (savedOrder && savedOrder.length > 0) {
+        const container = document.getElementById('items-container');
+        if (!container) return;
+        const items = new Map();
+        Array.from(container.children).forEach(row => {
+            if (row.classList.contains('item-row')) {
+                items.set(row.dataset.index, row);
+            }
+        });
+
+        // Create a document fragment to minimize reflows
+        const fragment = document.createDocumentFragment();
+        savedOrder.forEach(id => {
+            const item = items.get(id);
+            if (item) {
+                fragment.appendChild(item);
+            }
+        });
+        container.appendChild(fragment); // Append the reordered fragment
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
@@ -476,14 +828,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 salvo[`inv_critico_${id}`] || "",
                 salvo[`inv_tipo_dano_${id}`] || "",
                 salvo[`inv_teste_${id}`] || "",
-                salvo[`inv_atk_tipo_${id}`] || "Corpo-a-Corpo"
+                salvo[`inv_atk_tipo_${id}`] || "Corpo-a-Corpo",
+                salvo[`inv_cd_atual_${id}`] !== undefined ? salvo[`inv_cd_atual_${id}`] : 10,
+                salvo[`inv_cd_max_${id}`] !== undefined ? salvo[`inv_cd_max_${id}`] : 10
             );
             atualizarEstiloBonus(id);
             atualizarEstiloRaridade(id); // Garante que a raridade visual seja aplicada no carregamento
         });
+
+        // Load custom order, if any. If not, the items remain in their original loaded order.
+        const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_INVENTORY_ORDER));
+        if (savedOrder && savedOrder.length > 0) {
+            loadInventoryOrder();
+        } else {
+            ordenarItens(); // If no custom order, apply default sorting
+        }
     }
 
-    ordenarItens();
     filtrarItens();
     atualizarTudo(); // Chama atualizarTudo uma única vez após carregar tudo
 });

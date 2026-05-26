@@ -8,7 +8,8 @@ function adicionarAtaqueUI(nome = "", teste = "", dano = "", critico = "", alcan
 
     const index = idIndex !== null ? idIndex : Date.now();
     const row = document.createElement('div');
-    row.className = 'item-row atk-row-grid';
+    row.className = 'item-row atk-row-grid draggable';
+    row.draggable = true;
     row.dataset.index = index;
 
     row.innerHTML = `

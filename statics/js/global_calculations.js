@@ -62,17 +62,35 @@ window.calcularBonusItens = function (dados) {
                 addBonus('movimentacao', -(parseInt(dados[`inv_defesa_penalidade_${id}`]) || 0), `${nome} (Peso)`);
             }
 
-            if (categoria === 'armas') {
-                ['cabo', 'base'].forEach(f => {
-                    const raw = dados[`inv_${f}_${id}`];
-                    if (raw && raw.startsWith('{')) {
-                        try {
-                            const mat = JSON.parse(raw);
-                            (mat.attributes || []).forEach(a => addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, parseInt(a.mod) || 0, `${nome} (${mat.nome})`));
-                        } catch (e) { }
-                    }
-                });
-            }
+            // Agora processa materiais para QUALQUER categoria de item equipado
+            ['cabo', 'base'].forEach(f => {
+                const raw = dados[`inv_${f}_${id}`];
+                if (raw && raw.startsWith('{')) {
+                    try {
+                        const mat = JSON.parse(raw);
+                        const matName = mat.nome || (f === 'cabo' ? 'Centro' : 'Base');
+
+                        let attributesToProcess = [];
+                        if (Array.isArray(mat.attributes)) {
+                            // Formato antigo/simples (Cobre, Madeira, etc)
+                            attributesToProcess = mat.attributes;
+                        } else if (mat.attributes && typeof mat.attributes === 'object') {
+                            // Formato novo/contextual (Ouro, Platina, etc)
+                            // Tenta pegar da categoria do item ou cai no 'geral'
+                            attributesToProcess = mat.attributes[categoria] || mat.attributes['geral'] || [];
+                        }
+
+                        if (attributesToProcess.length > 0) {
+                            attributesToProcess.forEach(a => {
+                                const val = parseInt(a.mod);
+                                if (!isNaN(val)) {
+                                    addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (${matName})`);
+                                }
+                            });
+                        }
+                    } catch (e) { }
+                }
+            });
         }
     });
     return { totals: totais, sources: fontes };
@@ -97,23 +115,56 @@ window.engineCalcularAtributos = function (dadosObj, bonusItens = {}, racaKey, b
         processarRaca(dadosObj.hibrido_raca_2);
     }
 
-    const attrs = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma", "aura"];
+    const attrs = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma", "aura", "status_info"];
 
     attrs.forEach(id => {
         const input = document.getElementById(id);
         const totalBonus = (bonusItens[id] || 0) + (bonusRaca[id] || 0);
         const modBonus = (modBonusRaca[id] || 0);
 
-        let base = input === document.activeElement ? (parseInt(input.value) || 0) - totalBonus : (parseInt(dadosObj[id]) || 10);
-        const total = base + totalBonus;
-        const finalMod = Math.floor((total - 10) / 2) + modBonus;
+        // 1. Calcula os bônus externos primeiro
+        let bonusExtraMod = 0;
+        let fonteExtraMod = "";
+        if (id === 'status_info') {
+            const modCarisma = cache.mods['carisma'] || 0;
+            if (modCarisma >= 3) {
+                bonusExtraMod = 1; // Bônus por ser influente
+                fonteExtraMod = "Carisma (Influência) (+1)";
+            } else if (modCarisma <= -1) {
+                bonusExtraMod = -1; // Penalidade por ser antisocial
+                fonteExtraMod = "Carisma (Antisocial) (-1)";
+            }
+        }
+
+        // Correção: Se for status_info, o padrão é 0. Para os demais atributos core, o padrão é 10.
+        const defaultValue = (id === 'status_info') ? 0 : 10;
+
+        // 2. Determina a BASE. Se estivermos editando, subtraímos os bônus do valor digitado.
+        let base = input === document.activeElement
+            ? (parseInt(input.value) || 0) - totalBonus - bonusExtraMod
+            : (dadosObj[id] !== undefined && dadosObj[id] !== "" ? parseInt(dadosObj[id]) : defaultValue);
+
+        if (isNaN(base)) base = defaultValue;
+
+        // 3. Soma tudo para o TOTAL final
+        const total = base + totalBonus + bonusExtraMod;
+
+        // Status Info não usa a fórmula de modificador (Total - 10) / 2
+        let finalMod = 0;
+        if (id !== 'status_info') {
+            finalMod = Math.floor((total - 10) / 2) + modBonus;
+        }
 
         const display = document.getElementById(`mod${id.charAt(0).toUpperCase() + id.slice(1)}`);
-        if (display) {
+        if (display && id !== 'status_info') {
             display.innerText = (finalMod >= 0 ? "+" : "") + finalMod;
+        }
+
+        if (input) {
             if (input && input !== document.activeElement) input.value = total;
 
             let details = [`Base: ${base}`];
+            if (fonteExtraMod) details.push(fonteExtraMod);
             if (bonusRaca[id]) details.push(`Raça: ${bonusRaca[id] > 0 ? '+' : ''}${bonusRaca[id]}`);
             if (modBonus !== 0) details.push(`Mod. Raça: ${modBonus > 0 ? '+' : ''}${modBonus}`);
 
@@ -122,11 +173,13 @@ window.engineCalcularAtributos = function (dadosObj, bonusItens = {}, racaKey, b
                     ...(breakdown.itens[id] || []),
                     ...(breakdown.poderes[id] || []),
                     ...(breakdown.habilidades[id] || []),
-                    ...(breakdown.aliados[id] || [])
+                    ...(breakdown.aliados[id] || []),
+                    ...(breakdown.racaManual[id] || []),
+                    ...(breakdown.event[id] || [])
                 ];
                 sources.forEach(s => details.push(s));
             }
-            if (input) input.title = `Total: ${total} (${details.join(' | ')})`;
+            input.title = `Total: ${total} (${details.join(' | ')})`;
         }
 
         dadosObj[id] = base;

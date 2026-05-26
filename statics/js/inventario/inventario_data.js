@@ -9,6 +9,8 @@ const OPTIONS_ATTR = [
     { v: "pm_max", t: "Mana Máx" }, { v: "defesa", t: "Defesa" }, { v: "movimentacao", t: "Movimento" },
     { v: "sanidade_max", t: "Sanidade Máx" }, { v: "status_info", t: "Status" },
     { v: "dano", t: "Arma: Dano" }, { v: "critico", t: "Arma: Crítico" }, { v: "alcance", t: "Arma: Alcance" },
+    { v: "cd_max", t: "Durabilidade (CD)" },
+    { v: "teste", t: "Arma: Acerto" },
     { v: "todas", t: "P: TODAS as Perícias" },
     { v: "acrobacia", t: "P: Acrobacia" }, { v: "adestramento", t: "P: Adestramento" },
     { v: "atuação", t: "P: Atuação" }, { v: "bloquear", t: "P: Bloquear" },
@@ -58,19 +60,31 @@ const OPTIONS_TAMANHO = [
     { v: "Enorme", t: "Enorme" }
 ];
 
+const OPTIONS_TIPO_DANO_CATEGORIZADO = {
+    comum: [
+        { v: "Corte", t: "Corte" }, { v: "Perfuração", t: "Perfuração" },
+        { v: "Impacto", t: "Impacto" }, { v: "Balistico", t: "Balistico" }
+    ],
+    elemental: [
+        { v: "Fogo", t: "Fogo" }, { v: "Fogo Verdadeiro", t: "Fogo Verdadeiro" }, { v: "Fumaça", t: "Fumaça" }, { v: "Lava", t: "Lava" },
+        { v: "Água", t: "Água" }, { v: "Água (SubElemento)", t: "Água (SubElemento)" }, { v: "Gelo", t: "Gelo" }, { v: "Sangue", t: "Sangue" },
+        { v: "Ar", t: "Ar" }, { v: "Ar (SubElemento)", t: "Ar (SubElemento)" }, { v: "Gás", t: "Gás" }, { v: "ATM", t: "ATM" },
+        { v: "Terra", t: "Terra" }, { v: "Terra (SubElemento)", t: "Terra (SubElemento)" }, { v: "Metal", t: "Metal" }, { v: "Cristal", t: "Cristal" },
+        { v: "Vida", t: "Vida" }, { v: "Morte", t: "Morte " },
+        { v: "Luz", t: "Luz" }, { v: "Escuridão", t: "Escuridão" },
+        { v: "Raio", t: "Raio" }, { v: "Energia", t: "Energia" }
+    ],
+    outros: [
+        { v: "Calor", t: "Calor" }, { v: "Frio", t: "Frio" },
+        { v: "Mágico", t: "Mágico" }, { v: "Veneno", t: "Veneno" }, { v: "Mental", t: "Mental" },
+        { v: "Explosivo", t: "Explosivo" }, { v: "Sangramento", t: "Sangramento" },
+        { v: "Outro", t: "Outro" }
+    ]
+};
+
+// Mantém a lista plana para compatibilidade em outros lugares do sistema
 const OPTIONS_TIPO_DANO = [
-    { v: "Corte", t: "Corte" },
-    { v: "Perfuração", t: "Perfuração" },
-    { v: "Impacto", t: "Impacto" },
-    { v: "Balistico", t: "Balistico" },
-    { v: "Fogo", t: "Fogo" },
-    { v: "Frio", t: "Frio" },
-    { v: "Veneno", t: "Veneno" },
-    { v: "Mental", t: "Mental" },
-    { v: "Luz", t: "Luz" },
-    { v: "Escuridão", t: "Escuridão" },
-    { v: "Vida", t: "Vida" },
-    { v: "Morte", t: "Morte" },
-    { v: "Energia", t: "Energia" },
-    { v: "Outro", t: "Outro" }
+    ...OPTIONS_TIPO_DANO_CATEGORIZADO.comum,
+    ...OPTIONS_TIPO_DANO_CATEGORIZADO.elemental,
+    ...OPTIONS_TIPO_DANO_CATEGORIZADO.outros
 ];

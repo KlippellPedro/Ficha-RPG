@@ -52,7 +52,8 @@ function adicionarMagiaUI(nome = "", tipo = "Comum", nivel = "1", custo = "", ti
     if (!container) return;
     const index = idIndex !== null ? idIndex : Date.now();
     const row = document.createElement('div');
-    row.className = 'item-row mag-row-grid';
+    row.className = 'item-row mag-row-grid draggable';
+    row.draggable = true;
     row.dataset.index = index;
     let optionsHtml = TIPOS_MAGIA.map(t => `<option value="${t}" ${tipo === t ? 'selected' : ''}>${t}</option>`).join('');
 

@@ -1,15 +1,20 @@
 // Detecta se estamos no contexto de um aliado via URL
 const urlParams = new URLSearchParams(window.location.search);
-const allyId = urlParams.get('allyId');
+window.allyId = urlParams.get('allyId');
 
 // Chaves de Armazenamento Dinâmicas: Se houver allyId, usa uma chave isolada
-const STORAGE_KEY = allyId ? `ally_${allyId}` : "ficha_rpg_dados";
-const HISTORY_KEY = allyId ? `ally_hist_${allyId}` : "ficha_rpg_historico";
+window.STORAGE_KEY = window.allyId ? `ally_${window.allyId}` : "ficha_rpg_dados";
+window.HISTORY_KEY = window.allyId ? `ally_hist_${window.allyId}` : "ficha_rpg_historico";
 
-const BACKUP_KEY = "ficha_rpg_backup";
-const THEME_KEY = "ficha_rpg_tema";
-const DLCS_KEY = "ficha_rpg_dlcs";
-const ALIADOS_KEY = "ficha_rpg_aliados";
+window.BACKUP_KEY = "ficha_rpg_backup";
+window.THEME_KEY = "ficha_rpg_tema";
+window.DLCS_KEY = "ficha_rpg_dlcs";
+window.ALIADOS_KEY = "ficha_rpg_aliados";
+window.STORAGE_KEY_INVENTORY_ORDER = window.allyId ? `ally_inv_order_${window.allyId}` : "ficha_rpg_inventario_order";
+window.STORAGE_KEY_HABILIDADES_ORDER = window.allyId ? `ally_hab_order_${window.allyId}` : "ficha_rpg_hab_order";
+window.STORAGE_KEY_PODERES_ORDER = window.allyId ? `ally_pod_order_${window.allyId}` : "ficha_rpg_pod_order";
+window.STORAGE_KEY_MAGIAS_ORDER = window.allyId ? `ally_mag_order_${window.allyId}` : "ficha_rpg_mag_order";
+window.STORAGE_KEY_ATAQUES_ORDER = window.allyId ? `ally_atk_order_${window.allyId}` : "ficha_rpg_atk_order";
 
 window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
     ficha: [
@@ -17,7 +22,8 @@ window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
         { v: "constituicao", t: "CON" }, { v: "inteligencia", t: "INT" }, { v: "sabedoria", t: "SAB" },
         { v: "carisma", t: "CAR" }, { v: "aura", t: "AUR" }, { v: "pv_max", t: "Vida Máx" },
         { v: "pm_max", t: "Mana Máx" }, { v: "defesa", t: "Defesa" }, { v: "movimentacao", t: "Movimento" },
-        { v: "sanidade_max", t: "Sanidade Máx" }, { v: "status_info", t: "Status" }
+        { v: "sanidade_max", t: "Sanidade Máx" }, { v: "status_info", t: "Status" },
+        { v: "cd_max", t: "Durabilidade (CD)" }
     ],
     pericia: [
         { v: "todas", t: "TODAS AS PERÍCIAS" },
@@ -38,6 +44,7 @@ window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
     arma: [
         { v: "dano", t: "Dano" },
         { v: "critico", t: "Crítico" },
+        { v: "teste", t: "Acerto" },
         { v: "alcance", t: "Alcance" },
         { v: "tipo_dano", t: "Tipo de Dano" }
     ],
@@ -112,7 +119,7 @@ function atualizarTudo() {
     inputsParaSalvar.forEach(input => {
         // Ignora campos de atributo e vantagens de perícia na coleta bruta.
         // Eles possuem lógica própria de Base vs Total nos motores específicos.
-        if (input.classList.contains('attr-input') || input.classList.contains('skill-adv')) return;
+        if (input.classList.contains('attr-input') || input.classList.contains('skill-adv') || input.id === 'status_info') return;
 
         const val = input.type === "checkbox" ? input.checked : input.value;
         dados[input.id] = val;
@@ -133,7 +140,7 @@ function atualizarTudo() {
     dados.xp_max = xpMax;
     const xpMaxEl = document.getElementById('xp_max');
     const xpMaxDisp = document.getElementById('xp_max_display');
-    
+
     // Coleta o XP atual diretamente do input ou do banco de dados do aliado
     const xpAtualEl = document.getElementById('xp_atual');
     const xpAtualVal = xpAtualEl ? (parseInt(xpAtualEl.value) || 0) : (parseInt(dados.xp_atual) || 0);
@@ -357,6 +364,11 @@ function atualizarTudo() {
         atualizarPericias(nivelTotal, infoAttr.mods, bonusItens, dados, breakdown);
     }
 
+    // Atualiza cores e tooltips de Status, Defesa e Movimentação
+    if (typeof aplicarBonusVisuais === 'function') {
+        aplicarBonusVisuais(bonusItens, dados, breakdown);
+    }
+
     if (typeof atualizarAtaques === 'function') atualizarAtaques(nivelTotal, infoAttr.mods, bonusItens);
     if (typeof atualizarRacaUI === 'function') atualizarRacaUI(racaKey); // Nova chamada para atualizar campos de raça
     if (typeof atualizarCarga === 'function') atualizarCarga(infoAttr, dados);
@@ -390,7 +402,7 @@ function alterarValor(id, delta) {
 
 window.currentImgTargetId = null; // Armazena se estamos editando ficha principal ou um aliado específico
 
-window.triggerCharImageInput = function(container) {
+window.triggerCharImageInput = function (container) {
     const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
     if (dados.foto) {
         window.abrirModalGerenciarImagem(null); // null indica que usa STORAGE_KEY
@@ -400,18 +412,18 @@ window.triggerCharImageInput = function(container) {
     }
 };
 
-window.abrirModalGerenciarImagem = function(targetId) {
+window.abrirModalGerenciarImagem = function (targetId) {
     window.currentImgTargetId = targetId;
     const key = targetId || STORAGE_KEY;
     const dados = JSON.parse(localStorage.getItem(key)) || {};
-    
+
     const modal = document.getElementById('modal-image-manager');
     const preview = document.getElementById('image-manager-preview');
-    
+
     if (!modal || !preview || !dados.foto) return;
 
     preview.src = dados.foto;
-    
+
     // Carrega valores salvos ou padrões
     document.getElementById('img-manager-zoom').value = dados.foto_zoom || 1;
     document.getElementById('img-manager-x').value = dados.foto_x || 50;
@@ -421,12 +433,12 @@ window.abrirModalGerenciarImagem = function(targetId) {
     modal.style.display = 'flex';
 };
 
-window.fecharModalGerenciarImagem = function() {
+window.fecharModalGerenciarImagem = function () {
     const modal = document.getElementById('modal-image-manager');
     if (modal) modal.style.display = 'none';
 };
 
-window.atualizarPreviewAjuste = function() {
+window.atualizarPreviewAjuste = function () {
     const preview = document.getElementById('image-manager-preview');
     const zoom = document.getElementById('img-manager-zoom').value;
     const x = document.getElementById('img-manager-x').value;
@@ -439,7 +451,7 @@ window.atualizarPreviewAjuste = function() {
     }
 };
 
-window.salvarAjustesImagem = function() {
+window.salvarAjustesImagem = function () {
     const key = window.currentImgTargetId || STORAGE_KEY;
     const dados = JSON.parse(localStorage.getItem(key)) || {};
 
@@ -449,7 +461,7 @@ window.salvarAjustesImagem = function() {
 
     localStorage.setItem(key, JSON.stringify(dados));
     window.fecharModalGerenciarImagem();
-    
+
     // Se estivermos na ficha, atualiza o avatar da ficha
     if (window.location.pathname.includes('ficha.html')) {
         const mainImg = document.getElementById('char-avatar-img');
@@ -460,7 +472,7 @@ window.salvarAjustesImagem = function() {
     showNotification("Ajustes de imagem salvos!", "success");
 };
 
-window.removerImagem = function() {
+window.removerImagem = function () {
     showConfirm("Deseja remover a foto permanentemente?", () => {
         const key = window.currentImgTargetId || STORAGE_KEY;
         const dados = JSON.parse(localStorage.getItem(key)) || {};
@@ -476,7 +488,7 @@ window.removerImagem = function() {
     });
 };
 
-window.trocarImagemDesdeModal = function() {
+window.trocarImagemDesdeModal = function () {
     window.fecharModalGerenciarImagem();
     // Se window.currentImgTargetId for nulo, estamos na ficha principal
     if (!window.currentImgTargetId) {
@@ -488,7 +500,7 @@ window.trocarImagemDesdeModal = function() {
     }
 };
 
-window.aplicarEstilosAvatar = function(imgEl, dados) {
+window.aplicarEstilosAvatar = function (imgEl, dados) {
     if (!imgEl || !dados) return;
     const zoom = dados.foto_zoom || 1;
     const x = dados.foto_x || 50;
@@ -500,7 +512,7 @@ window.aplicarEstilosAvatar = function(imgEl, dados) {
     imgEl.style.transformOrigin = `${x}% ${y}%`;
 };
 
-window.salvarImagemPersonagem = function(input) {
+window.salvarImagemPersonagem = function (input) {
     const file = input.files[0];
     if (!file) return;
 
@@ -518,7 +530,7 @@ window.salvarImagemPersonagem = function(input) {
         dados.foto_zoom = 1;
         dados.foto_x = 50;
         dados.foto_y = 50;
-        
+
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
 
         const img = document.getElementById('char-avatar-img');
