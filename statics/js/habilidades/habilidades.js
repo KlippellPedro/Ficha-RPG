@@ -86,9 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (salvo) {
         const ids = new Set();
         Object.keys(salvo).forEach(k => { if (k.startsWith('hab_nome_')) ids.add(k.replace('hab_nome_', '')); });
-        Array.from(ids).sort().forEach(idx => {
-            adicionarHabilidadeUI(salvo[`hab_nome_${idx}`], salvo[`hab_tipo_${idx}`], salvo[`hab_custo_${idx}`], salvo[`hab_tipo_custo_${idx}`], salvo[`hab_desc_${idx}`], parseInt(idx), salvo[`hab_duracao_${idx}`], salvo[`hab_alcance_${idx}`], salvo[`hab_acao_${idx}`], salvo[`hab_classe_${idx}`], salvo[`hab_mods_${idx}`]);
-        });
+
+        // Ordenação segura para IDs numéricos e strings (auto_...)
+        Array.from(ids)
+            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+            .forEach(idx => {
+                adicionarHabilidadeUI(salvo[`hab_nome_${idx}`], salvo[`hab_tipo_${idx}`], salvo[`hab_custo_${idx}`], salvo[`hab_tipo_custo_${idx}`], salvo[`hab_desc_${idx}`], idx, salvo[`hab_duracao_${idx}`], salvo[`hab_alcance_${idx}`], salvo[`hab_acao_${idx}`], salvo[`hab_classe_${idx}`], salvo[`hab_mods_${idx}`]);
+            });
 
         loadHabilidadesOrder();
     }
@@ -97,7 +101,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('habilidades-container');
     let draggedItem = null;
 
+    // Garante que a seleção de texto funcione desativando o drag ao clicar em inputs
+    container.addEventListener('mousedown', (e) => {
+        const row = e.target.closest('.draggable');
+        if (!row) return;
+        if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+            row.draggable = false;
+        } else {
+            row.draggable = true;
+        }
+    });
+
     container.addEventListener('dragstart', (e) => {
+        // Bloqueia o arrasto se o clique originar em campos de texto, botões ou seletores
+        if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+            e.preventDefault();
+            return;
+        }
         draggedItem = e.target.closest('.draggable');
         if (draggedItem) {
             e.dataTransfer.effectAllowed = 'move';

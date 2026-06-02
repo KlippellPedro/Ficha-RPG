@@ -289,12 +289,19 @@ body.hp-critical .critical-vignette {
   width: 100%;
 }
 
-/* Grids específicas para Poderes e Habilidades (7 colunas após unificação) */
+/* Grids específicas para Poderes, Habilidades e Magias */
 .pod-row-grid,
 .hab-row-grid {
   display: grid !important;
   grid-template-columns: 2fr 160px 180px 50px 70px 50px 40px !important;
   gap: 10px;
+}
+
+.mag-row-grid {
+  display: grid !important;
+  grid-template-columns: 2fr 120px 100px 160px 50px 70px 50px 40px !important;
+  gap: 10px;
+  align-items: center;
 }
 
 .ficha-header-main {

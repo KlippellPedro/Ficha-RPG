@@ -211,8 +211,8 @@
     height: 40px !important;
     font-size: 1.2rem !important;
     justify-self: end !important;
-    background: var(--primary-glow) !important;
-    border: 1px solid var(--primary-color) !important;
+    background: transparent !important;
+    border: none !important;
     color: var(--primary-color) !important;
     border-radius: 8px !important;
     opacity: 0.7 !important;
@@ -224,7 +224,6 @@
   }
   html body .atk-row-grid .btn-remove-class:hover {
     opacity: 1 !important;
-    background: var(--primary-color) !important;
-    color: black !important;
+    color: var(--primary-color) !important;
   }
 }

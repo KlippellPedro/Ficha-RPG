@@ -7,6 +7,12 @@ window.exportarFicha = function () {
     const pacote = {
         dados: JSON.parse(localStorage.getItem(STORAGE_KEY)),
         historico: JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"),
+        habilidadesOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_HABILIDADES_ORDER) || "[]"),
+        poderesOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_PODERES_ORDER) || "[]"),
+        magiasOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_MAGIAS_ORDER) || "[]"),
+        ataquesOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_ATAQUES_ORDER) || "[]"),
+        inventarioOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_INVENTORY_ORDER) || "[]"),
+        notasOrder: JSON.parse(localStorage.getItem(window.STORAGE_KEY_NOTAS_ORDER) || "[]"),
         exportadoEm: new Date().toLocaleString('pt-BR'),
         versaoSistema: "2.5"
     };
@@ -28,6 +34,12 @@ window.importarFicha = function (event) {
             const dados = imp.dados || imp;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
             if (imp.historico) localStorage.setItem(HISTORY_KEY, JSON.stringify(imp.historico));
+            if (imp.habilidadesOrder) localStorage.setItem(STORAGE_KEY_HABILIDADES_ORDER, JSON.stringify(imp.habilidadesOrder));
+            if (imp.poderesOrder) localStorage.setItem(STORAGE_KEY_PODERES_ORDER, JSON.stringify(imp.poderesOrder));
+            if (imp.magiasOrder) localStorage.setItem(STORAGE_KEY_MAGIAS_ORDER, JSON.stringify(imp.magiasOrder));
+            if (imp.ataquesOrder) localStorage.setItem(STORAGE_KEY_ATAQUES_ORDER, JSON.stringify(imp.ataquesOrder));
+            if (imp.notasOrder) localStorage.setItem(window.STORAGE_KEY_NOTAS_ORDER, JSON.stringify(imp.notasOrder));
+            if (imp.inventarioOrder) localStorage.setItem(STORAGE_KEY_INVENTORY_ORDER, JSON.stringify(imp.inventarioOrder));
             showNotification("Ficha importada!", "success");
             setTimeout(() => location.reload(), 1000);
         } catch (err) { showNotification("Arquivo inválido.", "error"); }

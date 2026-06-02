@@ -97,14 +97,14 @@ document.addEventListener('DOMContentLoaded', () => {
         .map(k => k.replace('poder_nome_', ''));
 
     if (indices.length > 0) {
-        indices.sort((a, b) => parseInt(a) - parseInt(b)).forEach(idx => {
+        indices.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach(idx => {
             adicionarPoderUI(
                 salvo[`poder_nome_${idx}`] || "",    // 1. nome
                 salvo[`poder_tipo_${idx}`] || "Poder de Classe", // 2. tipo
                 salvo[`poder_custo_${idx}`] || "",   // 3. custo
                 salvo[`poder_tipo_custo_${idx}`] || "PM", // 4. tipoCusto
                 salvo[`poder_desc_${idx}`] || "",    // 5. desc
-                parseInt(idx),                       // 6. idIndex
+                idx,                                 // 6. idIndex (Mantém como string para evitar NaN)
                 salvo[`poder_duracao_${idx}`] || "", // 7. duracao
                 salvo[`poder_alcance_${idx}`] || "", // 8. alcance
                 salvo[`poder_acao_${idx}`] || "",    // 9. acao
@@ -115,6 +115,59 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         });
     }
+
+    // Aplica a ordem personalizada salva
+    loadPoderesOrder();
+
+    // Lógica de Drag and Drop para Poderes
+    const container = document.getElementById('poderes-container');
+    let draggedItem = null;
+
+    // Garante que a seleção de texto funcione desativando o drag ao clicar em inputs
+    container.addEventListener('mousedown', (e) => {
+        const row = e.target.closest('.draggable');
+        if (!row) return;
+        if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+            row.draggable = false;
+        } else {
+            row.draggable = true;
+        }
+    });
+
+    container.addEventListener('dragstart', (e) => {
+        // Bloqueia o arrasto se o clique originar em campos de texto, botões ou seletores
+        if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+            e.preventDefault();
+            return;
+        }
+        draggedItem = e.target.closest('.draggable');
+        if (draggedItem) {
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => draggedItem.classList.add('dragging'), 0);
+        }
+    });
+
+    container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const target = e.target.closest('.draggable');
+        if (target && target !== draggedItem) {
+            const rect = target.getBoundingClientRect();
+            const isAfter = e.clientY > rect.top + rect.height / 2;
+            if (isAfter) target.after(draggedItem);
+            else target.before(draggedItem);
+        }
+    });
+
+    container.addEventListener('drop', (e) => {
+        e.preventDefault();
+        savePoderesOrder();
+        container.querySelectorAll('.draggable').forEach(row => row.classList.remove('drag-insert-top', 'drag-insert-bottom'));
+    });
+
+    container.addEventListener('dragend', () => {
+        if (draggedItem) draggedItem.classList.remove('dragging');
+        draggedItem = null;
+    });
 
     // Atualiza o dropdown de filtros para as classes/origens
     atualizarFiltroPoderesUI();

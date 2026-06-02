@@ -15,6 +15,7 @@ window.STORAGE_KEY_HABILIDADES_ORDER = window.allyId ? `ally_hab_order_${window.
 window.STORAGE_KEY_PODERES_ORDER = window.allyId ? `ally_pod_order_${window.allyId}` : "ficha_rpg_pod_order";
 window.STORAGE_KEY_MAGIAS_ORDER = window.allyId ? `ally_mag_order_${window.allyId}` : "ficha_rpg_mag_order";
 window.STORAGE_KEY_ATAQUES_ORDER = window.allyId ? `ally_atk_order_${window.allyId}` : "ficha_rpg_atk_order";
+window.STORAGE_KEY_NOTAS_ORDER = window.allyId ? `ally_notas_order_${window.allyId}` : "ficha_rpg_notas_order";
 
 window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
     ficha: [
@@ -554,6 +555,13 @@ function exportarFicha() {
     const pacoteCompleto = {
         dados: JSON.parse(dadosFicha),
         historico: JSON.parse(historico),
+        // Inclui as ordens personalizadas no pacote de exportação
+        habilidadesOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_HABILIDADES_ORDER) || "[]"),
+        poderesOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_PODERES_ORDER) || "[]"),
+        magiasOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_MAGIAS_ORDER) || "[]"),
+        ataquesOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_ATAQUES_ORDER) || "[]"),
+        notasOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_NOTAS_ORDER) || "[]"),
+        inventarioOrder: JSON.parse(localStorage.getItem(STORAGE_KEY_INVENTORY_ORDER) || "[]"),
         exportadoEm: new Date().toLocaleString('pt-BR'),
         versaoSistema: "2.1"
     };
@@ -585,6 +593,14 @@ function importarFicha(event) {
                 if (importado.historico) {
                     localStorage.setItem(HISTORY_KEY, JSON.stringify(importado.historico));
                 }
+                // Restaura as ordens personalizadas
+                if (importado.habilidadesOrder) localStorage.setItem(STORAGE_KEY_HABILIDADES_ORDER, JSON.stringify(importado.habilidadesOrder));
+                if (importado.poderesOrder) localStorage.setItem(STORAGE_KEY_PODERES_ORDER, JSON.stringify(importado.poderesOrder));
+                if (importado.magiasOrder) localStorage.setItem(STORAGE_KEY_MAGIAS_ORDER, JSON.stringify(importado.magiasOrder));
+                if (importado.ataquesOrder) localStorage.setItem(STORAGE_KEY_ATAQUES_ORDER, JSON.stringify(importado.ataquesOrder));
+                if (importado.notasOrder) localStorage.setItem(STORAGE_KEY_NOTAS_ORDER, JSON.stringify(importado.notasOrder));
+                if (importado.inventarioOrder) localStorage.setItem(STORAGE_KEY_INVENTORY_ORDER, JSON.stringify(importado.inventarioOrder));
+
             } else {
                 // Formato Antigo (Dados diretos)
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(importado));

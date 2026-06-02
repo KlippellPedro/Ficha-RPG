@@ -715,7 +715,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById(cfg.id);
         if (!container) return;
 
+        // Garante que a seleção de texto funcione desativando o drag ao clicar em inputs
+        container.addEventListener('mousedown', (e) => {
+            const row = e.target.closest('.draggable') || e.target.closest('[draggable="true"]');
+            if (!row) return;
+            if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+                row.draggable = false;
+            } else {
+                row.draggable = true;
+            }
+        });
+
         container.addEventListener('dragstart', (e) => {
+            // Bloqueia o arrasto se o clique originar em campos de texto, botões ou seletores
+            if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+                e.preventDefault();
+                return;
+            }
             draggedItem = e.target.closest('.draggable') || e.target.closest('[draggable="true"]');
             if (draggedItem) {
                 e.dataTransfer.effectAllowed = 'move';

@@ -11,7 +11,8 @@ function adicionarNotaUI(titulo = "", tipo = "", desc = "", idIndex = null, camp
     const dataFormatada = data || new Date().toLocaleDateString('pt-BR');
 
     const row = document.createElement('div');
-    row.className = 'item-row nota-row-grid';
+    row.className = 'item-row nota-row-grid draggable';
+    row.draggable = true;
     row.dataset.index = index;
 
     row.innerHTML = `

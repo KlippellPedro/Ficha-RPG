@@ -158,3 +158,22 @@
   background: var(--primary-glow);
   box-shadow: 0 0 10px var(--primary-glow);
 }
+
+/* Botão Remover (X) Padronizado - Transparente */
+.nota-row-grid .btn-remove-class {
+  background: transparent !important;
+  border: none !important;
+  color: var(--primary-color) !important;
+  font-size: 1.2rem !important;
+  cursor: pointer !important;
+  opacity: 0.6 !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.nota-row-grid .btn-remove-class:hover {
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
+}

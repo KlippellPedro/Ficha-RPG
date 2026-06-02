@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         a.textContent = item.name;
 
         if (item.isBackBtn) {
-            a.style.color = 'var(--primary-color) !important';
+            a.style.setProperty('color', 'var(--primary-color)', 'important');
             a.style.fontWeight = '800';
         }
 
@@ -92,25 +92,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         .menu-links a { 
             color: #ffffff !important; 
-            opacity: 0.6 !important;
+            opacity: 0.7 !important;
             font-size: 0.85rem !important;
             letter-spacing: 1px;
             transition: all 0.3s ease !important;
             border-bottom: 2px solid transparent !important;
+            padding-bottom: 4px !important;
             margin: 0 10px !important;
             text-decoration: none !important;
+            box-shadow: none !important;
             outline: none !important;
             background: transparent !important;
+            position: relative !important;
+        }
+        .menu-links a::after, .menu-links a::before {
+            content: none !important;
+            display: none !important;
         }
         .menu-links a:hover { 
             opacity: 1 !important;
             color: var(--primary-color) !important; 
+            text-decoration: none !important;
             text-shadow: 0 0 8px var(--primary-glow);
             background: transparent !important;
-            border-bottom-color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color) !important;
         }
         .menu-links a.active { 
             opacity: 1 !important;
+            text-decoration: none !important;
             color: var(--primary-color) !important; 
             border-bottom: 2px solid var(--primary-color) !important;
             background: transparent !important;

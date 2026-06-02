@@ -162,7 +162,11 @@ function loadMagiasOrder() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    const indices = Object.keys(salvo).filter(k => k.startsWith('mag_nome_')).map(k => k.replace('mag_nome_', '')).sort((a, b) => a - b);
+    const indices = Object.keys(salvo)
+        .filter(k => k.startsWith('mag_nome_'))
+        .map(k => k.replace('mag_nome_', ''))
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
     indices.forEach(idx => {
         adicionarMagiaUI(salvo[`mag_nome_${idx}`], salvo[`mag_tipo_${idx}`], salvo[`mag_nivel_${idx}`], salvo[`mag_custo_${idx}`], salvo[`mag_tipo_custo_${idx}`], salvo[`mag_desc_${idx}`], idx, salvo[`mag_duracao_${idx}`], salvo[`mag_alcance_${idx}`], salvo[`mag_acao_${idx}`], salvo[`mag_teste_${idx}`]); // `renderizarCampoNivel` will format `mag_nivel_${idx}`
     });
@@ -173,7 +177,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('magias-container');
     let draggedItem = null;
 
+    // Garante que a seleção de texto funcione desativando o drag ao clicar em inputs
+    container.addEventListener('mousedown', (e) => {
+        const row = e.target.closest('.draggable');
+        if (!row) return;
+        if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+            row.draggable = false;
+        } else {
+            row.draggable = true;
+        }
+    });
+
     container.addEventListener('dragstart', (e) => {
+        // Bloqueia o arrasto se o clique originar em campos de texto, botões ou seletores
+        if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+            e.preventDefault();
+            return;
+        }
         draggedItem = e.target.closest('.draggable');
         if (draggedItem) {
             e.dataTransfer.effectAllowed = 'move';

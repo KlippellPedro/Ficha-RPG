@@ -12,7 +12,7 @@
     grid-template-columns: 45px 1fr 40px !important;
     grid-template-areas:
       "fav-area header-area fechar-area"
-      "cat-area cat-area cat-area cat-area"
+      "cat-area cat-area cat-area"
       "lupa-btn dup-btn dup-btn" !important;
     gap: 15px !important;
     padding: 18px !important;
@@ -90,14 +90,14 @@
   }
 
   /* Botão Remover (X) */
-  html body .nota-row-grid > :nth-child(6) {
+  html body .nota-row-grid .btn-remove-class {
     grid-area: fechar-area !important;
     width: 40px !important;
     height: 40px !important;
     font-size: 1.2rem !important;
     justify-self: end !important;
-    background: var(--primary-glow) !important;
-    border: 1px solid var(--primary-color) !important;
+    background: transparent !important;
+    border: none !important;
     color: var(--primary-color) !important;
     border-radius: 8px !important;
     opacity: 0.7 !important;
@@ -107,10 +107,9 @@
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
   }
-  html body .nota-row-grid > :nth-child(6):hover {
+  html body .nota-row-grid .btn-remove-class:hover {
     opacity: 1 !important;
-    background: var(--primary-color) !important;
-    color: black !important;
+    color: var(--primary-color) !important;
   }
 
   /* Filtros e Ajustes Finais */
