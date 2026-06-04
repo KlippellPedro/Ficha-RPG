@@ -179,6 +179,26 @@ h1 {
   background: var(--primary-glow) !important;
   border-color: var(--primary-color) !important;
   box-shadow: 0 0 12px var(--primary-glow);
+  position: relative;
+}
+
+.inv-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 6px var(--primary-glow);
+  animation: check-pop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes check-pop {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
 /* Dividores de Seção (Usados dentro de modais ou páginas) */

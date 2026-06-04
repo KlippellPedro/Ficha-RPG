@@ -521,7 +521,8 @@ window.abrirModalBuffsAliado = function (btn) {
     const buffs = dados.buffs_dono || [];
     buffs.forEach(b => adicionarLinhaBuffAliado(b));
 
-    document.getElementById('modal-ally-buffs').style.display = 'flex';
+    const buffsModal = document.getElementById('modal-ally-buffs');
+    if (buffsModal && !buffsModal.open) buffsModal.showModal();
 }
 
 /** Adiciona uma linha de modificador no modal */
@@ -581,7 +582,8 @@ window.salvarBuffsAliado = function () {
     dados.buffs_dono = buffs;
     localStorage.setItem(currentAllyBuffId, JSON.stringify(dados));
 
-    document.getElementById('modal-ally-buffs').style.display = 'none';
+    const buffsModalClose = document.getElementById('modal-ally-buffs');
+    if (buffsModalClose && buffsModalClose.open) buffsModalClose.close();
     showNotification("Buffs do aliado salvos!", "success");
 
     // Dispara o evento de storage manualmente para atualizar a ficha principal na hora

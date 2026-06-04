@@ -154,9 +154,9 @@ function verificarStatusInicial(mods) {
 
     const modal = document.getElementById('modal-status');
     if (modCar >= 3 && !jaEscolheu) {
-        if (modal) modal.style.display = 'flex';
+        if (modal && !modal.open) modal.showModal();
     } else {
-        if (modal) modal.style.display = 'none';
+        if (modal && modal.open) modal.close();
         if (modCar < 3 && jaEscolheu) {
             inputDef.value = "false";
             if (inputStatus) inputStatus.value = "";
