@@ -3,17 +3,33 @@
   display: none;
   text-align: center;
   margin-top: 20px;
-  padding: 15px;
-  border: 1px dashed var(--primary-color);
-  border-radius: 8px;
+  padding: 18px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.extra-section-block::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color, #457b9d), transparent 70%);
+  opacity: 0.7;
 }
 
 .extra-section-label {
+  font-family: var(--font-heading, serif);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
   color: var(--primary-color);
-  font-weight: bold;
+  font-weight: 600;
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   text-transform: uppercase;
+  opacity: 0.9;
 }
 
 .extra-section-display {

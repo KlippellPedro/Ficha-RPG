@@ -1,12 +1,37 @@
 .inventory-title {
   text-align: left;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   margin-bottom: 15px;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  border-left: 5px solid var(--primary-color);
+  letter-spacing: 0.15em;
+  border-left: none;
   color: var(--primary-color);
-  padding-left: 15px;
+  padding-left: 16px;
+  position: relative;
+  text-shadow: 0 0 20px var(--primary-glow);
+}
+
+.inventory-title::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 10%; bottom: 10%;
+  width: 4px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--primary-color), var(--secondary-color, #457b9d));
+}
+
+.weight-stats {
+  position: relative;
+  overflow: hidden;
+}
+
+.weight-stats::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--secondary-color, #457b9d), var(--primary-color), transparent);
+  opacity: 0.6;
 }
 
 .inventory-container {

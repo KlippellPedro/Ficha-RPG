@@ -86,12 +86,25 @@
 
 .selection-option {
   cursor: pointer;
-  padding: 10px;
+  padding: 12px 14px;
   border: 1px solid #333;
-  border-radius: 5px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.02);
-  transition: background 0.2s;
-  color: white;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  color: var(--text-main);
+}
+
+.selection-option strong {
+  color: var(--text-main);
+  font-size: 0.95rem;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.selection-option p {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: 0;
 }
 
 .selection-option:hover {
@@ -118,13 +131,14 @@
 
 .btn-save-modal {
   background: var(--primary-color);
-  color: #000;
+  color: #fff;
   border: none;
   padding: 12px 25px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
   transition: 0.2s;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .btn-save-modal:hover {

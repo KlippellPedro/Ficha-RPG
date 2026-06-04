@@ -67,7 +67,7 @@ function abrirModalHab(index) {
         </div>
         <div class="input-group" id="hab-buff-btn-container" style="display: ${tipo === 'Passiva' ? 'block' : 'none'}">
             <label>Configurações de Buff</label>
-            <button type="button" class="btn-save-modal" style="width:100%; background: #4ade80; color: #000; border: 1px solid #166534;" onclick="abrirModalBuffsHab('${index}')">Definir Buffs</button>
+            <button type="button" class="btn-save-modal" style="width:100%; background: #16a34a; color: #fff; border: 1px solid #166534;" onclick="abrirModalBuffsHab('${index}')">Definir Buffs</button>
         </div>
         <div class="input-group">
             <label>Descrição e Efeito</label>

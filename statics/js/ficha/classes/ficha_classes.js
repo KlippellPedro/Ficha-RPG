@@ -264,12 +264,20 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
     else if (currentClassData?.dlc === 'olimpo') rowClasses += ' olimpo-class-row';
     const maxAttr = nome === 'ceifeiro_almas' ? '' : 'max="99"';
 
+    const nomeExibido = nome ? (classesDB[nome]?.nome || nome) : '';
+
     const row = document.createElement('div');
     row.className = rowClasses;
     row.innerHTML = `
-        <div class="input-group">
+        <div class="input-group" style="flex:1; min-width:0;">
             <label>Classe</label>
-            <select id="class_name_${index}" class="save-input header-input" onchange="handleClassChange(this)">
+            <button type="button"
+                    id="class_btn_${index}"
+                    class="btn-class-select${nome ? '' : ' empty'}"
+                    onclick="abrirModalSelecionarClasse('${index}')">
+                ${nomeExibido || 'Selecionar Classe...'}
+            </button>
+            <select id="class_name_${index}" class="save-input" style="display:none" onchange="handleClassChange(this)">
                 <option value="">Selecione...</option>
                 ${options}
             </select>
@@ -282,12 +290,76 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
         <button type="button" class="btn-remove-class" onclick="removerClasseUI(this)">×</button>`;
     container.appendChild(row);
 
-    // Garante que o estilo e gatilhos especiais (como despertar do Avatar) 
+    // Garante que o estilo e gatilhos especiais (como despertar do Avatar)
     // sejam aplicados imediatamente ao adicionar uma nova classe
     const select = row.querySelector('select');
     if (nome && select && typeof atualizarEstiloClasse === 'function') {
         atualizarEstiloClasse(select);
     }
+}
+
+/**
+ * Abre o modal de seleção de classe para uma row específica
+ */
+function abrirModalSelecionarClasse(index) {
+    const modal = document.getElementById('modal-class-select');
+    const listContainer = document.getElementById('modal-class-select-list');
+    if (!modal || !listContainer) return;
+
+    const classesDB = window.CLASSES_DATA || {};
+    const currentVal = document.getElementById(`class_name_${index}`)?.value || '';
+
+    const grupos = {};
+    Object.keys(classesDB)
+        .filter(key => !classesDB[key].dlc || isDlcAtiva(classesDB[key].dlc))
+        .forEach(key => {
+            const data = classesDB[key];
+            const grupo = data.dlc ? data.dlc.toUpperCase() : 'Base';
+            if (!grupos[grupo]) grupos[grupo] = [];
+            grupos[grupo].push({ key, data });
+        });
+
+    let html = '';
+    Object.keys(grupos).sort((a, b) => a === 'Base' ? -1 : 1).forEach(grupo => {
+        html += `<div style="font-size:0.6rem;letter-spacing:0.15em;color:var(--text-muted);text-transform:uppercase;
+                             padding:8px 0 4px;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:6px;
+                             font-family:var(--font-heading,serif);">${grupo}</div>`;
+        grupos[grupo].forEach(({ key, data }) => {
+            const isSelected = key === currentVal;
+            html += `
+                <div class="selection-option" style="${isSelected ? 'border-color:var(--primary-color);background:var(--primary-glow);' : ''}"
+                     onclick="confirmarSelecionarClasse('${index}', '${key}')">
+                    <strong style="${isSelected ? 'color:var(--primary-color);' : ''}">${data.nome || key}</strong>
+                    <p>${data.dlc ? 'Expansão: ' + data.dlc.toUpperCase() : 'Classe Base'}</p>
+                </div>`;
+        });
+    });
+
+    listContainer.innerHTML = html;
+    modal.showModal();
+}
+
+/**
+ * Confirma a escolha de classe no modal e atualiza a row
+ */
+function confirmarSelecionarClasse(index, className) {
+    const select = document.getElementById(`class_name_${index}`);
+    const btn = document.getElementById(`class_btn_${index}`);
+    if (!select) return;
+
+    select.value = className;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+
+    if (btn) {
+        const classesDB = window.CLASSES_DATA || {};
+        const nome = classesDB[className]?.nome || className;
+        btn.textContent = nome;
+        btn.classList.remove('empty');
+    }
+
+    document.getElementById('modal-class-select')?.close();
+    if (typeof atualizarEstiloClasse === 'function') atualizarEstiloClasse(select);
+    if (typeof atualizarTudo === 'function') atualizarTudo();
 }
 
 /** Renderiza dinamicamente os campos de porcentagem e manifestação para cada instância de Avatar */

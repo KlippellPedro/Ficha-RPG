@@ -10,6 +10,42 @@
   box-sizing: border-box;
 }
 
+/* --- Correção para Modais (Dialog) --- */
+dialog.modal-overlay {
+  border: none;
+  background: transparent;
+  max-width: 100vw;
+  max-height: 100vh;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: none; /* Escondido por padrão */
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+dialog.modal-overlay[open] {
+  display: flex; /* Quando aberto via showModal, vira flex para centralizar o conteúdo */
+}
+
+dialog.modal-overlay::backdrop {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: linear-gradient(160deg, #1e1e23 0%, #18181b 100%);
+  border: 1px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), 0 0 20px var(--primary-glow);
+  animation: popIn 0.25s ease both;
+}
+
 /* Vinheta de Sangramento para HP Crítico */
 .critical-vignette {
   position: fixed;
@@ -67,13 +103,29 @@ body.hp-critical .critical-vignette {
 
 /* Seletor de DLCs */
 .dlc-selector-box {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 15px 20px;
-  border-radius: 12px;
+  border-radius: 10px;
   margin-bottom: 30px;
   backdrop-filter: blur(5px);
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.dlc-selector-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--secondary-color, #457b9d),
+    var(--primary-color),
+    transparent 80%
+  );
+  opacity: 0.7;
 }
 
 .dlc-label {
@@ -203,16 +255,18 @@ body.hp-critical .critical-vignette {
 }
 
 .attributes-section-header {
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px dashed var(--border-color);
+  margin-top: 8px;
+  padding-top: 4px;
 }
 
 .stats-section-header {
   margin-top: 20px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   width: 100%;
+  gap: 4px;
 }
 
 .combat-header-row {
@@ -406,30 +460,42 @@ body.hp-critical .critical-vignette {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 25px; /* Mais espaço entre os cards para não ficarem colados */
+  gap: 25px;
   width: 100%;
+  padding-bottom: 22px; /* espaço para o .attr-full-name que aparece no hover */
 }
 
 .attribute-card {
-  background: linear-gradient(135deg, #18181b 0%, #09090b 100%);
-  padding: 15px 5px; /* Mais respiro vertical */
+  background: linear-gradient(160deg, #1e1e23 0%, #111114 100%);
+  padding: 15px 5px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
   border-top: 3px solid var(--primary-color);
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
   display: flex;
   flex-direction: column;
-  width: 90px; /* Largura levemente maior para melhor equilíbrio */
+  width: 90px;
   align-items: center;
-  gap: 12px; /* Espaço interno entre label, input e mod */
+  gap: 12px;
   position: relative;
+  overflow: visible;
+  animation: popIn 0.4s ease both;
 }
 
+/* Stagger de entrada dos cards de atributo */
+.atributos-grid .attribute-card:nth-child(1) { animation-delay: 0.05s; }
+.atributos-grid .attribute-card:nth-child(2) { animation-delay: 0.10s; }
+.atributos-grid .attribute-card:nth-child(3) { animation-delay: 0.15s; }
+.atributos-grid .attribute-card:nth-child(4) { animation-delay: 0.20s; }
+.atributos-grid .attribute-card:nth-child(5) { animation-delay: 0.25s; }
+.atributos-grid .attribute-card:nth-child(6) { animation-delay: 0.30s; }
+.atributos-grid .attribute-card:nth-child(7) { animation-delay: 0.35s; }
+
 .attribute-card:hover {
-  transform: translateX(5px);
+  transform: translateY(-4px);
   border-color: var(--primary-color);
-  box-shadow: -5px 0 15px var(--primary-glow);
-  background: #1c1c21;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 14px var(--primary-glow);
+  background: #1e1e24;
 }
 
 .attr-help-btn {
@@ -468,7 +534,12 @@ body.hp-critical .critical-vignette {
   font-size: 1.3rem;
   color: var(--primary-color);
   font-weight: bold;
-  background: var(--primary-glow);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--_pr-rgb, 255, 68, 68), 0.18) 0%,
+    rgba(var(--_sec-rgb, 69, 123, 157), 0.1) 100%
+  );
+  background: linear-gradient(135deg, var(--primary-glow) 0%, var(--secondary-glow, rgba(69,123,157,0.15)) 100%);
   width: 100%;
   height: 40px;
   display: flex;
@@ -477,6 +548,64 @@ body.hp-critical .critical-vignette {
   border-radius: 4px;
   border: 1px solid var(--primary-glow);
   text-shadow: 0 0 8px var(--primary-glow);
+  transition: box-shadow 0.25s;
+}
+
+.attribute-card:hover .modificador {
+  box-shadow: 0 0 12px var(--primary-glow);
+  border-color: var(--primary-color);
+}
+
+/* Nome completo do atributo (tooltip visual) */
+.attr-full-name {
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s, transform 0.2s;
+  position: absolute;
+  bottom: -18px;
+  left: 0; right: 0;
+  text-align: center;
+  pointer-events: none;
+}
+
+.attribute-card:hover .attr-full-name {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* botão de seleção de classe (substitui o select visualmente) */
+.btn-class-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-class-select:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-input);
+  box-shadow: 0 0 8px var(--primary-glow);
+  transform: none;
+  filter: none;
+}
+
+.btn-class-select.empty {
+  color: var(--text-muted);
+  border-style: dashed;
 }
 
 /* Barras de Status */
@@ -580,10 +709,24 @@ body.hp-critical .critical-vignette {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100px;
+  width: 60%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.18) 50%, transparent 100%);
   animation: shimmer var(--shimmer-speed) infinite linear;
+}
+
+/* Brilho de topo (gloss) nas barras */
+.bar-inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
+  border-radius: 4px 4px 0 0;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .bar-text {
@@ -940,12 +1083,13 @@ body.hp-critical .critical-vignette {
   align-items: center;
   gap: 10px;
   min-width: 140px;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .action-item:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 10px var(--primary-glow);
 }
 
 .action-item label {
@@ -1018,11 +1162,17 @@ body.hp-critical .critical-vignette {
 
 @keyframes shimmer {
   0% {
-    transform: translateX(-100%);
+    transform: translateX(-160%);
   }
   100% {
-    transform: translateX(100%);
+    transform: translateX(260%);
   }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.92) translateY(6px); }
+  60%  { transform: scale(1.02) translateY(-1px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @keyframes dual-pulse {
@@ -1045,6 +1195,9 @@ body.hp-critical .critical-vignette {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2px solid var(--secondary-color, #457b9d);
+  box-shadow: -4px 0 16px rgba(69, 123, 157, 0.15);
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .xp-color {

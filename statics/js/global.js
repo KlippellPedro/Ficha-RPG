@@ -8,6 +8,7 @@ window.HISTORY_KEY = window.allyId ? `ally_hist_${window.allyId}` : "ficha_rpg_h
 
 window.BACKUP_KEY = "ficha_rpg_backup";
 window.THEME_KEY = "ficha_rpg_tema";
+window.THEME_KEY_SECONDARY = "ficha_rpg_tema_secundaria";
 window.DLCS_KEY = "ficha_rpg_dlcs";
 window.ALIADOS_KEY = "ficha_rpg_aliados";
 window.STORAGE_KEY_INVENTORY_ORDER = window.allyId ? `ally_inv_order_${window.allyId}` : "ficha_rpg_inventario_order";
@@ -431,12 +432,12 @@ window.abrirModalGerenciarImagem = function (targetId) {
     document.getElementById('img-manager-y').value = dados.foto_y || 50;
 
     window.atualizarPreviewAjuste();
-    modal.style.display = 'flex';
+    modal.showModal();
 };
 
 window.fecharModalGerenciarImagem = function () {
     const modal = document.getElementById('modal-image-manager');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.close();
 };
 
 window.atualizarPreviewAjuste = function () {
@@ -664,6 +665,21 @@ function aplicarCorTema(cor) {
 }
 
 /**
+ * Aplica a cor secundária ao tema da ficha
+ */
+function aplicarCorSecundaria(cor) {
+    if (!cor) return;
+    document.documentElement.style.setProperty('--secondary-color', cor);
+
+    const r = parseInt(cor.slice(1, 3), 16);
+    const g = parseInt(cor.slice(3, 5), 16);
+    const b = parseInt(cor.slice(5, 7), 16);
+    document.documentElement.style.setProperty('--secondary-glow', `rgba(${r}, ${g}, ${b}, 0.3)`);
+
+    localStorage.setItem(THEME_KEY_SECONDARY, cor);
+}
+
+/**
  * Verifica se uma DLC específica está ativa
  */
 window.isDlcAtiva = function (dlcId) {
@@ -784,6 +800,10 @@ document.addEventListener('DOMContentLoaded', () => {
             temaParaAplicar = salvo.cor_tema;
         }
         if (temaParaAplicar) aplicarCorTema(temaParaAplicar);
+
+        // Carrega cor secundária
+        const temaSecundario = localStorage.getItem(THEME_KEY_SECONDARY);
+        if (temaSecundario) aplicarCorSecundaria(temaSecundario);
 
     } catch (e) {
         console.warn("Nenhum dado prévio encontrado ou erro no JSON.");

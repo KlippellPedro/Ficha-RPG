@@ -5,7 +5,7 @@
 (function () {
     // 1. Definição do HTML do Modal (Injetado via JS para manter o HTML principal limpo)
     const modalHtml = `
-        <div id="modal-avatar-despertar" class="modal-overlay" style="display: none; z-index: 3000;">
+        <dialog id="modal-avatar-despertar" class="modal-overlay" style="z-index: 3000;">
             <div class="modal-content avatar-epic-modal" style="max-width: 700px;">
                 <div class="modal-header">
                     <h3 id="avatar-modal-title" class="modal-title">Quem sou eu ?</h3>
@@ -20,7 +20,7 @@
                     <p style="font-size: 0.7rem; color: #666; width: 100%; text-align: center;">Esta escolha define sua jornada inicial como Avatar.</p>
                 </div>
             </div>
-        </div>
+        </dialog>
     `;
 
     // 2. Injeta o modal no Body ao carregar
@@ -53,7 +53,7 @@
             `;
         }).join('');
 
-        document.getElementById('modal-avatar-despertar').style.display = 'flex';
+        document.getElementById('modal-avatar-despertar').showModal();
     };
 
     /**
@@ -87,7 +87,7 @@
             `;
         }).join('');
 
-        document.getElementById('modal-avatar-despertar').style.display = 'flex';
+        document.getElementById('modal-avatar-despertar').showModal();
     };
 
     /**
@@ -103,7 +103,7 @@
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
 
-        document.getElementById('modal-avatar-despertar').style.display = 'none';
+        document.getElementById('modal-avatar-despertar').close();
 
         // Força a atualização do nome no select imediatamente
         const select = document.getElementById(`class_name_${idx}`);
@@ -133,7 +133,7 @@
         dados[`class_avatar_subelement_${idx}`] = subKey;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
 
-        document.getElementById('modal-avatar-despertar').style.display = 'none';
+        document.getElementById('modal-avatar-despertar').close();
 
         const select = document.getElementById(`class_name_${idx}`);
         if (select) {
