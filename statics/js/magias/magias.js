@@ -88,8 +88,21 @@ function resetarFiltrosMagia() {
     if (tipo) tipo.value = 'todos';
     if (nivel) nivel.value = 'todos';
 
+    // Reseta chips
+    document.querySelectorAll('.circle-chip').forEach(c => c.classList.remove('active'));
+    const allChip = document.querySelector('.circle-chip[data-nivel="todos"]');
+    if (allChip) allChip.classList.add('active');
+
     filtrarMagias();
     showNotification("Filtros limpos", "info", 2000);
+}
+
+function setCircleFilter(btn, nivel) {
+    document.querySelectorAll('.circle-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const sel = document.getElementById('filter-magia-nivel');
+    if (sel) sel.value = nivel;
+    filtrarMagias();
 }
 
 function filtrarMagias() {

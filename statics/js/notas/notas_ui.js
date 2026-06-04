@@ -39,6 +39,10 @@ function adicionarNotaUI(titulo = "", tipo = "", desc = "", idIndex = null, camp
         </div>
     `;
 
+    // Marca como recente se foi criada hoje
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    if (dataFormatada === hoje) row.classList.add('nota-recente');
+
     container.appendChild(row);
     if (idIndex === null) {
         atualizarTudo();

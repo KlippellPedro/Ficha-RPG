@@ -125,6 +125,29 @@
   color: var(--text-muted);
 }
 
+/* Badge de status do aliado */
+.ally-status-badge {
+  font-family: var(--font-heading, serif);
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-weight: 700;
+  border: 1px solid currentColor;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.status-alive    { color: #4ade80; background: rgba(74,222,128,0.1); }
+.status-wounded  { color: #f59e0b; background: rgba(245,158,11,0.12); animation: badge-pulse 2s ease-in-out infinite; }
+.status-critical { color: var(--danger); background: rgba(239,68,68,0.12); animation: badge-pulse 1s ease-in-out infinite; }
+.status-dead     { color: #6b7280; background: rgba(107,114,128,0.1); text-decoration: line-through; }
+
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
 .ally-nivel-input {
   background: transparent;
   border: none;

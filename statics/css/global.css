@@ -143,9 +143,14 @@ h1 {
 }
 
 .inv-input:focus {
-  border-color: var(--primary-color);
+  border-color: transparent;
   background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 8px var(--primary-glow);
+  background-image:
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    linear-gradient(135deg, var(--primary-color), var(--secondary-color, #457b9d));
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  box-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--secondary-glow, rgba(69,123,157,0.1));
 }
 
 /* Estilização Customizada para Checkboxes de Lista (Equipado) */

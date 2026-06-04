@@ -33,6 +33,7 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
     row.className = 'item-row hab-row-grid draggable';
     row.draggable = true;
     row.dataset.index = index;
+    row.dataset.tipo = tipo;
     row.innerHTML = `
         <input type="text" id="hab_nome_${index}" class="save-input inv-input" placeholder="Nome" value="${nome}">
         <select id="hab_classe_${index}" class="save-input inv-input"> <-- CORRETO: Único para cada linha

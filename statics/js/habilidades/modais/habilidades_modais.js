@@ -95,7 +95,13 @@ function salvarDetalhesHab() {
     if (habSendoEditadaIdx === null) return;
     const idx = habSendoEditadaIdx;
     document.getElementById(`hab_classe_${idx}`).value = document.getElementById('modal_hab_classe').value;
-    if (document.getElementById(`hab_tipo_${idx}`)) document.getElementById(`hab_tipo_${idx}`).value = document.getElementById('modal_hab_tipo').value;
+    if (document.getElementById(`hab_tipo_${idx}`)) {
+        const novoTipo = document.getElementById('modal_hab_tipo').value;
+        document.getElementById(`hab_tipo_${idx}`).value = novoTipo;
+        // Atualiza o badge visual da row
+        const row = document.getElementById(`hab_tipo_${idx}`)?.closest('.item-row');
+        if (row) row.dataset.tipo = novoTipo;
+    }
     document.getElementById(`hab_custo_${idx}`).value = document.getElementById('modal_hab_custo').value;
     document.getElementById(`hab_tipo_custo_${idx}`).value = document.getElementById('modal_hab_tipo_custo').value;
     document.getElementById(`hab_desc_${idx}`).value = document.getElementById('modal_hab_desc').value;
