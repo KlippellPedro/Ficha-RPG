@@ -1,6 +1,6 @@
 /* Estilos Gerais para Modais */
 .modal-overlay {
-  display: none; /* Controlado via JS (flex/none) */
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -11,6 +11,23 @@
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(5px);
+}
+
+/* Garante que dialog[open] seja visível independente do display:none herdado */
+dialog.modal-overlay[open] {
+  display: flex;
+}
+
+/* Remove border/padding nativo do dialog */
+dialog.modal-overlay {
+  border: none;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: visible;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.85);
 }
 
 .modal-content-box,

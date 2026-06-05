@@ -5,7 +5,7 @@ window.CLASSES_DATA["demonio"] = {
     pm_lvl: 5,
     isSpecial: true,
     showDemonio: true,
-    ambientType: "ember",
+    ambientType: ["ember", "hellfire"],
     skills: [],
     progressao: {
         1: { habilidades: [], poderes: [] }

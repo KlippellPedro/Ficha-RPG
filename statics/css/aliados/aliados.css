@@ -210,11 +210,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 800;
   color: var(--text-muted);
-  letter-spacing: 1px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
+
+/* Cores por tipo de stat */
+.ally-stat-group:nth-child(1) .ally-stat-labels > span:first-child { color: #f87171; }
+.ally-stat-group:nth-child(2) .ally-stat-labels > span:first-child { color: #60a5fa; }
+.ally-stat-group:nth-child(3) .ally-stat-labels > span:first-child { color: #34d399; }
 
 .ally-inputs {
   display: flex;
@@ -237,33 +243,56 @@
 }
 
 .ally-bar-outer {
-  height: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 4px;
+  height: 12px;
+  background: linear-gradient(180deg, #080810 0%, #0f0f18 100%);
+  border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  position: relative;
 }
 
 .ally-bar-inner {
   height: 100%;
   width: 0%;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer nas barras do aliado */
+.ally-bar-inner::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 3s infinite linear;
+}
+
+/* Brilho topo */
+.ally-bar-inner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+  pointer-events: none;
 }
 
 .ally-bar-pv {
-  background: linear-gradient(90deg, #800020, #ff4444);
-  box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
+  background: linear-gradient(90deg, #7a0020, #c8003a);
+  box-shadow: 0 0 8px rgba(200, 0, 58, 0.4);
 }
 
 .ally-bar-pm {
-  background: linear-gradient(90deg, #1e3a8a, #2563eb);
-  box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+  background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
 }
 
 .ally-bar-sanity {
-  background: linear-gradient(90deg, #10b981, #34d399);
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+  background: linear-gradient(90deg, #064e3b, #10b981);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 
 .ally-quick-stats {

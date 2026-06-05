@@ -53,6 +53,49 @@ h1::before {
   flex: 1;
 }
 
+/* Filtro de atributos */
+.attr-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.attr-filter-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.btn-attr-filter {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.btn-attr-filter:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: var(--primary-glow);
+}
+
+.btn-attr-filter.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #000;
+  box-shadow: 0 0 8px var(--primary-glow);
+}
+
 #search-pericia {
   /* Agora utiliza o estilo herdado de .inv-input das outras listas */
   height: 45px;

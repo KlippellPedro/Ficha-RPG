@@ -24,19 +24,22 @@ function atualizarFiltroPoderesUI() {
     if (filterSelect) filterSelect.innerHTML = `<option value="todos">Todas as Fontes</option>` + getOpcoesClassesPod(filterSelect.value);
 }
 
-function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "", pv_bonus = 0, pm_bonus = 0, mods = "[]") {
+function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "", pv_bonus = 0, pm_bonus = 0, mods = "[]", buffAtivo = undefined, modoAtivoPas = "Ativa") {
     const container = document.getElementById('poderes-container');
     if (!container) return;
     const index = idIndex !== null ? idIndex : Date.now();
+    const isPassiva = modoAtivoPas === 'Passiva';
+    const isAtivo = buffAtivo === 'true';
+    const hasLegacyBuff = buffAtivo === undefined;
 
     const row = document.createElement('div');
-    row.className = 'item-row pod-row-grid draggable';
+    row.className = `item-row pod-row-grid draggable${isAtivo ? ' has-active-buff' : ''}`;
     row.draggable = true;
     row.dataset.index = index;
     row.innerHTML = `
         <input type="text" id="poder_nome_${index}" class="save-input inv-input" placeholder="Nome do Poder" value="${nome}">
         <select id="poder_classe_${index}" class="save-input inv-input" onchange="atualizarTudo()">
-            ${getOpcoesClassesPod(classe || tipo)} 
+            ${getOpcoesClassesPod(classe || tipo)}
         </select>
         <div class="cost-container" style="display:flex; gap:5px;">
             <input type="text" id="poder_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
@@ -47,7 +50,12 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
             </select>
         </div>
         <button type="button" class="btn-open-desc" onclick="abrirModalPod('${index}')">🔍</button>
-        <button type="button" class="btn-use-skill" onclick="usarPoder('${index}')">Usar</button>
+        <button type="button" id="btn_usar_poder_${index}"
+                class="btn-use-skill${isAtivo ? ' buff-ativo' : ''}"
+                onclick="toggleBuffPoder('${index}')"
+                style="${isPassiva ? 'display:none' : ''}">
+            ${isAtivo ? 'Ativo' : 'Usar'}
+        </button>
         <button type="button" class="btn-duplicate" onclick="duplicarPoder('${index}')" title="Duplicar">📋</button>
         <button type="button" class="btn-remove-class" onclick="removerPoder(this)">×</button>
 
@@ -60,6 +68,8 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
             <input type="hidden" id="poder_pv_bonus_${index}" class="save-input" value="${pv_bonus}">
             <input type="hidden" id="poder_pm_bonus_${index}" class="save-input" value="${pm_bonus}">
             <input type="hidden" id="poder_mods_${index}" class="save-input" value='${mods}'>
+            <input type="hidden" id="poder_buff_ativo_${index}" class="save-input" value="${hasLegacyBuff ? 'legado' : (buffAtivo || 'false')}">
+            <input type="hidden" id="poder_modo_${index}" class="save-input" value="${modoAtivoPas}">
         </div>
     `;
     container.appendChild(row);
@@ -69,7 +79,8 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
 function duplicarPoder(index) {
     const fields = ['nome', 'tipo', 'custo', 'tipo_custo', 'desc', 'duracao', 'alcance', 'acao', 'classe', 'pv_bonus', 'pm_bonus', 'mods'];
     const vals = fields.map(f => document.getElementById(`poder_${f}_${index}`)?.value || "");
-    adicionarPoderUI(vals[0] + " (Cópia)", vals[1], vals[2], vals[3], vals[4], null, vals[5], vals[6], vals[7], vals[8], vals[9], vals[10], vals[11]);
+    const modo = document.getElementById(`poder_modo_${index}`)?.value || 'Ativa';
+    adicionarPoderUI(vals[0] + " (Cópia)", vals[1], vals[2], vals[3], vals[4], null, vals[5], vals[6], vals[7], vals[8], vals[9], vals[10], vals[11], 'false', modo);
 }
 
 function removerPoder(btn) {

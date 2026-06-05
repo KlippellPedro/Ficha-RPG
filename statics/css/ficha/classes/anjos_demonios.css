@@ -7,97 +7,139 @@
   animation: dual-pulse 4s infinite alternate ease-in-out;
 }
 
-/* Estilo Específico para Anjo (Ouro Divino) */
+/* ── Anjo (Ouro Divino) ──────────────────────────────────────────── */
 .anjo-class-row {
   border: 1px solid #f59e0b !important;
   background: rgba(245, 158, 11, 0.1) !important;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35), 0 0 40px rgba(245, 158, 11, 0.1);
+  animation: anjo-row-pulse 3s infinite ease-in-out;
 }
 .anjo-class-row label {
   color: #f59e0b !important;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
 }
 
-/* Estilo Específico para Demônio (Vermelho Infernal) */
+/* ── Demônio (Vermelho Infernal) ─────────────────────────────────── */
 .demonio-class-row {
   border: 1px solid #ef4444 !important;
   background: rgba(239, 68, 68, 0.1) !important;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.35), 0 0 40px rgba(239, 68, 68, 0.1);
+  animation: demonio-row-pulse 2.5s infinite ease-in-out;
 }
 .demonio-class-row label {
   color: #ef4444 !important;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
 }
 
-/* Partículas: Penas (Anjo) */
+/* ──────────────────────────────────────────────────────────────────
+   PARTÍCULAS — ANJO: Penas divinas e centelhas sagradas
+   ────────────────────────────────────────────────────────────────── */
+
+/* Pena pequena — cai do céu */
 .particle-feather {
   position: fixed;
-  bottom: -20px;
-  pointer-events: none;
-  z-index: 9999;
-  width: 8px;
-  height: 15px;
-  background: white;
-  border-radius: 50% 10% 50% 10%;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
-  transform: rotate(45deg);
-  animation: rise-and-fade 4s linear infinite;
-}
-
-/* Partículas: Brasas (Demônio) */
-.particle-ember {
-  position: fixed;
-  bottom: -20px;
   pointer-events: none;
   z-index: 9999;
   width: 6px;
-  height: 6px;
-  background: #ff4444;
-  box-shadow:
-    0 0 10px #ff0000,
-    0 0 5px #ff8800;
-  border-radius: 50%;
-  filter: blur(0.3px);
-  animation: rise-and-fade 3s ease-in infinite;
+  height: 14px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.4), #fff);
+  border-radius: 50% 50% 10% 50% / 50% 50% 10% 30%;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.9), 0 0 16px rgba(255, 215, 0, 0.5);
+  animation: feather-fall var(--duration, 6s) linear forwards;
 }
 
-/* Variante específica para efeito demoníaco intenso */
-.particle-demonio {
+/* Centelha divina */
+.particle-divine {
   position: fixed;
-  bottom: -20px;
   pointer-events: none;
   z-index: 9999;
-  width: 7px;
-  height: 7px;
-  background: #ff0000;
-  box-shadow:
-    0 0 10px #ff0000,
-    0 0 20px rgba(255, 0, 0, 0.4);
   border-radius: 50%;
-  filter: blur(0.5px);
-  animation: rise-and-fade 3.5s ease-in infinite;
+  background: radial-gradient(circle, #fff9c0 0%, #f59e0b 50%, transparent 100%);
+  box-shadow: 0 0 12px #ffd700, 0 0 24px rgba(255, 200, 0, 0.6);
+  animation: divine-spark var(--duration, 3s) ease-out forwards;
 }
 
-@keyframes rise-and-fade {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-110vh) rotate(360deg);
-    opacity: 0;
-  }
+/* ──────────────────────────────────────────────────────────────────
+   PARTÍCULAS — DEMÔNIO: Brasas, labaredas e cinzas
+   ────────────────────────────────────────────────────────────────── */
+
+/* Brasa */
+.particle-ember {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffcc44 0%, #ff4400 60%, #800000 100%);
+  box-shadow:
+    0 0 8px #ff4400,
+    0 0 16px rgba(255, 80, 0, 0.7),
+    0 0 28px rgba(255, 0, 0, 0.3);
+  animation: ember-rise var(--duration, 4s) ease-in forwards;
 }
 
+/* Labareda sombria */
+.particle-hellfire {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
+  background: linear-gradient(to top, #ff0000, #ff6600, transparent);
+  box-shadow: 0 0 14px #ff2200, 0 0 28px rgba(200, 0, 0, 0.5);
+  filter: blur(1px);
+  animation: hellfire-rise var(--duration, 3.5s) ease-in forwards;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   ANIMAÇÕES
+   ────────────────────────────────────────────────────────────────── */
+
+/* Pena caindo do céu com balanço e rotação */
+@keyframes feather-fall {
+  0%   { transform: translateY(0) rotate(var(--rot-start, 10deg)) translateX(0); opacity: 0; }
+  8%   { opacity: 0.9; }
+  50%  { transform: translateY(55vh) rotate(var(--rot-mid, 180deg)) translateX(var(--dx, 20px)); opacity: 0.7; }
+  100% { transform: translateY(115vh) rotate(var(--rot-end, 350deg)) translateX(var(--dx2, -10px)); opacity: 0; }
+}
+
+/* Centelha divina — explode e sobe */
+@keyframes divine-spark {
+  0%   { transform: scale(0.2) translateY(0); opacity: 0; }
+  10%  { transform: scale(1.4) translateY(-8px); opacity: 1; }
+  40%  { opacity: 0.8; }
+  100% { transform: scale(0.4) translateY(calc(-1 * var(--dy, 90vh))); opacity: 0; }
+}
+
+/* Brasa subindo com turbulência */
+@keyframes ember-rise {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  6%   { opacity: 1; }
+  30%  { transform: translateY(-30vh) translateX(var(--dx1, 15px)) scale(0.8); }
+  60%  { transform: translateY(-65vh) translateX(var(--dx2, -10px)) scale(0.5); opacity: 0.6; }
+  100% { transform: translateY(-115vh) translateX(var(--dx3, 20px)) scale(0.1); opacity: 0; }
+}
+
+/* Labareda sombria subindo e crescendo */
+@keyframes hellfire-rise {
+  0%   { transform: scaleX(1) translateY(0); opacity: 0; }
+  8%   { opacity: 0.85; }
+  40%  { transform: scaleX(1.3) translateY(-40vh); opacity: 0.6; }
+  100% { transform: scaleX(0.5) translateY(-115vh); opacity: 0; filter: blur(6px); }
+}
+
+/* Pulsação do row do Anjo */
+@keyframes anjo-row-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.35), 0 0 40px rgba(245, 158, 11, 0.1); }
+  50%       { box-shadow: 0 0 30px rgba(245, 158, 11, 0.55), 0 0 60px rgba(255, 215, 0, 0.2); }
+}
+
+/* Pulsação do row do Demônio */
+@keyframes demonio-row-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.35), 0 0 40px rgba(239, 68, 68, 0.1); }
+  50%       { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), 0 0 60px rgba(200, 0, 0, 0.25); }
+}
+
+/* Dualidade Anjo+Demônio */
 @keyframes dual-pulse {
-  0% {
-    filter: brightness(1);
-  }
-  100% {
-    filter: brightness(1.2);
-  }
+  0%   { filter: brightness(1); }
+  100% { filter: brightness(1.25); }
 }

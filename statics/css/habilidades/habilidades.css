@@ -136,19 +136,53 @@
   gap: 10px;
 }
 
-/* Estilo para o botão "Usar Habilidade" */
+/* Botão "Usar" / "Ativo" */
 .btn-use-skill {
-  background: #4ade80; /* Verde */
-  color: #000;
-  border: none;
-  padding: 8px 15px;
+  background: #166534;
+  color: #4ade80;
+  border: 1px solid #16a34a;
+  padding: 6px 12px;
   border-radius: 6px;
   font-weight: bold;
+  font-size: 0.78rem;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
 }
 .btn-use-skill:hover {
-  filter: brightness(1.1);
+  background: #16a34a;
+  color: #fff;
+}
+
+/* Estado: buff ativo */
+.btn-use-skill.buff-ativo {
+  background: #14532d;
+  color: #4ade80;
+  border-color: #4ade80;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+  animation: buff-pulse 2s infinite ease-in-out;
+  overflow: hidden;
+  text-overflow: clip;
+}
+.btn-use-skill.buff-ativo:hover {
+  background: #7f1d1d;
+  color: #fca5a5;
+  border-color: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  animation: none;
+}
+
+@keyframes buff-pulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(74, 222, 128, 0.4); }
+  50%       { box-shadow: 0 0 14px rgba(74, 222, 128, 0.8); }
+}
+
+/* Row com buff ativo — destaque sutil */
+.item-row.has-active-buff {
+  border-left-color: #4ade80 !important;
+  background: rgba(74, 222, 128, 0.04) !important;
 }
 
 /* Estilos para feedback de custo de Mana */

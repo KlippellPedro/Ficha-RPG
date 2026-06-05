@@ -32,7 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3 class="modal-title" style="color:var(--primary-color)">Escolher Raça</h3>
                     <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
                 </div>
-                <div class="modal-body" id="modal-raca-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:65vh;overflow-y:auto;padding:4px 2px;"></div>
+                <div style="padding: 4px 0 8px 0;">
+                    <input type="text" id="modal-raca-search"
+                           placeholder="🔍  Buscar raça..."
+                           oninput="filtrarModalRaca(this.value)"
+                           style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:white;font-size:0.85rem;outline:none;box-sizing:border-box;"
+                    />
+                </div>
+                <div class="modal-body" id="modal-raca-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:60vh;overflow-y:auto;padding:4px 2px;"></div>
             </div>
         </dialog>
     `;
@@ -58,7 +65,8 @@ window.abrirModalSelecionarRaca = function () {
                 ? `<span style="font-size:0.45rem;background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 4px;opacity:0.6;">${r.dlc.toUpperCase()}</span>`
                 : '';
             return `
-                <div onclick="confirmarSelecionarRaca('${key}')"
+                <div data-raca-card data-raca-nome="${r.nome.toLowerCase()}"
+                     onclick="confirmarSelecionarRaca('${key}')"
                      style="
                         cursor:pointer;border-radius:8px;padding:14px 10px;text-align:center;
                         border:1px solid ${isSelected ? vis.cor : 'rgba(255,255,255,0.07)'};
@@ -74,7 +82,22 @@ window.abrirModalSelecionarRaca = function () {
                 </div>`;
         }).join('');
 
+    // Limpa busca e foca ao abrir
+    const searchEl = document.getElementById('modal-raca-search');
+    if (searchEl) { searchEl.value = ''; setTimeout(() => searchEl.focus(), 80); }
+    // Garante que todos os cards estejam visíveis
+    list.querySelectorAll('[data-raca-card]').forEach(c => c.style.display = '');
+
     modal.showModal();
+};
+
+window.filtrarModalRaca = function (query) {
+    const list = document.getElementById('modal-raca-list');
+    if (!list) return;
+    const q = (query || '').toLowerCase().trim();
+    list.querySelectorAll('[data-raca-card]').forEach(card => {
+        card.style.display = (!q || card.dataset.racaNome.toLowerCase().includes(q)) ? '' : 'none';
+    });
 };
 
 function hexToRgbStr(hex) {

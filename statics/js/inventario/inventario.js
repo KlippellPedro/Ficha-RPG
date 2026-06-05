@@ -14,6 +14,33 @@ if (typeof materialSendoEditadoTipo === 'undefined') {
 }
 
 /**
+ * Detecta qual categoria (comum/elemental/outros) pertence um tipo de dano
+ */
+function _detectCatTipoDano(val) {
+    if (!val) return 'comum';
+    if (OPTIONS_TIPO_DANO_CATEGORIZADO.comum.some(o => o.v === val)) return 'comum';
+    if (OPTIONS_TIPO_DANO_CATEGORIZADO.elemental.some(o => o.v === val)) return 'elemental';
+    if (OPTIONS_TIPO_DANO_CATEGORIZADO.outros.some(o => o.v === val)) return 'outros';
+    return 'comum';
+}
+
+/**
+ * Popula o select de tipo de dano conforme a categoria escolhida.
+ * Se currentVal for '' (vazio), seleciona o primeiro item da nova categoria.
+ */
+window.atualizarSelectTipoDano = function (cat, currentVal) {
+    const select = document.getElementById('modal_item_tipo_dano');
+    if (!select) return;
+    const opts = OPTIONS_TIPO_DANO_CATEGORIZADO[cat] || [];
+    // Mantém seleção atual se pertencer à nova categoria, senão usa o primeiro
+    const prevVal = currentVal !== undefined ? currentVal : select.value;
+    const hasMatch = opts.some(o => o.v === prevVal);
+    select.innerHTML = opts.map(o =>
+        `<option value="${o.v}" ${o.v === (hasMatch ? prevVal : opts[0]?.v) ? 'selected' : ''}>${o.t}</option>`
+    ).join('');
+};
+
+/**
  * Helper para obter o nome amigável da raridade a partir do seu valor
  */
 function getNomeRaridade(valor) {
@@ -70,25 +97,34 @@ function abrirModalItem(index) {
         const crit = document.getElementById(`inv_critico_${index}`)?.value || "";
         const tipoDano = document.getElementById(`inv_tipo_dano_${index}`)?.value || "";
         const alcance = document.getElementById(`inv_alcance_${index}`)?.value || "";
+        // Detecta qual categoria o tipo de dano salvo pertence
+        const catDano = _detectCatTipoDano(tipoDano);
+        const optsIniciais = OPTIONS_TIPO_DANO_CATEGORIZADO[catDano] || [];
+
         weaponArmorHtml = `
             <div class="section-divider">Dados de Combate (Arma)</div>
             <div class="grid-2-cols" style="margin-bottom: 10px;">
-                <div class="input-group"><label>Dano</label><input type="text" id="modal_item_dano" class="inv-input" value="${dano}" placeholder="Ex: 1d8+2"></div>
-                <div class="input-group"><label>Crítico</label><input type="text" id="modal_item_critico" class="inv-input" value="${crit}" placeholder="Ex: 19/x2"></div>
+                <div class="input-group"><label>Dano</label>
+                    <input type="text" id="modal_item_dano" class="inv-input" value="${dano}" placeholder="Ex: 1d8+2">
+                </div>
+                <div class="input-group"><label>Crítico</label>
+                    <input type="text" id="modal_item_critico" class="inv-input" value="${crit}" placeholder="Ex: 19/x2">
+                </div>
             </div>
             <div class="grid-2-cols" style="margin-bottom: 15px;">
-                <div class="input-group"><label>Tipo de Dano</label>
-                    <select id="modal_item_tipo_dano" class="inv-input">
-                        <optgroup label="Comuns">
-                            ${OPTIONS_TIPO_DANO_CATEGORIZADO.comum.map(opt => `<option value="${opt.v}" ${tipoDano === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
-                        </optgroup>
-                        <optgroup label="Elementais">
-                            ${OPTIONS_TIPO_DANO_CATEGORIZADO.elemental.map(opt => `<option value="${opt.v}" ${tipoDano === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
-                        </optgroup>
-                        <optgroup label="Outros">
-                            ${OPTIONS_TIPO_DANO_CATEGORIZADO.outros.map(opt => `<option value="${opt.v}" ${tipoDano === opt.v ? 'selected' : ''}>${opt.t}</option>`).join('')}
-                        </optgroup>
-                    </select>
+                <div class="input-group">
+                    <label>Tipo de Dano</label>
+                    <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px;">
+                        <select id="modal_cat_dano" class="inv-input"
+                                onchange="atualizarSelectTipoDano(this.value, '')">
+                            <option value="comum"    ${catDano === 'comum' ? 'selected' : ''}>Comum</option>
+                            <option value="elemental" ${catDano === 'elemental' ? 'selected' : ''}>Elemental</option>
+                            <option value="outros"   ${catDano === 'outros' ? 'selected' : ''}>Outro</option>
+                        </select>
+                        <select id="modal_item_tipo_dano" class="inv-input">
+                            ${optsIniciais.map(o => `<option value="${o.v}" ${tipoDano === o.v ? 'selected' : ''}>${o.t}</option>`).join('')}
+                        </select>
+                    </div>
                 </div>
                 <div class="input-group"><label>Alcance</label>
                     <select id="modal_item_alcance" class="inv-input">
@@ -125,11 +161,11 @@ function abrirModalItem(index) {
         <div class="grid-2-cols" style="margin-bottom: 15px;">
             <div class="input-group">
                 <label>CD Atual</label>
-                <input type="number" id="modal_item_cd_atual" class="inv-input" value="${cdAtual}">
+                <input type="number" id="modal_item_cd_atual" class="inv-input" value="${Math.max(0, parseInt(cdAtual) || 0)}" min="0">
             </div>
             <div class="input-group">
-                <label>CD Máxima</label>
-                <input type="number" id="modal_item_cd_max" class="inv-input" value="${cdMax + cdBonus}">
+                <label>CD Máxima (base ${cdMax}${cdBonus > 0 ? ' +' + cdBonus + ' bônus' : ''})</label>
+                <input type="number" id="modal_item_cd_max" class="inv-input" value="${cdMax + cdBonus}" min="1">
             </div>
         </div>
 
@@ -205,33 +241,35 @@ function adicionarLinhaModificacao(attr = 'nenhum', mod = 0, isAdv = false) {
     const container = document.getElementById('modal-mods-container');
     if (!container) return;
 
-    // Determinar a categoria correta baseada no atributo para carregar o select certo
+    // Detecta a categoria correta do atributo
     let cat = isAdv ? 'vantagem' : 'ficha';
     if (!isAdv && attr !== 'nenhum') {
         if (window.OPTIONS_CATEGORIZADAS.pericia.some(o => o.v === attr)) cat = 'pericia';
         else if (window.OPTIONS_CATEGORIZADAS.arma.some(o => o.v === attr)) cat = 'arma';
+        else if (window.OPTIONS_CATEGORIZADAS.item?.some(o => o.v === attr)) cat = 'item';
     }
 
     const row = document.createElement('div');
-    row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
+    row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:center;';
     row.innerHTML = `
-        <select class="inv-input mod-cat-select" style="flex: 1;">
-            <option value="ficha" ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
-            <option value="pericia" ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
-            <option value="arma" ${cat === 'arma' ? 'selected' : ''}>Arma</option>
+        <select class="inv-input mod-cat-select" style="flex:1.1;">
+            <option value="ficha"    ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia"  ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma"     ${cat === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="item"     ${cat === 'item' ? 'selected' : ''}>Item</option>
             <option value="vantagem" ${cat === 'vantagem' ? 'selected' : ''}>Vantagem</option>
         </select>
-        <select class="inv-input mod-attr-select" style="flex: 1.5;"></select>
-        <input type="text" class="inv-input mod-val-input" style="flex: 0.8;" value="${mod}" placeholder="Val">
+        <select class="inv-input mod-attr-select" style="flex:1.6;"></select>
+        <input type="text" class="inv-input mod-val-input" style="flex:0.8;" value="${mod}" placeholder="Val">
         <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
     `;
     container.appendChild(row);
 
     const selectCat = row.querySelector('.mod-cat-select');
     const selectAttr = row.querySelector('.mod-attr-select');
-    const update = (val = "nenhum") => {
-        const options = window.OPTIONS_CATEGORIZADAS[selectCat.value] || [];
-        selectAttr.innerHTML = options.map(o => `<option value="${o.v}" ${o.v === val ? 'selected' : ''}>${o.t}</option>`).join('');
+    const update = (val = 'nenhum') => {
+        const opts = window.OPTIONS_CATEGORIZADAS[selectCat.value] || [];
+        selectAttr.innerHTML = opts.map(o => `<option value="${o.v}" ${o.v === val ? 'selected' : ''}>${o.t}</option>`).join('');
     };
     selectCat.onchange = () => update();
     update(attr);
@@ -291,8 +329,8 @@ function salvarDetalhesItem() {
     document.getElementById(`inv_peso_${idx}`).value = peso;
     document.getElementById(`inv_qtd_${idx}`).value = qtd;
     document.getElementById(`inv_desc_${idx}`).value = desc;
-    document.getElementById(`inv_cd_atual_${idx}`).value = cdAtual;
-    document.getElementById(`inv_cd_max_${idx}`).value = baseCdMax;
+    document.getElementById(`inv_cd_atual_${idx}`).value = Math.max(0, parseInt(cdAtual) || 0);
+    document.getElementById(`inv_cd_max_${idx}`).value = Math.max(1, baseCdMax);
 
     // Salva campos de combate/defesa se eles estiverem presentes no modal
     const danoInput = document.getElementById('modal_item_dano');
@@ -354,28 +392,30 @@ function adicionarLinhaBuffRaridade(attr = 'nenhum', mod = 0, isAdv = false) {
     if (!isAdv && attr !== 'nenhum') {
         if (window.OPTIONS_CATEGORIZADAS.pericia.some(o => o.v === attr)) cat = 'pericia';
         else if (window.OPTIONS_CATEGORIZADAS.arma.some(o => o.v === attr)) cat = 'arma';
+        else if (window.OPTIONS_CATEGORIZADAS.item?.some(o => o.v === attr)) cat = 'item';
     }
 
     const row = document.createElement('div');
-    row.style = "display: flex; gap: 10px; margin-bottom: 10px; align-items: center;";
+    row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:center;';
     row.innerHTML = `
-        <select class="inv-input rarity-cat-select" style="flex: 1;">
-            <option value="ficha" ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
-            <option value="pericia" ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
-            <option value="arma" ${cat === 'arma' ? 'selected' : ''}>Arma</option>
+        <select class="inv-input rarity-cat-select" style="flex:1.1;">
+            <option value="ficha"    ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia"  ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma"     ${cat === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="item"     ${cat === 'item' ? 'selected' : ''}>Item</option>
             <option value="vantagem" ${cat === 'vantagem' ? 'selected' : ''}>Vantagem</option>
         </select>
-        <select class="inv-input rarity-buff-attr" style="flex: 1.5;"></select>
-        <input type="text" class="inv-input rarity-buff-val" style="flex: 0.8;" value="${mod}" placeholder="Val">
+        <select class="inv-input rarity-buff-attr" style="flex:1.6;"></select>
+        <input type="text" class="inv-input rarity-buff-val" style="flex:0.8;" value="${mod}" placeholder="Val">
         <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
     `;
     container.appendChild(row);
 
     const selectCat = row.querySelector('.rarity-cat-select');
     const selectAttr = row.querySelector('.rarity-buff-attr');
-    const update = (val = "nenhum") => {
-        const options = window.OPTIONS_CATEGORIZADAS[selectCat.value] || [];
-        selectAttr.innerHTML = options.map(o => `<option value="${o.v}" ${o.v === val ? 'selected' : ''}>${o.t}</option>`).join('');
+    const update = (val = 'nenhum') => {
+        const opts = window.OPTIONS_CATEGORIZADAS[selectCat.value] || [];
+        selectAttr.innerHTML = opts.map(o => `<option value="${o.v}" ${o.v === val ? 'selected' : ''}>${o.t}</option>`).join('');
     };
     selectCat.onchange = () => update();
     update(attr);
@@ -767,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isAfter = e.clientY > rect.top + rect.height / 2;
                 if (isAfter) dropTarget.after(draggedItem);
                 else dropTarget.before(draggedItem);
-                
+
                 saveInventoryOrder(cfg.id, cfg.key);
             }
             container.querySelectorAll('.draggable, [draggable="true"]').forEach(row =>
@@ -786,7 +826,7 @@ document.addEventListener('dragend', () => {
         draggedItem.classList.remove('dragging');
         draggedItem = null;
     }
-    document.querySelectorAll('.drag-insert-top, .drag-insert-bottom').forEach(el => 
+    document.querySelectorAll('.drag-insert-top, .drag-insert-bottom').forEach(el =>
         el.classList.remove('drag-insert-top', 'drag-insert-bottom')
     );
 });

@@ -37,6 +37,7 @@ function renderPericias() {
 
             <div class="skill-adv-container" title="Vantagens (Dados extras)">
                 <span class="adv-label">V</span>
+                <button type="button" class="btn-calc-ajuda" style="font-size:0.55rem;width:14px;height:14px;" onclick="mostrarAjudaVantagem('${slug}')" title="Ver fontes das vantagens">?</button>
                 <input type="number" id="skill_adv_${slug}" class="save-input skill-adv" value="${savedAdv}" min="0" oninput="atualizarTudo()" />
             </div>
         </div>
@@ -79,6 +80,7 @@ function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", trainin
 
         <div class="skill-adv-container" title="Vantagens (Dados extras)">
             <span class="adv-label">V</span>
+            <button type="button" class="btn-calc-ajuda" style="font-size:0.55rem;width:14px;height:14px;" onclick="mostrarAjudaVantagem('${index}')" title="Ver fontes das vantagens">?</button>
             <input type="number" id="skill_adv_${index}" class="save-input skill-adv" value="${adv}" min="0" oninput="atualizarTudo()" />
         </div>
 
@@ -214,31 +216,81 @@ document.addEventListener('DOMContentLoaded', () => {
     filtrarPericias();
 });
 
+let _filtroAttrPericia = 'todos';
+
 /**
- * Filtra a lista de perícias com base no termo digitado
+ * Filtro rápido por atributo — clica nos chips no topo
+ */
+function filtrarPericiasPorAttr(btn) {
+    _filtroAttrPericia = btn.dataset.attr;
+    document.querySelectorAll('.btn-attr-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filtrarPericias();
+}
+
+/**
+ * Filtra a lista de perícias pelo nome e/ou atributo selecionado
  */
 function filtrarPericias() {
     const termo = document.getElementById('search-pericia')?.value.toLowerCase() || "";
-    const rows = document.querySelectorAll('#skills-container .skill-row');
-
-    rows.forEach(row => {
-        // Pega o nome das perícias estáticas ou o valor do input das dinâmicas
+    document.querySelectorAll('#skills-container .skill-row').forEach(row => {
         const staticName = row.querySelector('.static-skill-name')?.innerText.toLowerCase() || "";
         const dynamicName = row.querySelector('.skill-name-input')?.value.toLowerCase() || "";
         const nome = staticName || dynamicName;
+        const attrSel = row.querySelector('[id^="skill_attr_"]')?.value || "";
 
-        row.style.display = nome.includes(termo) ? '' : 'none';
+        const matchNome = nome.includes(termo);
+        const matchAttr = _filtroAttrPericia === 'todos' || attrSel === _filtroAttrPericia;
+        row.style.display = (matchNome && matchAttr) ? '' : 'none';
     });
 }
 
 /**
- * Limpa o campo de busca e restaura a lista completa
+ * Limpa busca + filtro de atributo
  */
 function resetarFiltrosPericias() {
     const search = document.getElementById('search-pericia');
-    if (search) {
-        search.value = '';
-        filtrarPericias();
-        showNotification("Filtro de perícias limpo", "info", 2000);
-    }
+    if (search) search.value = '';
+    _filtroAttrPericia = 'todos';
+    document.querySelectorAll('.btn-attr-filter').forEach(b => b.classList.remove('active'));
+    document.querySelector('.btn-attr-filter[data-attr="todos"]')?.classList.add('active');
+    filtrarPericias();
+    showNotification("Filtros de perícias limpos", "info", 2000);
+}
+
+/**
+ * Abre modal mostrando de onde vêm as vantagens de uma perícia
+ */
+function mostrarAjudaVantagem(skillSlug) {
+    const advInput = document.getElementById(`skill_adv_${skillSlug}`);
+    if (!advInput) return;
+    const modal = document.getElementById('modal-calc-ajuda');
+    const title = document.getElementById('modal-calc-ajuda-title');
+    const body  = document.getElementById('modal-calc-ajuda-body');
+    if (!modal || !title || !body) return;
+
+    const row = advInput.closest('.skill-row');
+    const skillName = row?.querySelector('.static-skill-name')?.textContent
+                   || row?.querySelector('.skill-name-input')?.value || "Perícia";
+    title.innerText = `Vantagens: ${skillName}`;
+
+    const fullTitle = advInput.title || "";
+    const hasBreakdown = fullTitle.includes('(');
+    const parts = hasBreakdown
+        ? fullTitle.substring(fullTitle.indexOf('(') + 1, fullTitle.lastIndexOf(')')).split(' | ')
+        : [];
+
+    body.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="padding:8px 12px;background:var(--primary-glow);border-radius:4px;font-size:0.8rem;color:var(--primary-color);text-align:center;">
+                <strong>Vantagem de Dado:</strong> Cada vantagem = rola um dado extra e usa o maior.
+            </div>
+            ${parts.length > 0
+                ? parts.map(p => `<div style="padding:8px;background:rgba(255,255,255,0.03);border-radius:4px;border-left:3px solid var(--primary-color);font-size:0.85rem;">${p}</div>`).join('')
+                : '<p style="color:#888;text-align:center;padding:12px 0;">Nenhum bônus de vantagem registrado.</p>'}
+            <div style="background:var(--primary-glow);border-radius:4px;padding:10px;text-align:center;font-weight:bold;">
+                Total: ${advInput.value} vantagem(ns)
+            </div>
+        </div>`;
+    modal.showModal();
 }

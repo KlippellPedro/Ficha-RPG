@@ -5,7 +5,7 @@ window.CLASSES_DATA["anjo"] = {
     pm_lvl: 5,
     isSpecial: true,
     showAnjo: true,
-    ambientType: "feather",
+    ambientType: ["feather", "divine"],
     skills: [],
     progressao: {
         1: { habilidades: [], poderes: [] }

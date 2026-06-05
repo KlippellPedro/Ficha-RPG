@@ -33,7 +33,7 @@ function abrirModalHab(index) {
                 </select>
             </div>
             <div class="input-group"><label>Tipo de Efeito</label>
-                <select id="modal_hab_tipo" class="inv-input" onchange="document.getElementById('hab-buff-btn-container').style.display = this.value === 'Passiva' ? 'block' : 'none';">
+                <select id="modal_hab_tipo" class="inv-input">
                     <option value="Ativa" ${tipo === 'Ativa' ? 'selected' : ''}>Ativa</option>
                     <option value="Passiva" ${tipo === 'Passiva' ? 'selected' : ''}>Passiva</option>
                     <option value="Reação" ${tipo === 'Reação' ? 'selected' : ''}>Reação</option>
@@ -65,9 +65,14 @@ function abrirModalHab(index) {
             <label>Ação</label>
             <input type="text" id="modal_hab_acao" class="inv-input" value="${acao}">
         </div>
-        <div class="input-group" id="hab-buff-btn-container" style="display: ${tipo === 'Passiva' ? 'block' : 'none'}">
-            <label>Configurações de Buff</label>
-            <button type="button" class="btn-save-modal" style="width:100%; background: #16a34a; color: #fff; border: 1px solid #166534;" onclick="abrirModalBuffsHab('${index}')">Definir Buffs</button>
+        <div class="input-group" id="hab-buff-btn-container">
+            <label style="display:flex;justify-content:space-between;align-items:center;">
+                <span>Buffs / Modificadores</span>
+                <small style="color:var(--text-muted);font-weight:normal;">
+                    ${tipo === 'Passiva' ? '🔒 Passiva: sempre ativo' : '⚡ Ativa: ativo ao usar'}
+                </small>
+            </label>
+            <button type="button" class="btn-save-modal" style="width:100%; background: #16a34a; color: #fff; border: 1px solid #166534;" onclick="abrirModalBuffsHab('${index}')">Configurar Buffs</button>
         </div>
         <div class="input-group">
             <label>Descrição e Efeito</label>
@@ -77,17 +82,16 @@ function abrirModalHab(index) {
 
     const footer = modal ? modal.querySelector('.modal-footer') : null;
     if (footer) {
-        footer.style.justifyContent = 'space-between';
+        footer.style.justifyContent = 'flex-end';
         footer.innerHTML = `
-            <button type="button" class="btn-use-skill" onclick="usarHabilidade('${index}')">Usar Habilidade</button>
             <button type="button" class="btn-save-modal" onclick="salvarDetalhesHab()">Salvar e Fechar</button>
         `;
     }
-    modal.style.display = 'flex';
+    modal.showModal();
 }
 
 function fecharModalHab() {
-    document.getElementById('modal-hab').style.display = 'none';
+    document.getElementById('modal-hab').close();
     habSendoEditadaIdx = null;
 }
 
@@ -98,9 +102,24 @@ function salvarDetalhesHab() {
     if (document.getElementById(`hab_tipo_${idx}`)) {
         const novoTipo = document.getElementById('modal_hab_tipo').value;
         document.getElementById(`hab_tipo_${idx}`).value = novoTipo;
-        // Atualiza o badge visual da row
         const row = document.getElementById(`hab_tipo_${idx}`)?.closest('.item-row');
         if (row) row.dataset.tipo = novoTipo;
+
+        // Atualiza visibilidade do botão Usar baseado no novo tipo
+        const btnUsar = document.getElementById(`btn_usar_hab_${idx}`);
+        if (btnUsar) btnUsar.style.display = novoTipo === 'Passiva' ? 'none' : '';
+
+        // Se mudou para Passiva, desativa buff ativo automaticamente
+        if (novoTipo === 'Passiva') {
+            const buffInput = document.getElementById(`hab_buff_ativo_${idx}`);
+            if (buffInput && buffInput.value === 'true') {
+                buffInput.value = 'false';
+                if (typeof _syncBotaoHab === 'function') _syncBotaoHab(idx);
+                let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+                dados[`hab_buff_ativo_${idx}`] = 'false';
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+            }
+        }
     }
     document.getElementById(`hab_custo_${idx}`).value = document.getElementById('modal_hab_custo').value;
     document.getElementById(`hab_tipo_custo_${idx}`).value = document.getElementById('modal_hab_tipo_custo').value;
@@ -131,14 +150,16 @@ function abrirModalBuffsHab(index) {
     }
 
     const title = document.getElementById('modal-pod-buffs-title');
-    if (title) title.innerText = "Buffs de Habilidade (Passiva)";
+    if (title) title.innerText = "Buffs / Modificadores da Habilidade";
     const btnSalvar = modal.querySelector('.btn-save-modal');
     if (btnSalvar) btnSalvar.setAttribute('onclick', 'salvarBuffsHab()');
-    modal.style.display = 'flex';
+    const btnAdd = modal.querySelector('.btn-add-class');
+    if (btnAdd) btnAdd.setAttribute('onclick', 'adicionarLinhaBuffHab()');
+    modal.showModal();
 }
 
 function fecharModalBuffHab() {
-    document.getElementById('modal-pod-buffs').style.display = 'none';
+    document.getElementById('modal-pod-buffs').close();
     currentHabModEditIdx = null;
 }
 

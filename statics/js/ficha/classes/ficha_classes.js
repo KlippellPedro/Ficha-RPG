@@ -52,7 +52,10 @@ function verificarVisibilidadeClasses() {
         const row = select.closest('.class-row');
 
         if (data) {
-            if (data.ambientType) ambientTypes.push(data.ambientType);
+            if (data.ambientType) {
+                if (Array.isArray(data.ambientType)) ambientTypes.push(...data.ambientType);
+                else ambientTypes.push(data.ambientType);
+            }
 
             Object.keys(visibilityMap).forEach(section => {
                 const parts = section.split('-');
@@ -97,7 +100,8 @@ function verificarVisibilidadeClasses() {
     // Efeitos visuais globais
     const container = document.querySelector('.container');
     if (container) {
-        const isDual = ambientTypes.includes('feather') && ambientTypes.includes('ember');
+        const isDual = (ambientTypes.includes('feather') || ambientTypes.includes('divine')) &&
+                       (ambientTypes.includes('ember') || ambientTypes.includes('hellfire'));
         container.classList.toggle('container-dual-alignment', isDual);
     }
 
@@ -344,7 +348,7 @@ function abrirModalSelecionarClasse(index) {
 
     let html = '';
     Object.keys(grupos).sort((a, b) => a === 'Base' ? -1 : 1).forEach(grupo => {
-        html += `<div style="font-size:0.6rem;letter-spacing:0.15em;color:var(--text-muted);text-transform:uppercase;
+        html += `<div data-grupo-header="${grupo}" style="font-size:0.6rem;letter-spacing:0.15em;color:var(--text-muted);text-transform:uppercase;
                              padding:8px 0 4px;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:6px;
                              font-family:var(--font-heading,serif);">${grupo}</div>`;
         grupos[grupo].forEach(({ key, data }) => {
@@ -359,7 +363,32 @@ function abrirModalSelecionarClasse(index) {
     });
 
     listContainer.innerHTML = html;
+
+    // Limpa e foca a busca ao abrir
+    const searchEl = document.getElementById('modal-class-search');
+    if (searchEl) { searchEl.value = ''; setTimeout(() => searchEl.focus(), 80); }
+
     modal.showModal();
+}
+
+function filtrarModalClasse(query) {
+    const list = document.getElementById('modal-class-select-list');
+    if (!list) return;
+    const q = (query || '').toLowerCase().trim();
+
+    list.querySelectorAll('[data-grupo-header]').forEach(header => {
+        let hasVisible = false;
+        let el = header.nextElementSibling;
+        while (el && !el.dataset.grupoHeader) {
+            if (el.classList.contains('selection-option')) {
+                const show = !q || el.textContent.toLowerCase().includes(q);
+                el.style.display = show ? '' : 'none';
+                if (show) hasVisible = true;
+            }
+            el = el.nextElementSibling;
+        }
+        header.style.display = hasVisible ? '' : 'none';
+    });
 }
 
 /**

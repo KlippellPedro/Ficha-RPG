@@ -104,8 +104,9 @@ function confirmarClasseUnica() {
 
         document.querySelectorAll('.class-row').forEach(row => {
             if (row !== targetRow) {
-                // Dispara o efeito de fumaça/almas saindo da linha que será removida
-                if (typeof criarEfeitoFumaca === 'function') criarEfeitoFumaca(row);
+                // Dispara o efeito épico de alma escapando da linha removida
+                if (typeof criarEfeitoAlmaEscapando === 'function') criarEfeitoAlmaEscapando(row);
+                else if (typeof criarEfeitoFumaca === 'function') criarEfeitoFumaca(row);
 
                 const nameSelect = row.querySelector('[id^="class_name_"]');
                 const index = nameSelect?.id.split('_').pop();

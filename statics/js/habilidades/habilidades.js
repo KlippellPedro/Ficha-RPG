@@ -3,6 +3,63 @@
  */
 
 /**
+ * Atualiza o visual do botão e da row com o estado do buff
+ */
+function _syncBotaoHab(index) {
+    const buffInput = document.getElementById(`hab_buff_ativo_${index}`);
+    const btn       = document.getElementById(`btn_usar_hab_${index}`);
+    if (!buffInput || !btn) return;
+    const isAtivo = buffInput.value === 'true';
+    btn.textContent = isAtivo ? 'Ativo' : 'Usar';
+    btn.classList.toggle('buff-ativo', isAtivo);
+    btn.closest('.item-row')?.classList.toggle('has-active-buff', isAtivo);
+}
+
+/**
+ * Alterna o estado do buff de uma habilidade ativa.
+ * Se buff está OFF → usa (deduciona custo) e ativa o buff (se tiver mods).
+ * Se buff está ON  → apenas desativa (sem custo).
+ */
+function toggleBuffHabilidade(index) {
+    const buffInput = document.getElementById(`hab_buff_ativo_${index}`);
+    if (!buffInput) return;
+    if (buffInput.value === 'true') {
+        // Desativar buff
+        buffInput.value = 'false';
+        _syncBotaoHab(index);
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        dados[`hab_buff_ativo_${index}`] = 'false';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        if (typeof showNotification === 'function') showNotification("Buff desativado.", "info");
+        atualizarTudo();
+    } else {
+        // Usar habilidade → irá ativar buff dentro de usarHabilidade se tiver mods
+        usarHabilidade(index);
+    }
+}
+
+/**
+ * Ativa o buff de uma habilidade se ela tiver mods configurados
+ */
+function _ativarBuffHab(index) {
+    const modsRaw = document.getElementById(`hab_mods_${index}`)?.value || '[]';
+    try {
+        const mods = JSON.parse(modsRaw);
+        if (!mods.length) return; // sem mods — não há buff pra ativar
+    } catch { return; }
+
+    const buffInput = document.getElementById(`hab_buff_ativo_${index}`);
+    if (!buffInput) return;
+    buffInput.value = 'true';
+    _syncBotaoHab(index);
+
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    dados[`hab_buff_ativo_${index}`] = 'true';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    if (typeof showNotification === 'function') showNotification("Buff ativado! Clique em 'Ativo' para desativar.", "success", 3500);
+}
+
+/**
  * Função para "usar" uma habilidade, subtraindo o custo em PM da mana atual.
  */
 function usarHabilidade(index) {
@@ -32,6 +89,7 @@ function usarHabilidade(index) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         registrarHistorico(document.getElementById(`hab_nome_${index}`).value || "Habilidade", custo, tipoCusto);
         showNotification(`Habilidade usada! ${custo} PM subtraídos. Mana atual: ${recursoAtual}/${recursoMax}.`, 'success');
+        _ativarBuffHab(index);
         atualizarTudo();
     } else if (tipoCusto === "PV") {
         let recursoAtual = parseInt(dados.pv_atual) || 0;
@@ -46,10 +104,12 @@ function usarHabilidade(index) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         registrarHistorico(document.getElementById(`hab_nome_${index}`).value || "Habilidade", custo, tipoCusto);
         showNotification(`Habilidade usada! ${custo} PV subtraídos. Vida atual: ${recursoAtual}/${recursoMax}.`, 'success');
+        _ativarBuffHab(index);
         atualizarTudo();
     } else if (tipoCusto === "Outro") {
-        showNotification(`Habilidade custa ${custo} de um recurso "Outro". Gerencie isso manualmente.`, 'info');
-        atualizarTudo(); // Apenas para garantir que a UI seja atualizada
+        showNotification(`Habilidade usada (custo manual).`, 'info');
+        _ativarBuffHab(index);
+        atualizarTudo();
     }
 }
 
@@ -91,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Array.from(ids)
             .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
             .forEach(idx => {
-                adicionarHabilidadeUI(salvo[`hab_nome_${idx}`], salvo[`hab_tipo_${idx}`], salvo[`hab_custo_${idx}`], salvo[`hab_tipo_custo_${idx}`], salvo[`hab_desc_${idx}`], idx, salvo[`hab_duracao_${idx}`], salvo[`hab_alcance_${idx}`], salvo[`hab_acao_${idx}`], salvo[`hab_classe_${idx}`], salvo[`hab_mods_${idx}`]);
+                adicionarHabilidadeUI(salvo[`hab_nome_${idx}`], salvo[`hab_tipo_${idx}`], salvo[`hab_custo_${idx}`], salvo[`hab_tipo_custo_${idx}`], salvo[`hab_desc_${idx}`], idx, salvo[`hab_duracao_${idx}`], salvo[`hab_alcance_${idx}`], salvo[`hab_acao_${idx}`], salvo[`hab_classe_${idx}`], salvo[`hab_mods_${idx}`], salvo[`hab_buff_ativo_${idx}`] || 'false');
             });
 
         loadHabilidadesOrder();

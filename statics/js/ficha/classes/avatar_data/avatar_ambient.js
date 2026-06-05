@@ -369,7 +369,17 @@
     // ── Carrega ao abrir a página se já há elemento salvo ──
     document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
+            // Só inicia partículas na página da ficha
+            if (!document.getElementById('classes-container')) return;
+
             const dados = JSON.parse(localStorage.getItem(window.STORAGE_KEY)) || {};
+
+            // Verifica se há uma classe avatar realmente ativa (não apenas um elemento salvo órfão)
+            const hasActiveAvatar = Object.keys(dados).some(
+                k => k.startsWith('class_name_') && dados[k] === 'avatar'
+            );
+            if (!hasActiveAvatar) return;
+
             // Busca a primeira instância de avatar com elemento definido
             const eleKey = Object.keys(dados).find(k => k.startsWith('class_avatar_element_'));
             if (!eleKey) return;

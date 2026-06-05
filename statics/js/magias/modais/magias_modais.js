@@ -56,25 +56,31 @@ function abrirModalMag(index) {
             <div class="input-group"><label>Ação</label><input type="text" id="modal_mag_acao" class="inv-input" value="${vals.acao}" placeholder="Ex: Padrão"></div>
             <div class="input-group"><label>Teste</label><input type="text" id="modal_mag_teste" class="inv-input" value="${vals.teste}" placeholder="Ex: Misticismo"></div>
         </div>
-        <div class="input-group"><label>Efeito da Magia</label><textarea id="modal_mag_desc" class="inv-input" style="min-height: 200px">${vals.desc}</textarea></div>
+        <div class="input-group"><label>Efeito da Magia</label><textarea id="modal_mag_desc" class="inv-input" style="min-height: 180px">${vals.desc}</textarea></div>
+        <div class="input-group">
+            <label style="display:flex;justify-content:space-between;align-items:center;">
+                <span>Buffs / Efeitos Persistentes</span>
+                <small style="color:var(--text-muted);font-weight:normal;">✨ Ativo ao conjurar</small>
+            </label>
+            <button type="button" class="btn-save-modal" style="width:100%;background:#6d28d9;color:#fff;border:1px solid #7c3aed;" onclick="abrirModalBuffsMag('${index}')">Configurar Buffs da Magia</button>
+        </div>
     `;
 
     const footer = modalEl.querySelector('.modal-footer');
     if (footer) {
-        footer.style.justifyContent = 'space-between';
+        footer.style.justifyContent = 'flex-end';
         footer.innerHTML = `
-            <button type="button" class="btn-use-skill" onclick="usarMagia('${index}')">Usar Magia</button>
             <button type="button" class="btn-save-modal" onclick="salvarDetalhesMag()">Salvar no Grimório</button>
         `;
     }
 
-    modalEl.style.display = 'flex';
+    modalEl.showModal();
     atualizarCorNivel('modal');
 }
 
 function fecharModalMag() {
     const modal = document.getElementById('modal-magia');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.close();
     magSendoEditadaIdx = null;
 }
 
@@ -99,4 +105,101 @@ function salvarDetalhesMag() {
         atualizarTudo();
         filtrarMagias();
     }
+}
+
+let _magBuffEditIdx = null;
+
+/**
+ * Adiciona uma linha de buff no container do modal — versão local para magias
+ * (idêntica à de poderes, mas independente para funcionar sem poderes_modais.js)
+ */
+function _adicionarLinhaBuff_Mag(attr = 'nenhum', mod = 0, isAdv = false) {
+    const container = document.getElementById('pod-buffs-container');
+    if (!container) return;
+
+    let cat = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && attr !== 'nenhum' && window.OPTIONS_CATEGORIZADAS) {
+        if (window.OPTIONS_CATEGORIZADAS.pericia?.some(o => o.v === attr)) cat = 'pericia';
+        else if (window.OPTIONS_CATEGORIZADAS.arma?.some(o => o.v === attr)) cat = 'arma';
+    }
+
+    const row = document.createElement('div');
+    row.className = 'material-attr-row';
+    row.style.cssText = 'display:flex;gap:10px;margin-bottom:10px;';
+    row.innerHTML = `
+        <select class="inv-input pod-cat-select" style="flex:1;">
+            <option value="ficha"    ${cat === 'ficha'    ? 'selected' : ''}>Ficha</option>
+            <option value="pericia"  ${cat === 'pericia'  ? 'selected' : ''}>Perícia</option>
+            <option value="arma"     ${cat === 'arma'     ? 'selected' : ''}>Arma</option>
+            <option value="vantagem" ${cat === 'vantagem' ? 'selected' : ''}>Vantagem</option>
+        </select>
+        <select class="inv-input pod-buff-attr" style="flex:1.5;"></select>
+        <input type="text" class="inv-input pod-buff-val" style="flex:0.8;" value="${mod}" placeholder="Val">
+        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(row);
+
+    const catSel  = row.querySelector('.pod-cat-select');
+    const attrSel = row.querySelector('.pod-buff-attr');
+
+    const populateAttr = (val = 'nenhum') => {
+        const opts = (window.OPTIONS_CATEGORIZADAS?.[catSel.value]) || [];
+        attrSel.innerHTML = opts.map(o => `<option value="${o.v}" ${o.v === val ? 'selected' : ''}>${o.t}</option>`).join('');
+    };
+    catSel.onchange = () => populateAttr();
+    populateAttr(attr);
+}
+
+function abrirModalBuffsMag(index) {
+    _magBuffEditIdx = index;
+    let modsData = [];
+    try { modsData = JSON.parse(document.getElementById(`mag_mods_${index}`)?.value || '[]'); } catch { modsData = []; }
+
+    const modal     = document.getElementById('modal-pod-buffs');
+    const container = document.getElementById('pod-buffs-container');
+    const title     = document.getElementById('modal-pod-buffs-title');
+    if (!modal || !container) return;
+
+    if (title) title.innerText = "Buffs da Magia (Efeito Persistente)";
+    container.innerHTML = '';
+
+    // Botão para adicionar nova linha
+    const btnAdd = modal.querySelector('.btn-add-class');
+    if (btnAdd) btnAdd.setAttribute('onclick', '_adicionarLinhaBuff_Mag()');
+
+    if (modsData.length > 0) {
+        modsData.forEach(m => _adicionarLinhaBuff_Mag(m.attr, m.mod, m.isAdv));
+    } else {
+        _adicionarLinhaBuff_Mag();
+    }
+
+    const btnSalvar = modal.querySelector('.btn-save-modal');
+    if (btnSalvar) btnSalvar.setAttribute('onclick', 'salvarBuffsMagia()');
+    modal.showModal();
+}
+
+function salvarBuffsMagia() {
+    if (_magBuffEditIdx === null) return;
+    const container = document.getElementById('pod-buffs-container');
+    if (!container) return;
+
+    const modsArr = [];
+    container.querySelectorAll('.material-attr-row').forEach(row => {
+        const cat    = row.querySelector('.pod-cat-select')?.value || 'ficha';
+        const attr   = row.querySelector('.pod-buff-attr')?.value;
+        const modVal = row.querySelector('.pod-buff-val')?.value;
+        if (!attr || attr === 'nenhum') return;
+        modsArr.push({
+            attr,
+            mod: isNaN(parseInt(modVal)) ? (modVal || 0) : parseInt(modVal),
+            isAdv: cat === 'vantagem'
+        });
+    });
+
+    const hidden = document.getElementById(`mag_mods_${_magBuffEditIdx}`);
+    if (hidden) hidden.value = JSON.stringify(modsArr);
+
+    document.getElementById('modal-pod-buffs')?.close();
+    _magBuffEditIdx = null;
+    atualizarTudo();
 }
