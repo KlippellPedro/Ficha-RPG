@@ -99,11 +99,11 @@
         fogo_verdadeiro: {
             dir: 'up', rate: 450,
             build: (p) => {
-                const s = 3 + Math.random() * 5;
+                const s = 4 + Math.random() * 6;
                 p.style.width = s + 'px'; p.style.height = s + 'px';
                 p.style.borderRadius = '50%';
-                p.style.background = `hsl(${45 + Math.random() * 20},100%,${80 + Math.random() * 15}%)`;
-                p.style.boxShadow = `0 0 12px #fff7d4, 0 0 20px #ffd700`;
+                p.style.background = `hsl(${355 + Math.random() * 8},100%,${35 + Math.random() * 18}%)`;
+                p.style.boxShadow = `0 0 12px #cc1500, 0 0 22px rgba(200,20,0,0.5)`;
             }
         },
         fumaca: {

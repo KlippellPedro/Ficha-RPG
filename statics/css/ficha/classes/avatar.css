@@ -216,3 +216,85 @@
   background: rgba(243, 231, 55, 0.05) !important;
   box-shadow: 0 0 15px rgba(243, 231, 55, 0.1) !important;
 }
+
+/* ── Subelementos ─────────────────────────────────────── */
+.row-element-fogo_verdadeiro {
+  border: 1px solid #cc1500 !important;
+  background: rgba(204, 21, 0, 0.1) !important;
+  box-shadow: 0 0 15px rgba(204, 21, 0, 0.25) !important;
+}
+.row-element-fumaca {
+  border: 1px solid #8b7d8b !important;
+  background: rgba(120, 100, 120, 0.1) !important;
+  box-shadow: 0 0 15px rgba(120, 100, 120, 0.15) !important;
+}
+.row-element-lava {
+  border: 1px solid #cc2900 !important;
+  background: rgba(204, 41, 0, 0.1) !important;
+  box-shadow: 0 0 15px rgba(255, 80, 0, 0.2) !important;
+}
+.row-element-agua_sub {
+  border: 1px solid #00d4ff !important;
+  background: rgba(0, 212, 255, 0.08) !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2) !important;
+}
+.row-element-gelo {
+  border: 1px solid #a8dce8 !important;
+  background: rgba(168, 220, 232, 0.08) !important;
+  box-shadow: 0 0 15px rgba(168, 220, 232, 0.2) !important;
+}
+.row-element-sangue {
+  border: 1px solid #8b0000 !important;
+  background: rgba(139, 0, 0, 0.12) !important;
+  box-shadow: 0 0 15px rgba(139, 0, 0, 0.25) !important;
+}
+.row-element-ar_sub {
+  border: 1px solid #e0e8ff !important;
+  background: rgba(200, 215, 255, 0.06) !important;
+  box-shadow: 0 0 15px rgba(200, 215, 255, 0.15) !important;
+}
+.row-element-gas {
+  border: 1px solid #7fff00 !important;
+  background: rgba(127, 255, 0, 0.06) !important;
+  box-shadow: 0 0 15px rgba(127, 255, 0, 0.15) !important;
+}
+.row-element-atm {
+  border: 1px solid #9400d3 !important;
+  background: rgba(148, 0, 211, 0.08) !important;
+  box-shadow: 0 0 15px rgba(148, 0, 211, 0.2) !important;
+}
+.row-element-terra_sub {
+  border: 1px solid #654321 !important;
+  background: rgba(101, 67, 33, 0.12) !important;
+  box-shadow: 0 0 15px rgba(101, 67, 33, 0.2) !important;
+}
+.row-element-metal {
+  border: 1px solid #c0c0c0 !important;
+  background: rgba(192, 192, 192, 0.06) !important;
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.15) !important;
+}
+.row-element-cristal {
+  border: 1px solid #9b59b6 !important;
+  background: rgba(0, 188, 212, 0.06) !important;
+  box-shadow: 0 0 15px rgba(155, 89, 182, 0.2) !important;
+}
+.row-element-raio_sub {
+  border: 1px solid #00fff5 !important;
+  background: rgba(0, 255, 245, 0.06) !important;
+  box-shadow: 0 0 18px rgba(0, 255, 245, 0.25) !important;
+}
+.row-element-morte {
+  border: 1px solid #660066 !important;
+  background: rgba(45, 10, 78, 0.15) !important;
+  box-shadow: 0 0 15px rgba(102, 0, 102, 0.2) !important;
+}
+.row-element-escuridao {
+  border: 1px solid #440066 !important;
+  background: rgba(10, 0, 30, 0.25) !important;
+  box-shadow: 0 0 15px rgba(68, 0, 102, 0.15) !important;
+}
+.row-element-energia {
+  border: 1px solid #00d4ff !important;
+  background: rgba(0, 212, 255, 0.06) !important;
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.2) !important;
+}

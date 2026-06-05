@@ -918,10 +918,69 @@ body.hp-critical .critical-vignette {
   display: flex;
   gap: 10px;
   justify-content: center;
-  border-radius: 4px;
-  font-weight: bold;
-  transition: var(--transition-speed);
-  flex: 1;
+  flex-wrap: wrap;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.controles::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color, #457b9d), transparent);
+  opacity: 0.5;
+}
+
+/* Botão de exportar (salvar) — destaque em verde */
+.controles button:first-child {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff;
+  border: 1px solid #16a34a;
+  font-family: var(--font-heading, serif);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.controles button:first-child:hover {
+  box-shadow: 0 0 16px rgba(22, 163, 74, 0.5), 0 4px 12px rgba(0,0,0,0.4);
+  filter: brightness(1.15);
+}
+
+/* Importar — secundário */
+.controles button:nth-child(3) {
+  background: transparent;
+  color: var(--secondary-color, #457b9d);
+  border: 1px solid var(--secondary-color, #457b9d);
+  font-family: var(--font-heading, serif);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.controles button:nth-child(3):hover {
+  background: var(--secondary-glow, rgba(69,123,157,0.15));
+  box-shadow: 0 0 12px var(--secondary-glow, rgba(69,123,157,0.3));
+  filter: none;
+}
+
+/* Limpar — perigo */
+.controles button:last-child {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  font-family: var(--font-heading, serif);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.controles button:last-child:hover {
+  background: rgba(239, 68, 68, 0.12);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+  filter: none;
 }
 
 /* Pulsação para estados críticos (Ex: HP baixo) */

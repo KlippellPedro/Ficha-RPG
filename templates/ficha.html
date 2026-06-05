@@ -81,7 +81,8 @@
           </div>
           <div class="input-group">
             <label>Raça</label>
-            <select id="raca" class="save-input header-input" onchange="atualizarTudo()"></select>
+            <button type="button" id="race-btn" class="btn-class-select empty" onclick="abrirModalSelecionarRaca()">Selecionar Raça...</button>
+            <select id="raca" class="save-input" style="display:none" onchange="atualizarTudo()"></select>
           </div>
           <div class="input-group">
             <label>Tamanho</label>

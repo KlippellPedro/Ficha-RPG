@@ -2,6 +2,106 @@
  * Lógica específica para raças e traços raciais
  */
 
+// ── Configuração visual das raças (cor de destaque) ───────────────
+const RACA_VISUAL = {
+    humano:     { cor: '#a0a0b0', desc: 'Versáteis e adaptáveis.' },
+    vampiro:    { cor: '#8b0000', desc: 'Imortais sedentos de sangue.' },
+    espirito:   { cor: '#00d4ff', desc: 'Seres etéreos além do véu.' },
+    morto_vivo: { cor: '#660066', desc: 'Mantidos pela força da morte.' },
+    animalia:   { cor: '#c97b2c', desc: 'Fusão entre humano e besta.' },
+    goblin:     { cor: '#4ade80', desc: 'Pequenos, espertos e ágeis.' },
+    fada:       { cor: '#f0abfc', desc: 'Criaturas mágicas da natureza.' },
+    anao:       { cor: '#a0522d', desc: 'Fortes e resistentes como pedra.' },
+    elfo:       { cor: '#86efac', desc: 'Longevos e refinados.' },
+    demonio:    { cor: '#ff4444', desc: 'Nascidos do caos infernal.' },
+    anjo:       { cor: '#f59e0b', desc: 'Guardiões da ordem divina.' },
+    semideus:   { cor: '#a78bfa', desc: 'Sangue de deuses nas veias.' },
+    deus:       { cor: '#ffd700', desc: 'Poder absoluto e eterno.' },
+    escolhido:  { cor: '#fb923c', desc: 'Marcados pelo destino.' },
+    corrompido: { cor: '#7e22ce', desc: 'Consumidos pela corrupção.' },
+    hibrido:    { cor: '#22d3ee', desc: 'Duas raças, um ser.' },
+    kitsune:    { cor: '#ff7043', desc: 'Raposas místicas do Olimpo.' },
+};
+
+// ── Modal de seleção de raça ─────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const modalHtml = `
+        <dialog id="modal-raca-select" class="modal-overlay">
+            <div class="modal-content" style="max-width:680px;width:95%;">
+                <div class="modal-header">
+                    <h3 class="modal-title" style="color:var(--primary-color)">Escolher Raça</h3>
+                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                </div>
+                <div class="modal-body" id="modal-raca-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:65vh;overflow-y:auto;padding:4px 2px;"></div>
+            </div>
+        </dialog>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+});
+
+window.abrirModalSelecionarRaca = function () {
+    const modal = document.getElementById('modal-raca-select');
+    const list = document.getElementById('modal-raca-list');
+    if (!modal || !list) return;
+
+    const racasDB = window.RACAS_DATA || {};
+    const currentVal = document.getElementById('raca')?.value || '';
+
+    list.innerHTML = Object.keys(racasDB)
+        .filter(key => !racasDB[key].dlc || isDlcAtiva(racasDB[key].dlc))
+        .map(key => {
+            const r = racasDB[key];
+            const vis = RACA_VISUAL[key] || { cor: '#888', desc: '' };
+            const isSelected = key === currentVal;
+            const size = r.tamanho ? `<small style="opacity:0.5;font-size:0.55rem;">${r.tamanho}</small>` : '';
+            const dlcBadge = r.dlc && r.dlc !== 'atual'
+                ? `<span style="font-size:0.45rem;background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 4px;opacity:0.6;">${r.dlc.toUpperCase()}</span>`
+                : '';
+            return `
+                <div onclick="confirmarSelecionarRaca('${key}')"
+                     style="
+                        cursor:pointer;border-radius:8px;padding:14px 10px;text-align:center;
+                        border:1px solid ${isSelected ? vis.cor : 'rgba(255,255,255,0.07)'};
+                        background:${isSelected ? `rgba(${hexToRgbStr(vis.cor)},0.15)` : 'rgba(255,255,255,0.02)'};
+                        box-shadow:${isSelected ? `0 0 12px rgba(${hexToRgbStr(vis.cor)},0.3)` : 'none'};
+                        transition:all 0.2s;display:flex;flex-direction:column;gap:5px;align-items:center;
+                     "
+                     onmouseenter="this.style.borderColor='${vis.cor}';this.style.background='rgba(${hexToRgbStr(vis.cor)},0.1)';this.style.transform='translateY(-3px)'"
+                     onmouseleave="this.style.borderColor='${isSelected ? vis.cor : 'rgba(255,255,255,0.07)'}';this.style.background='${isSelected ? `rgba(${hexToRgbStr(vis.cor)},0.15)` : 'rgba(255,255,255,0.02)'}';this.style.transform=''">
+                    <span style="font-family:var(--font-heading,serif);font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:${vis.cor};text-shadow:0 0 8px rgba(${hexToRgbStr(vis.cor)},0.4);">${r.nome}</span>
+                    ${size} ${dlcBadge}
+                    <span style="font-size:0.5rem;opacity:0.45;line-height:1.3;">${vis.desc}</span>
+                </div>`;
+        }).join('');
+
+    modal.showModal();
+};
+
+function hexToRgbStr(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r},${g},${b}`;
+}
+
+window.confirmarSelecionarRaca = function (key) {
+    const select = document.getElementById('raca');
+    const btn = document.getElementById('race-btn');
+    const racasDB = window.RACAS_DATA || {};
+    if (select) {
+        select.value = key;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    if (btn) {
+        btn.textContent = racasDB[key]?.nome || key;
+        btn.classList.remove('empty');
+        const cor = RACA_VISUAL[key]?.cor || 'var(--primary-color)';
+        btn.style.borderColor = cor;
+        btn.style.color = cor;
+    }
+    document.getElementById('modal-raca-select')?.close();
+};
+
 function initRaces() {
     const racaSelect = document.getElementById('raca');
     const h1 = document.getElementById('hibrido_raca_1');
@@ -16,7 +116,17 @@ function initRaces() {
             .map(key =>
                 `<option value="${key}">${racasDB[key].nome}</option>`
             ).join('');
-        if (salvo.raca) racaSelect.value = salvo.raca;
+        if (salvo.raca) {
+            racaSelect.value = salvo.raca;
+            // Atualiza botão com o valor salvo
+            const btn = document.getElementById('race-btn');
+            if (btn && salvo.raca) {
+                btn.textContent = racasDB[salvo.raca]?.nome || salvo.raca;
+                btn.classList.remove('empty');
+                const cor = RACA_VISUAL[salvo.raca]?.cor;
+                if (cor) { btn.style.borderColor = cor; btn.style.color = cor; }
+            }
+        }
     }
 
     if (h1 && h2) {

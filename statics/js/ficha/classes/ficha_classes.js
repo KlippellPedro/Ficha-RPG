@@ -102,6 +102,11 @@ function verificarVisibilidadeClasses() {
     }
 
     if (typeof gerenciarEfeitosAmbientes === 'function') gerenciarEfeitosAmbientes(ambientTypes);
+
+    // Partículas de Avatar: para se nenhuma classe avatar estiver ativa
+    const temAvatar = Array.from(document.querySelectorAll('[id^="class_name_"]')).some(s => s.value === 'avatar');
+    if (!temAvatar && typeof window.pararAvatarAmbient === 'function') window.pararAvatarAmbient();
+
     const btnAdd = document.querySelector('.btn-add-class');
     if (btnAdd) btnAdd.style.display = ambientTypes.includes('soul') ? 'none' : 'block';
 }
@@ -210,7 +215,9 @@ function atualizarEstiloClasse(selectEl) {
         if (lvl >= 1 && window.verificarDespertarAvatar) window.verificarDespertarAvatar(index, lvl, 'avatar');
 
         if (elementoEscolhido) {
-            row.classList.add(`row-element-${elementoEscolhido}`);
+            // Usa subelemento para cor da row se existir
+            const chaveVisual = dados[`class_avatar_subelement_${index}`] || elementoEscolhido;
+            row.classList.add(`row-element-${chaveVisual}`);
 
             const subElemento = dados[`class_avatar_subelement_${index}`];
             const elData = window.AVATAR_ELEMENTS_DATA?.[elementoEscolhido];
