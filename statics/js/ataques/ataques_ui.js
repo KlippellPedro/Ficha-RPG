@@ -16,7 +16,7 @@ function adicionarAtaqueUI(nome = "", teste = "", dano = "", critico = "", alcan
         <input type="text" id="atk_nome_${index}" class="save-input inv-input" placeholder="Arma/Ataque" value="${nome}" oninput="if(typeof sincronizarAtaqueComInventario === 'function') sincronizarAtaqueComInventario('${index}')">
         <input type="text" id="atk_teste_${index}" class="save-input inv-input" placeholder="Ex: Luta" value="${teste}">
         <input type="text" id="atk_dano_${index}" class="save-input inv-input" placeholder="Ex: 1d8+5" value="${dano}">
-        <input type="text" id="atk_tipo_dano_${index}" class="save-input inv-input" placeholder="Ex: Cortante" value="${tipo_dano}" oninput="if(typeof sincronizarAtaqueComInventario === 'function') sincronizarAtaqueComInventario('${index}')">
+        <input type="text" id="atk_tipo_dano_${index}" class="save-input inv-input atk-damage-badge" placeholder="Ex: Cortante" value="${tipo_dano}" oninput="atualizarBadgeDano('${index}'); if(typeof sincronizarAtaqueComInventario === 'function') sincronizarAtaqueComInventario('${index}')" data-damage-type="${tipo_dano.toLowerCase()}">
         <input type="text" id="atk_critico_${index}" class="save-input inv-input" placeholder="Ex: 19/x3" value="${critico}">
         <input type="text" id="atk_alcance_${index}" class="save-input inv-input" placeholder="Ex: Curto" value="${alcance}">
         
@@ -32,9 +32,33 @@ function adicionarAtaqueUI(nome = "", teste = "", dano = "", critico = "", alcan
     `;
 
     container.appendChild(row);
+    atualizarBadgeDano(index);
     if (idIndex === null) {
         atualizarTudo();
         filtrarAtaques();
+    }
+}
+
+function atualizarBadgeDano(index) {
+    const input = document.getElementById(`atk_tipo_dano_${index}`);
+    if (!input) return;
+    const val = input.value.toLowerCase();
+    const DAMAGE_MAP = {
+        cortante: 'dmg-slash',   corte: 'dmg-slash',
+        perfurante: 'dmg-pierce', perfur: 'dmg-pierce',
+        contundente: 'dmg-blunt', contund: 'dmg-blunt',
+        fogo: 'dmg-fire',        chama: 'dmg-fire',
+        gelo: 'dmg-ice',         frio: 'dmg-ice',
+        raio: 'dmg-lightning',   elétric: 'dmg-lightning',
+        ácido: 'dmg-acid',       acido: 'dmg-acid',
+        necr: 'dmg-necrotic',    necrótic: 'dmg-necrotic',
+        radiant: 'dmg-radiant',  divino: 'dmg-radiant',
+        psíquic: 'dmg-psychic',  mental: 'dmg-psychic',
+    };
+    const allClasses = Object.values(DAMAGE_MAP);
+    input.classList.remove(...allClasses);
+    for (const [key, cls] of Object.entries(DAMAGE_MAP)) {
+        if (val.includes(key)) { input.classList.add(cls); break; }
     }
 }
 

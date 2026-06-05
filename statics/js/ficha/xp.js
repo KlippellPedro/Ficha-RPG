@@ -45,7 +45,7 @@ window.validarXP = function () {
     const xpAtual = parseInt(xpAtualEl?.value) || 0;
 
     const modal = document.getElementById('modal-level-up');
-    if (xpAtual >= xpMax && modal && modal.style.display !== 'flex') {
+    if (xpAtual >= xpMax && modal && !modal.open) {
         abrirModalEscolhaLevelUp();
     }
 };
@@ -108,7 +108,7 @@ function abrirModalEscolhaLevelUp() {
     `;
 
     container.innerHTML = html;
-    modal.style.display = 'flex';
+    modal.showModal();
 }
 
 /**
@@ -155,7 +155,7 @@ function selecionarNovaClasseLevelUp() {
 function concluirNovaClasseLevelUp(className) {
     if (typeof adicionarClasseUI === 'function') {
         adicionarClasseUI(className, 1);
-        document.getElementById('modal-level-up').style.display = 'none';
+        document.getElementById('modal-level-up').close();
 
         const xpAtualEl = document.getElementById('xp_atual');
         const nivelEl = document.getElementById('nivel');
@@ -194,7 +194,7 @@ function processarLevelUp(idx) {
             atualizarEstiloClasse(selectName);
         }
 
-        document.getElementById('modal-level-up').style.display = 'none';
+        document.getElementById('modal-level-up').close();
 
         // Desconta exatamente o XP necessário para o nível que o personagem estava
         xpAtualEl.value = Math.max(0, atualXP - xpMaxGasto);

@@ -5,29 +5,41 @@
   grid-template-columns: 2fr 130px 90px 160px 50px 60px 50px 40px; /* Removido !important */
 }
 
-/* Cores por Círculo/Nível */
-.mag-nivel-1 {
-  color: #ffffff !important;
+/* Chips de filtro de círculo */
+.circle-chips {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
 }
-.mag-nivel-2 {
-  color: #4ade80 !important;
-  text-shadow: 0 0 5px rgba(74, 222, 128, 0.3);
-  font-weight: bold;
+
+.circle-chip {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-family: var(--font-heading, serif);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
 }
-.mag-nivel-3 {
-  color: #3b82f6 !important;
-  text-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
-  font-weight: bold;
-}
-.mag-nivel-4 {
-  color: #f59e0b !important;
-  text-shadow: 0 0 5px rgba(245, 158, 11, 0.3);
-  font-weight: bold;
-}
-.mag-nivel-extra {
-  color: #ff4444 !important;
-  font-weight: bold;
-}
+
+.circle-chip:hover           { transform: translateY(-1px); filter: brightness(1.3); }
+.circle-chip.active          { color: var(--primary-color); background: var(--primary-glow); border-color: var(--primary-color); }
+.circle-chip.chip-2.active   { color: #4ade80; background: rgba(74,222,128,0.12); border-color: #4ade80; }
+.circle-chip.chip-3.active   { color: #3b82f6; background: rgba(59,130,246,0.12); border-color: #3b82f6; }
+.circle-chip.chip-4.active   { color: #f59e0b; background: rgba(245,158,11,0.12); border-color: #f59e0b; }
+.circle-chip.chip-extra.active { color: #ff4444; background: rgba(255,68,68,0.12); border-color: #ff4444; }
+
+/* Cores por Círculo/Nível com glow mais forte */
+.mag-nivel-1 { color: #ffffff !important; }
+.mag-nivel-2 { color: #4ade80 !important; text-shadow: 0 0 10px rgba(74,222,128,0.6); font-weight: bold; }
+.mag-nivel-3 { color: #3b82f6 !important; text-shadow: 0 0 10px rgba(59,130,246,0.6); font-weight: bold; }
+.mag-nivel-4 { color: #f59e0b !important; text-shadow: 0 0 12px rgba(245,158,11,0.7); font-weight: bold; }
+.mag-nivel-extra { color: #ff4444 !important; text-shadow: 0 0 12px rgba(255,68,68,0.7); font-weight: bold; }
 
 /* Estilização das opções dentro do seletor */
 select.inv-input option[value="1"] {

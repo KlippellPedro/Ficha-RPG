@@ -52,7 +52,7 @@ Implementação de lógica de carga baseada em atributos (Força), com alertas v
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/ficha-rpg.git
+   git clone https://github.com/KlippellPedro/Ficha-Supremacia-do-Protesto.git
    ```
 2. Instale as dependências de desenvolvimento:
    ```bash
@@ -65,7 +65,7 @@ Implementação de lógica de carga baseada em atributos (Força), com alertas v
 
 ---
 
-Desenvolvido por **Pedro Ndalon Klippel** como parte de um estudo avançado em Vanilla JavaScript e Sistemas de RPG.
+Desenvolvido por **Pedro Nadalon Klippel** como parte de um estudo avançado em Vanilla JavaScript e Sistemas de RPG.
 
 ```
 

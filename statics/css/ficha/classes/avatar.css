@@ -1,3 +1,76 @@
+/* ══════════════════════════════════════════════
+   CARDS CANVAS — Modal de Seleção de Elemento
+══════════════════════════════════════════════ */
+
+/* Grid do modal */
+.avatar-canvas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  padding: 4px 2px;
+}
+
+/* Card base */
+.avatar-canvas-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #0d0d14;
+  aspect-ratio: 1 / 1.1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 0 12px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
+  user-select: none;
+}
+
+.avatar-canvas-card:hover {
+  transform: translateY(-5px) scale(1.03);
+}
+
+.avatar-canvas-card--sub {
+  aspect-ratio: 1 / 0.95;
+}
+
+/* Canvas dentro do card */
+.avatar-canvas-card canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Nome do elemento */
+.avatar-card-name {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-heading, 'Cinzel', serif);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  text-align: center;
+  padding: 0 6px;
+}
+
+/* Descrição no sub */
+.avatar-card-desc {
+  position: relative;
+  z-index: 2;
+  font-size: 0.48rem;
+  opacity: 0.45;
+  max-width: 95px;
+  text-align: center;
+  margin-top: 3px;
+  line-height: 1.3;
+  padding: 0 4px;
+}
+
 /* Estilos para a Classe Avatar */
 .avatar-epic-modal {
   border-top: 4px solid var(--primary-color); /* Mantido para compatibilidade, mas o box-shadow é mais dominante */
@@ -142,4 +215,86 @@
   border: 1px solid #f3e737 !important;
   background: rgba(243, 231, 55, 0.05) !important;
   box-shadow: 0 0 15px rgba(243, 231, 55, 0.1) !important;
+}
+
+/* ── Subelementos ─────────────────────────────────────── */
+.row-element-fogo_verdadeiro {
+  border: 1px solid #cc1500 !important;
+  background: rgba(204, 21, 0, 0.1) !important;
+  box-shadow: 0 0 15px rgba(204, 21, 0, 0.25) !important;
+}
+.row-element-fumaca {
+  border: 1px solid #8b7d8b !important;
+  background: rgba(120, 100, 120, 0.1) !important;
+  box-shadow: 0 0 15px rgba(120, 100, 120, 0.15) !important;
+}
+.row-element-lava {
+  border: 1px solid #cc2900 !important;
+  background: rgba(204, 41, 0, 0.1) !important;
+  box-shadow: 0 0 15px rgba(255, 80, 0, 0.2) !important;
+}
+.row-element-agua_sub {
+  border: 1px solid #00d4ff !important;
+  background: rgba(0, 212, 255, 0.08) !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2) !important;
+}
+.row-element-gelo {
+  border: 1px solid #a8dce8 !important;
+  background: rgba(168, 220, 232, 0.08) !important;
+  box-shadow: 0 0 15px rgba(168, 220, 232, 0.2) !important;
+}
+.row-element-sangue {
+  border: 1px solid #8b0000 !important;
+  background: rgba(139, 0, 0, 0.12) !important;
+  box-shadow: 0 0 15px rgba(139, 0, 0, 0.25) !important;
+}
+.row-element-ar_sub {
+  border: 1px solid #e0e8ff !important;
+  background: rgba(200, 215, 255, 0.06) !important;
+  box-shadow: 0 0 15px rgba(200, 215, 255, 0.15) !important;
+}
+.row-element-gas {
+  border: 1px solid #7fff00 !important;
+  background: rgba(127, 255, 0, 0.06) !important;
+  box-shadow: 0 0 15px rgba(127, 255, 0, 0.15) !important;
+}
+.row-element-atm {
+  border: 1px solid #9400d3 !important;
+  background: rgba(148, 0, 211, 0.08) !important;
+  box-shadow: 0 0 15px rgba(148, 0, 211, 0.2) !important;
+}
+.row-element-terra_sub {
+  border: 1px solid #654321 !important;
+  background: rgba(101, 67, 33, 0.12) !important;
+  box-shadow: 0 0 15px rgba(101, 67, 33, 0.2) !important;
+}
+.row-element-metal {
+  border: 1px solid #c0c0c0 !important;
+  background: rgba(192, 192, 192, 0.06) !important;
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.15) !important;
+}
+.row-element-cristal {
+  border: 1px solid #9b59b6 !important;
+  background: rgba(0, 188, 212, 0.06) !important;
+  box-shadow: 0 0 15px rgba(155, 89, 182, 0.2) !important;
+}
+.row-element-raio_sub {
+  border: 1px solid #00fff5 !important;
+  background: rgba(0, 255, 245, 0.06) !important;
+  box-shadow: 0 0 18px rgba(0, 255, 245, 0.25) !important;
+}
+.row-element-morte {
+  border: 1px solid #660066 !important;
+  background: rgba(45, 10, 78, 0.15) !important;
+  box-shadow: 0 0 15px rgba(102, 0, 102, 0.2) !important;
+}
+.row-element-escuridao {
+  border: 1px solid #440066 !important;
+  background: rgba(10, 0, 30, 0.25) !important;
+  box-shadow: 0 0 15px rgba(68, 0, 102, 0.15) !important;
+}
+.row-element-energia {
+  border: 1px solid #00d4ff !important;
+  background: rgba(0, 212, 255, 0.06) !important;
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.2) !important;
 }

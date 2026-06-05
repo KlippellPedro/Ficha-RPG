@@ -28,7 +28,7 @@ function abrirModalPod(index) {
         <div class="input-group"><label>Ação</label><input type="text" id="modal_pod_acao" class="inv-input" value="${acao}"></div>
         <div class="input-group">
             <label>Configurações de Buff (Passivo)</label>
-            <button type="button" class="btn-save-modal" style="width:100%; background: #4ade80; color: #000;" onclick="abrirModalBuffPod('${index}')">Definir Bônus Automáticos</button>
+            <button type="button" class="btn-save-modal" style="width:100%; background: #16a34a; color: #fff;" onclick="abrirModalBuffPod('${index}')">Definir Bônus Automáticos</button>
         </div>
         <div class="input-group"><label>Descrição do Poder</label>
             <textarea id="modal_pod_desc" class="inv-input" style="min-height: 150px">${desc}</textarea>

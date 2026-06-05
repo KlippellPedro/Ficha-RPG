@@ -67,7 +67,7 @@ function abrirModalHab(index) {
         </div>
         <div class="input-group" id="hab-buff-btn-container" style="display: ${tipo === 'Passiva' ? 'block' : 'none'}">
             <label>Configurações de Buff</label>
-            <button type="button" class="btn-save-modal" style="width:100%; background: #4ade80; color: #000; border: 1px solid #166534;" onclick="abrirModalBuffsHab('${index}')">Definir Buffs</button>
+            <button type="button" class="btn-save-modal" style="width:100%; background: #16a34a; color: #fff; border: 1px solid #166534;" onclick="abrirModalBuffsHab('${index}')">Definir Buffs</button>
         </div>
         <div class="input-group">
             <label>Descrição e Efeito</label>
@@ -95,7 +95,13 @@ function salvarDetalhesHab() {
     if (habSendoEditadaIdx === null) return;
     const idx = habSendoEditadaIdx;
     document.getElementById(`hab_classe_${idx}`).value = document.getElementById('modal_hab_classe').value;
-    if (document.getElementById(`hab_tipo_${idx}`)) document.getElementById(`hab_tipo_${idx}`).value = document.getElementById('modal_hab_tipo').value;
+    if (document.getElementById(`hab_tipo_${idx}`)) {
+        const novoTipo = document.getElementById('modal_hab_tipo').value;
+        document.getElementById(`hab_tipo_${idx}`).value = novoTipo;
+        // Atualiza o badge visual da row
+        const row = document.getElementById(`hab_tipo_${idx}`)?.closest('.item-row');
+        if (row) row.dataset.tipo = novoTipo;
+    }
     document.getElementById(`hab_custo_${idx}`).value = document.getElementById('modal_hab_custo').value;
     document.getElementById(`hab_tipo_custo_${idx}`).value = document.getElementById('modal_hab_tipo_custo').value;
     document.getElementById(`hab_desc_${idx}`).value = document.getElementById('modal_hab_desc').value;

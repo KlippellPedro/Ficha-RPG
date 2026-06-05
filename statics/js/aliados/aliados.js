@@ -128,6 +128,25 @@ function atualizarBarrasCard(card) {
     const sanAtual = parseInt(card.querySelector('.ally-sanidade-atual').value) || 0;
     const sanMax = parseInt(card.querySelector('.ally-sanidade-max').value) || 1;
 
+    // Badge de status baseado em HP %
+    const pctPvStatus = pvAtual / Math.max(1, pvMax);
+    let badge = card.querySelector('.ally-status-badge');
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'ally-status-badge';
+        const header = card.querySelector('.ally-header');
+        if (header) header.appendChild(badge);
+    }
+    if (pvAtual <= 0) {
+        badge.textContent = 'MORTO'; badge.className = 'ally-status-badge status-dead';
+    } else if (pctPvStatus <= 0.25) {
+        badge.textContent = 'CRÍTICO'; badge.className = 'ally-status-badge status-critical';
+    } else if (pctPvStatus <= 0.5) {
+        badge.textContent = 'FERIDO'; badge.className = 'ally-status-badge status-wounded';
+    } else {
+        badge.textContent = 'VIVO'; badge.className = 'ally-status-badge status-alive';
+    }
+
     const barPv = card.querySelector('.ally-bar-pv');
     const barPm = card.querySelector('.ally-bar-pm');
     const barSan = card.querySelector('.ally-bar-sanity');
@@ -502,7 +521,8 @@ window.abrirModalBuffsAliado = function (btn) {
     const buffs = dados.buffs_dono || [];
     buffs.forEach(b => adicionarLinhaBuffAliado(b));
 
-    document.getElementById('modal-ally-buffs').style.display = 'flex';
+    const buffsModal = document.getElementById('modal-ally-buffs');
+    if (buffsModal && !buffsModal.open) buffsModal.showModal();
 }
 
 /** Adiciona uma linha de modificador no modal */
@@ -562,7 +582,8 @@ window.salvarBuffsAliado = function () {
     dados.buffs_dono = buffs;
     localStorage.setItem(currentAllyBuffId, JSON.stringify(dados));
 
-    document.getElementById('modal-ally-buffs').style.display = 'none';
+    const buffsModalClose = document.getElementById('modal-ally-buffs');
+    if (buffsModalClose && buffsModalClose.open) buffsModalClose.close();
     showNotification("Buffs do aliado salvos!", "success");
 
     // Dispara o evento de storage manualmente para atualizar a ficha principal na hora

@@ -17,12 +17,22 @@
 
 h1 {
   color: var(--primary-color);
-  text-shadow: 0 0 15px var(--primary-glow);
+  text-shadow: 0 0 20px var(--primary-glow);
   text-transform: uppercase;
-  letter-spacing: 2px;
-  border-left: 5px solid var(--primary-color);
-  padding-left: 15px;
+  letter-spacing: 0.15em;
+  border-left: none;
+  padding-left: 16px;
   margin-bottom: 20px;
+  position: relative;
+}
+
+h1::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 10%; bottom: 10%;
+  width: 4px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--primary-color), var(--secondary-color, #457b9d));
 }
 
 /* Estilização da Barra de Busca e Filtros */

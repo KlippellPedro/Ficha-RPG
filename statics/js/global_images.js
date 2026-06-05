@@ -30,12 +30,12 @@ window.abrirModalGerenciarImagem = function (targetId) {
     document.getElementById('img-manager-y').value = dados.foto_y || 50;
 
     window.atualizarPreviewAjuste();
-    modal.style.display = 'flex';
+    modal.showModal();
 };
 
 window.fecharModalGerenciarImagem = function () {
     const modal = document.getElementById('modal-image-manager');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.close();
 };
 
 window.atualizarPreviewAjuste = function () {

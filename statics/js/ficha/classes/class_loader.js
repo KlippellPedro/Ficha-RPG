@@ -28,11 +28,11 @@
             'fogo', 'fogo_verdadeiro', 'fumaca', 'lava',
             'agua', 'agua_sub', 'gelo', 'sangue',
             'ar', 'ar_sub', 'gas', 'atm',
-            'raio', 'energia',
+            'raio', 'raio_sub', 'energia',
             'terra', 'terra_sub', 'metal', 'cristal',
             'vida', 'morte',
             'luz', 'escuridao',
-            'avatar_ui'
+            'avatar_ui', 'avatar_ambient'
         ]
     };
 

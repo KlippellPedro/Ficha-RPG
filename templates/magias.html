@@ -54,7 +54,17 @@
           <option value="Palavra Sagrada">Palavra Sagrada</option>
           <option value="Outro">Outro</option>
         </select>
-        <select id="filter-magia-nivel" class="inv-input" style="max-width: 120px" onchange="filtrarMagias()">
+        <!-- Chips de círculo substituem o select de nível -->
+        <div class="circle-chips" id="circle-chips">
+          <button type="button" class="circle-chip active" data-nivel="todos" onclick="setCircleFilter(this, 'todos')">Todos</button>
+          <button type="button" class="circle-chip chip-1" data-nivel="1" onclick="setCircleFilter(this, '1')">I</button>
+          <button type="button" class="circle-chip chip-2" data-nivel="2" onclick="setCircleFilter(this, '2')">II</button>
+          <button type="button" class="circle-chip chip-3" data-nivel="3" onclick="setCircleFilter(this, '3')">III</button>
+          <button type="button" class="circle-chip chip-4" data-nivel="4" onclick="setCircleFilter(this, '4')">IV</button>
+          <button type="button" class="circle-chip chip-extra" data-nivel="extra" onclick="setCircleFilter(this, 'extra')">+</button>
+        </div>
+        <!-- select oculto para manter compatibilidade com filtrarMagias() -->
+        <select id="filter-magia-nivel" style="display:none" onchange="filtrarMagias()">
           <option value="todos">Todos Níveis</option>
           <option value="1">Círculo I</option>
           <option value="2">Círculo II</option>

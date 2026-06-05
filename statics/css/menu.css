@@ -51,7 +51,8 @@
 
 .menu-links a:hover,
 .menu-links a.active {
-  color: #0abab5;
+  color: var(--primary-color);
+  text-shadow: 0 0 8px var(--primary-glow);
 }
 
 .menu-links a:hover::after,

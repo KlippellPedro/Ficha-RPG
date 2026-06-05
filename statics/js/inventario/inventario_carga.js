@@ -37,4 +37,20 @@ function atualizarCarga(infoAttr, dados) {
         }
     }
     if (warning) warning.style.display = ratio > 1.0 ? 'block' : 'none';
+
+    // Shake visual no painel de peso quando excede
+    const weightStats = document.querySelector('.weight-stats');
+    if (weightStats) {
+        if (ratio > 1.0) {
+            if (!weightStats.classList.contains('weight-overloaded')) {
+                weightStats.classList.add('weight-overloaded');
+                // Re-dispara a animação de shake
+                weightStats.classList.remove('weight-shake');
+                void weightStats.offsetWidth; // reflow
+                weightStats.classList.add('weight-shake');
+            }
+        } else {
+            weightStats.classList.remove('weight-overloaded', 'weight-shake');
+        }
+    }
 }

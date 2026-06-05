@@ -22,8 +22,27 @@
   grid-template-columns: 2fr 100px 100px 100px 100px 100px 50px 50px 40px;
 }
 
-/* Destaque para armas não equipadas */
+/* Destaque para armas não equipadas — pisca suavemente */
 .item-row.weapon-not-equipped {
-  background: rgba(255, 68, 68, 0.08);
-  border-right: 4px solid #ff4444;
+  background: rgba(255, 68, 68, 0.06);
+  border-right: 3px solid var(--primary-color);
+  animation: unequipped-pulse 2s ease-in-out infinite;
 }
+
+@keyframes unequipped-pulse {
+  0%, 100% { border-right-color: rgba(255, 68, 68, 0.3); }
+  50%       { border-right-color: var(--primary-color); box-shadow: 3px 0 10px var(--primary-glow); }
+}
+
+/* Badge de tipo de dano — cor por keyword */
+.atk-damage-badge { font-weight: 600; transition: color 0.2s; }
+.dmg-slash     { color: #f87171 !important; }
+.dmg-pierce    { color: #c084fc !important; }
+.dmg-blunt     { color: #94a3b8 !important; }
+.dmg-fire      { color: #fb923c !important; text-shadow: 0 0 6px rgba(251,146,60,0.5); }
+.dmg-ice       { color: #67e8f9 !important; text-shadow: 0 0 6px rgba(103,232,249,0.4); }
+.dmg-lightning { color: #facc15 !important; text-shadow: 0 0 8px rgba(250,204,21,0.5); }
+.dmg-acid      { color: #a3e635 !important; }
+.dmg-necrotic  { color: #a855f7 !important; text-shadow: 0 0 8px rgba(168,85,247,0.4); }
+.dmg-radiant   { color: #fde68a !important; text-shadow: 0 0 8px rgba(253,230,138,0.4); }
+.dmg-psychic   { color: #f0abfc !important; }

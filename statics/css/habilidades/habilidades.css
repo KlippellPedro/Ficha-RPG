@@ -50,8 +50,31 @@
 .btn-open-desc:hover,
 .btn-duplicate:hover {
   background: var(--primary-color);
-  color: #000;
+  color: #fff;
 }
+
+/* Badge de tipo: Passiva vs Ativa */
+.item-row[data-tipo="Passiva"] {
+  border-left: 3px solid #4ade80;
+  background: rgba(74, 222, 128, 0.03) !important;
+}
+
+.item-row[data-tipo="Passiva"]::after {
+  content: 'PASSIVA';
+  position: absolute;
+  top: 4px; right: 40px;
+  font-family: var(--font-heading, serif);
+  font-size: 0.5rem;
+  letter-spacing: 0.15em;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 3px;
+  padding: 1px 5px;
+  pointer-events: none;
+}
+
+.item-row[data-tipo] { position: relative; }
 
 .btn-add-card {
   margin: 30px auto;
