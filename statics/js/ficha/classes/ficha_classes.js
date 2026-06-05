@@ -216,9 +216,25 @@ function atualizarEstiloClasse(selectEl) {
             const elData = window.AVATAR_ELEMENTS_DATA?.[elementoEscolhido];
             const subData = subElemento ? window.AVATAR_ELEMENTS_DATA?.[subElemento] : null;
 
+            const suffix = subData
+                ? `${elData?.nome} - ${subData.nome}`
+                : (elData?.nome || elementoEscolhido);
+
+            // Atualiza o <select> oculto
             const option = selectEl.querySelector('option[value="avatar"]');
-            const suffix = subData ? `${elData?.nome} - ${subData.nome}` : (elData?.nome || elementoEscolhido);
             if (option) option.textContent = `Avatar (${suffix})`;
+
+            // Atualiza o botão visível (substituiu o select)
+            const btnVisible = document.getElementById(`class_btn_${index}`);
+            if (btnVisible) {
+                btnVisible.textContent = `Avatar (${suffix})`;
+                btnVisible.classList.remove('empty');
+            }
+
+            // Inicia/atualiza partículas de fundo
+            if (typeof window.iniciarAvatarAmbient === 'function') {
+                window.iniciarAvatarAmbient(elementoEscolhido, subElemento || null);
+            }
         }
     }
 
