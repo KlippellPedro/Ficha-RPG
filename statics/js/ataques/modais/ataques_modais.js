@@ -50,12 +50,12 @@ function abrirModalAtk(index) {
         footer.innerHTML = `<button type="button" class="btn-save-modal" onclick="salvarDetalhesAtk()" style="width:100%">Salvar Alterações</button>`;
     }
 
-    modalEl.style.display = 'flex';
+    modalEl.showModal();
 }
 
 function fecharModalAtk() {
     const modal = document.getElementById('modal-ataque');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.close();
     atkSendoEditadoIdx = null;
 }
 

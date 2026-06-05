@@ -47,12 +47,13 @@ function atualizarCorNivel(index) {
     else select.classList.add('mag-nivel-extra');
 }
 
-function adicionarMagiaUI(nome = "", tipo = "Comum", nivel = "1", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", teste = "") {
+function adicionarMagiaUI(nome = "", tipo = "Comum", nivel = "1", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", teste = "", mods = "[]", buffAtivo = "false") {
     const container = document.getElementById('magias-container');
     if (!container) return;
     const index = idIndex !== null ? idIndex : Date.now();
+    const isAtivo = buffAtivo === 'true';
     const row = document.createElement('div');
-    row.className = 'item-row mag-row-grid draggable';
+    row.className = `item-row mag-row-grid draggable${isAtivo ? ' has-active-buff' : ''}`;
     row.draggable = true;
     row.dataset.index = index;
     let optionsHtml = TIPOS_MAGIA.map(t => `<option value="${t}" ${tipo === t ? 'selected' : ''}>${t}</option>`).join('');
@@ -72,7 +73,11 @@ function adicionarMagiaUI(nome = "", tipo = "Comum", nivel = "1", custo = "", ti
             </select>
         </div>
         <button type="button" class="btn-open-desc" onclick="abrirModalMag('${index}')">🔍</button>
-        <button type="button" class="btn-use-skill" onclick="usarMagia('${index}')">Usar</button>
+        <button type="button" id="btn_usar_mag_${index}"
+                class="btn-use-skill${isAtivo ? ' buff-ativo' : ''}"
+                onclick="toggleBuffMagia('${index}')">
+            ${isAtivo ? 'Ativo' : 'Usar'}
+        </button>
         <button type="button" class="btn-open-desc" onclick="duplicarMagia('${index}')" title="Duplicar">📋</button>
         <button type="button" class="btn-remove-class" onclick="removerMagia(this)">×</button>
         <div style="display:none">
@@ -81,6 +86,8 @@ function adicionarMagiaUI(nome = "", tipo = "Comum", nivel = "1", custo = "", ti
             <input type="hidden" id="mag_alcance_${index}" class="save-input" value="${alcance}">
             <input type="hidden" id="mag_acao_${index}" class="save-input" value="${acao}">
             <input type="hidden" id="mag_teste_${index}" class="save-input" value="${teste}">
+            <input type="hidden" id="mag_mods_${index}" class="save-input" value='${mods}'>
+            <input type="hidden" id="mag_buff_ativo_${index}" class="save-input" value="${buffAtivo}">
         </div>
     `;
     container.appendChild(row);
@@ -100,7 +107,15 @@ function duplicarMagia(index) {
     const tipo = document.getElementById(`mag_tipo_${index}`).value;
     let nivel = document.getElementById(`mag_nivel_${index}`).value;
     if (tipo === "Elemental" && nivel.endsWith('%')) nivel = nivel.slice(0, -1);
-    adicionarMagiaUI(document.getElementById(`mag_nome_${index}`).value + " (Cópia)", tipo, nivel, document.getElementById(`mag_custo_${index}`).value, document.getElementById(`mag_tipo_custo_${index}`).value, document.getElementById(`mag_desc_${index}`).value, null, document.getElementById(`mag_duracao_${index}`).value, document.getElementById(`mag_alcance_${index}`).value, document.getElementById(`mag_acao_${index}`).value, document.getElementById(`mag_teste_${index}`).value);
+    const mods = document.getElementById(`mag_mods_${index}`)?.value || '[]';
+    adicionarMagiaUI(
+        document.getElementById(`mag_nome_${index}`).value + " (Cópia)", tipo, nivel,
+        document.getElementById(`mag_custo_${index}`).value, document.getElementById(`mag_tipo_custo_${index}`).value,
+        document.getElementById(`mag_desc_${index}`).value, null,
+        document.getElementById(`mag_duracao_${index}`).value, document.getElementById(`mag_alcance_${index}`).value,
+        document.getElementById(`mag_acao_${index}`).value, document.getElementById(`mag_teste_${index}`).value,
+        mods, 'false'
+    );
 }
 
 function removerMagia(btn) {

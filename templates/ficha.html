@@ -250,16 +250,25 @@
                 <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculo('vida')" title="Ver cálculo de Vida">?</button>
               </div>
               <div class="bar-controls">
-                <button type="button" class="btn-qty" onclick="alterarValor('pv_atual', -1)">-</button>
+                <div class="bar-btn-group">
+                  <button type="button" class="btn-qty btn-qty-5" onclick="alterarValor('pv_atual', -5)" title="-5 Vida">-5</button>
+                  <button type="button" class="btn-qty" onclick="alterarValor('pv_atual', -1)" title="-1 Vida">-</button>
+                </div>
                 <div class="bar-outer">
                   <div id="bar-pv" class="bar-inner pv-color"></div>
                   <div class="bar-text">
-                    <input type="number" id="pv_atual" class="save-input bar-value-input" value="20" oninput="atualizarTudo()" />
+                    <input type="text" inputmode="numeric" id="pv_atual" class="save-input bar-value-input bar-input-atual" value="20"
+                           onfocus="barInputFocus(this)"
+                           onkeydown="barInputKeydown(event,this)"
+                           onblur="barInputApply(this)" />
                     <span>/</span>
                     <input type="number" id="pv_max" class="save-input bar-value-input" value="20" oninput="atualizarTudo()" />
                   </div>
                 </div>
-                <button type="button" class="btn-qty" onclick="alterarValor('pv_atual', 1)">+</button>
+                <div class="bar-btn-group">
+                  <button type="button" class="btn-qty" onclick="alterarValor('pv_atual', 1)" title="+1 Vida">+</button>
+                  <button type="button" class="btn-qty btn-qty-5" onclick="alterarValor('pv_atual', 5)" title="+5 Vida">+5</button>
+                </div>
               </div>
               <!-- Barra de Vida Temporária -->
               <div class="bar-controls temp-bar-controls">
@@ -279,16 +288,25 @@
                 <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculo('mana')" title="Ver cálculo de Mana">?</button>
               </div>
               <div class="bar-controls">
-                <button type="button" class="btn-qty" onclick="alterarValor('pm_atual', -1)">-</button>
+                <div class="bar-btn-group">
+                  <button type="button" class="btn-qty btn-qty-5" onclick="alterarValor('pm_atual', -5)" title="-5 Mana">-5</button>
+                  <button type="button" class="btn-qty" onclick="alterarValor('pm_atual', -1)" title="-1 Mana">-</button>
+                </div>
                 <div class="bar-outer">
                   <div id="bar-pm" class="bar-inner pm-color"></div>
                   <div class="bar-text">
-                    <input type="number" id="pm_atual" class="save-input bar-value-input" value="10" oninput="atualizarTudo()" />
+                    <input type="text" inputmode="numeric" id="pm_atual" class="save-input bar-value-input bar-input-atual" value="10"
+                           onfocus="barInputFocus(this)"
+                           onkeydown="barInputKeydown(event,this)"
+                           onblur="barInputApply(this)" />
                     <span>/</span>
                     <input type="number" id="pm_max" class="save-input bar-value-input" value="10" oninput="atualizarTudo()" />
                   </div>
                 </div>
-                <button type="button" class="btn-qty" onclick="alterarValor('pm_atual', 1)">+</button>
+                <div class="bar-btn-group">
+                  <button type="button" class="btn-qty" onclick="alterarValor('pm_atual', 1)" title="+1 Mana">+</button>
+                  <button type="button" class="btn-qty btn-qty-5" onclick="alterarValor('pm_atual', 5)" title="+5 Mana">+5</button>
+                </div>
               </div>
               <!-- Barra de Mana Temporária -->
               <div class="bar-controls temp-bar-controls">
@@ -310,16 +328,25 @@
                 </button>
               </div>
               <div class="bar-controls">
-                <button type="button" class="btn-qty" onclick="alterarValor('sanidade_atual', -1)">-</button>
+                <div class="bar-btn-group">
+                  <button type="button" class="btn-qty btn-qty-5" onclick="alterarValor('sanidade_atual', -5)" title="-5 Sanidade">-5</button>
+                  <button type="button" class="btn-qty" onclick="alterarValor('sanidade_atual', -1)" title="-1 Sanidade">-</button>
+                </div>
                 <div class="bar-outer">
                   <div id="bar-sanidade" class="bar-inner sanidade-color"></div>
                   <div class="bar-text">
-                    <input type="number" id="sanidade_atual" class="save-input bar-value-input" value="100" oninput="atualizarTudo()" />
+                    <input type="text" inputmode="numeric" id="sanidade_atual" class="save-input bar-value-input bar-input-atual" value="100"
+                           onfocus="barInputFocus(this)"
+                           onkeydown="barInputKeydown(event,this)"
+                           onblur="barInputApply(this)" />
                     <span>/</span>
                     <input type="number" id="sanidade_max" class="save-input bar-value-input" value="100" oninput="atualizarTudo()" />
                   </div>
                 </div>
-                <button type="button" class="btn-qty" onclick="alterarValor('sanidade_atual', 1)">+</button>
+                <div class="bar-btn-group">
+                  <button type="button" class="btn-qty" onclick="alterarValor('sanidade_atual', 1)" title="+1 Sanidade">+</button>
+                  <button type="button" class="btn-qty btn-qty-5" onclick="alterarValor('sanidade_atual', 5)" title="+5 Sanidade">+5</button>
+                </div>
               </div>
             </div>
           </div>

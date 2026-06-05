@@ -20,12 +20,31 @@ window.STORAGE_KEY_NOTAS_ORDER = window.allyId ? `ally_notas_order_${window.ally
 
 window.OPTIONS_CATEGORIZADAS = { // Torna a constante globalmente acessível
     ficha: [
-        { v: "nenhum", t: "-" }, { v: "forca", t: "FOR" }, { v: "destreza", t: "DES" },
-        { v: "constituicao", t: "CON" }, { v: "inteligencia", t: "INT" }, { v: "sabedoria", t: "SAB" },
-        { v: "carisma", t: "CAR" }, { v: "aura", t: "AUR" }, { v: "pv_max", t: "Vida Máx" },
-        { v: "pm_max", t: "Mana Máx" }, { v: "defesa", t: "Defesa" }, { v: "movimentacao", t: "Movimento" },
-        { v: "sanidade_max", t: "Sanidade Máx" }, { v: "status_info", t: "Status" },
-        { v: "cd_max", t: "Durabilidade (CD)" }
+        { v: "nenhum",          t: "-"                },
+        // ── Atributos base ──────────────────────────────
+        { v: "forca",           t: "FOR"              },
+        { v: "destreza",        t: "DES"              },
+        { v: "constituicao",    t: "CON"              },
+        { v: "inteligencia",    t: "INT"              },
+        { v: "sabedoria",       t: "SAB"              },
+        { v: "carisma",         t: "CAR"              },
+        { v: "aura",            t: "AUR"              },
+        // ── Recursos máximos ────────────────────────────
+        { v: "pv_max",          t: "Vida Máx"         },
+        { v: "pm_max",          t: "Mana Máx"         },
+        { v: "sanidade_max",    t: "Sanidade Máx"     },
+        // ── Stats de combate ────────────────────────────
+        { v: "defesa",          t: "Defesa"           },
+        { v: "movimentacao",    t: "Movimento"        },
+        { v: "invocacoes_max",  t: "Invocações Máx"   },
+        // ── Outros ──────────────────────────────────────
+        { v: "status_info",     t: "Status"           },
+        { v: "xp_max",          t: "XP Máx"           }
+    ],
+    // Categoria exclusiva para propriedades de item/equipamento
+    item: [
+        { v: "nenhum",  t: "-"                     },
+        { v: "cd_max",  t: "Durabilidade Máx (CD)" }
     ],
     pericia: [
         { v: "todas", t: "TODAS AS PERÍCIAS" },
@@ -195,29 +214,39 @@ function atualizarTudo() {
         if (key.startsWith('poder_pv_bonus_')) bonusPoderes['pv_max'] = (bonusPoderes['pv_max'] || 0) + (parseInt(dados[key]) || 0);
         if (key.startsWith('poder_pm_bonus_')) bonusPoderes['pm_max'] = (bonusPoderes['pm_max'] || 0) + (parseInt(dados[key]) || 0);
 
-        // Bônus vindos de Modificações dinâmicas de Poderes (JSON)
+        // Bônus de Poderes — Passiva/legado: sempre | Ativa: apenas com buff_ativo='true'
         if (key.startsWith('poder_mods_') && typeof dados[key] === 'string' && dados[key].startsWith('[')) {
             const id = key.replace('poder_mods_', '');
             const nome = dados[`poder_nome_${id}`] || "Poder";
-            try {
-                const mods = JSON.parse(dados[key]);
-                mods.forEach(m => {
-                    const val = parseInt(m.mod);
-                    if (!isNaN(val) && m.attr && m.attr !== 'nenhum') {
-                        const target = m.isAdv ? `adv_${m.attr}` : m.attr;
-                        bonusPoderes[target] = (bonusPoderes[target] || 0) + val;
-                        if (!fontesPoderes[target]) fontesPoderes[target] = [];
-                        fontesPoderes[target].push(`${nome} (${val > 0 ? '+' : ''}${val})`);
-                    }
-                });
-            } catch (e) { console.error("Erro ao processar modificações do poder:", key); }
+            const buffAtivo = dados[`poder_buff_ativo_${id}`];
+            const modoP = dados[`poder_modo_${id}`]; // 'Ativa', 'Passiva', ou undefined (legado)
+            const isPassivaOuLegado = !modoP || modoP === 'Passiva' || buffAtivo === 'legado';
+            // Aplica se: passiva/legado (sempre) OU ativa com buff ativo
+            if (isPassivaOuLegado || buffAtivo === 'true') {
+                try {
+                    const mods = JSON.parse(dados[key]);
+                    mods.forEach(m => {
+                        const val = parseInt(m.mod);
+                        if (!isNaN(val) && m.attr && m.attr !== 'nenhum') {
+                            const target = m.isAdv ? `adv_${m.attr}` : m.attr;
+                            bonusPoderes[target] = (bonusPoderes[target] || 0) + val;
+                            if (!fontesPoderes[target]) fontesPoderes[target] = [];
+                            const label = `${nome} (${val > 0 ? '+' : ''}${val})${buffAtivo === 'true' ? ' [Ativo]' : ''}`;
+                            fontesPoderes[target].push(label);
+                        }
+                    });
+                } catch (e) { console.error("Erro ao processar modificações do poder:", key); }
+            }
         }
 
-        // Bônus vindos de Modificações dinâmicas de Habilidades (JSON) - Apenas se for Passiva
+        // Bônus de Habilidades — Passiva: sempre ativo | Ativa/Reação: só se buff_ativo = 'true'
         if (key.startsWith('hab_mods_') && typeof dados[key] === 'string' && dados[key].startsWith('[')) {
             const id = key.replace('hab_mods_', '');
             const nome = dados[`hab_nome_${id}`] || "Habilidade";
-            if (dados[`hab_tipo_${id}`] === 'Passiva') {
+            const tipo = dados[`hab_tipo_${id}`];
+            const buffAtivo = dados[`hab_buff_ativo_${id}`];
+            const deveAplicar = tipo === 'Passiva' || buffAtivo === 'true';
+            if (deveAplicar) {
                 try {
                     const mods = JSON.parse(dados[key]);
                     mods.forEach(m => {
@@ -226,10 +255,31 @@ function atualizarTudo() {
                             const target = m.isAdv ? `adv_${m.attr}` : m.attr;
                             bonusHabilidades[target] = (bonusHabilidades[target] || 0) + val;
                             if (!fontesHabilidades[target]) fontesHabilidades[target] = [];
-                            fontesHabilidades[target].push(`${nome} (${val > 0 ? '+' : ''}${val})`);
+                            const label = `${nome} (${val > 0 ? '+' : ''}${val})${buffAtivo === 'true' ? ' [Ativo]' : ''}`;
+                            fontesHabilidades[target].push(label);
                         }
                     });
                 } catch (e) { console.error("Erro ao processar modificações da habilidade:", key); }
+            }
+        }
+
+        // Bônus de Magias — aplica somente se buff_ativo = 'true'
+        if (key.startsWith('mag_mods_') && typeof dados[key] === 'string' && dados[key].startsWith('[')) {
+            const id = key.replace('mag_mods_', '');
+            const nome = dados[`mag_nome_${id}`] || "Magia";
+            if (dados[`mag_buff_ativo_${id}`] === 'true') {
+                try {
+                    const mods = JSON.parse(dados[key]);
+                    mods.forEach(m => {
+                        const val = parseInt(m.mod);
+                        if (!isNaN(val) && m.attr && m.attr !== 'nenhum') {
+                            const target = m.isAdv ? `adv_${m.attr}` : m.attr;
+                            bonusHabilidades[target] = (bonusHabilidades[target] || 0) + val;
+                            if (!fontesHabilidades[target]) fontesHabilidades[target] = [];
+                            fontesHabilidades[target].push(`${nome} (${val > 0 ? '+' : ''}${val}) [Magia Ativa]`);
+                        }
+                    });
+                } catch (e) { console.error("Erro ao processar modificações da magia:", key); }
             }
         }
     });
@@ -351,7 +401,6 @@ function atualizarTudo() {
     if (typeof atualizarMana === 'function') atualizarMana(infoAttr.mods, dados, bonusItens, breakdown);
     if (typeof atualizarMovimento === 'function') atualizarMovimento(infoAttr.mods, dados, bonusItens, breakdown);
     if (typeof verificarStatusInicial === 'function') verificarStatusInicial(infoAttr.mods);
-    atualizarBarras(bonusItens);
     if (typeof verificarVisibilidadeClasses === 'function') verificarVisibilidadeClasses();
     if (typeof verificarExtraDeusEscolhido === 'function') verificarExtraDeusEscolhido(dados);
     if (typeof verificarCorrompido === 'function') verificarCorrompido(dados);
@@ -396,10 +445,45 @@ function alterarValor(id, delta) {
     if (input) {
         const newValue = Math.max(0, (parseInt(input.value) || 0) + delta);
         input.value = newValue;
-        // Dispara atualizarTudo() para recalcular e atualizar as cores de habilidades/poderes
-        // e também para salvar o novo valor de PV/PM atual.
+        input.dataset.prevVal = String(newValue);
         atualizarTudo();
     }
+}
+
+// ── Input aritmético nas barras de status ────────────────────────
+function barInputFocus(inputEl) {
+    inputEl.dataset.prevVal = inputEl.value;
+    inputEl.select();
+}
+
+function barInputKeydown(e, inputEl) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        barInputApply(inputEl);
+        inputEl.blur();
+    } else if (e.key === 'Escape') {
+        inputEl.value = inputEl.dataset.prevVal || inputEl.value;
+        inputEl.blur();
+    }
+}
+
+function barInputApply(inputEl) {
+    const raw = (inputEl.value || '').trim();
+    const prev = parseInt(inputEl.dataset.prevVal) || 0;
+    let newVal;
+
+    if (/^[+-]\d+(\.\d+)?$/.test(raw)) {
+        // Aritmético: +15 ou -8 → aplica sobre o valor anterior
+        newVal = Math.max(0, Math.round(prev + parseFloat(raw)));
+    } else if (raw !== '' && !isNaN(parseFloat(raw))) {
+        newVal = Math.max(0, Math.round(parseFloat(raw)));
+    } else {
+        newVal = prev; // Input inválido → restaura
+    }
+
+    inputEl.value = newVal;
+    inputEl.dataset.prevVal = String(newVal);
+    atualizarTudo();
 }
 
 window.currentImgTargetId = null; // Armazena se estamos editando ficha principal ou um aliado específico

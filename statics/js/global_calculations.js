@@ -62,7 +62,7 @@ window.calcularBonusItens = function (dados) {
                 addBonus('movimentacao', -(parseInt(dados[`inv_defesa_penalidade_${id}`]) || 0), `${nome} (Peso)`);
             }
 
-            // Agora processa materiais para QUALQUER categoria de item equipado
+            // Processa materiais (cabo e base) com suporte a formato contextual por categoria
             ['cabo', 'base'].forEach(f => {
                 const raw = dados[`inv_${f}_${id}`];
                 if (raw && raw.startsWith('{')) {
@@ -72,25 +72,49 @@ window.calcularBonusItens = function (dados) {
 
                         let attributesToProcess = [];
                         if (Array.isArray(mat.attributes)) {
-                            // Formato antigo/simples (Cobre, Madeira, etc)
                             attributesToProcess = mat.attributes;
                         } else if (mat.attributes && typeof mat.attributes === 'object') {
-                            // Formato novo/contextual (Ouro, Platina, etc)
-                            // Tenta pegar da categoria do item ou cai no 'geral'
                             attributesToProcess = mat.attributes[categoria] || mat.attributes['geral'] || [];
                         }
 
-                        if (attributesToProcess.length > 0) {
-                            attributesToProcess.forEach(a => {
-                                const val = parseInt(a.mod);
-                                if (!isNaN(val)) {
-                                    addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (${matName})`);
-                                }
-                            });
-                        }
+                        attributesToProcess.forEach(a => {
+                            const val = parseInt(a.mod);
+                            if (!isNaN(val)) {
+                                addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (${matName})`);
+                            }
+                        });
                     } catch (e) { }
                 }
             });
+
+            // ─── MODIFICAÇÕES DO ITEM (encantamentos, melhorias) ─────────────────
+            const modsRaw = dados[`inv_mods_item_${id}`];
+            if (modsRaw && modsRaw.startsWith('{')) {
+                try {
+                    const modsData = JSON.parse(modsRaw);
+                    (modsData.attributes || []).forEach(a => {
+                        const val = parseInt(a.mod);
+                        if (!isNaN(val) && a.attr && a.attr !== 'nenhum') {
+                            addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (Modificação)`);
+                        }
+                    });
+                } catch (e) { }
+            }
+
+            // ─── RARIDADE DO ITEM ─────────────────────────────────────────────────
+            const raroRaw = dados[`inv_raro_${id}`];
+            if (raroRaw && raroRaw.startsWith('{')) {
+                try {
+                    const raroData = JSON.parse(raroRaw);
+                    const rarLabel = raroData.raridade ? raroData.raridade.charAt(0).toUpperCase() + raroData.raridade.slice(1) : 'Raro';
+                    (raroData.attributes || []).forEach(a => {
+                        const val = parseInt(a.mod);
+                        if (!isNaN(val) && a.attr && a.attr !== 'nenhum') {
+                            addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (${rarLabel})`);
+                        }
+                    });
+                } catch (e) { }
+            }
         }
     });
     return { totals: totais, sources: fontes };

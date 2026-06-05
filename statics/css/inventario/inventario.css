@@ -306,6 +306,22 @@
   gap: 20px; /* Mais espaço entre colunas */
 }
 
+/* Seletor cascateado de Tipo de Dano — categoria acima, tipo específico abaixo */
+#modal_cat_dano {
+  font-size: 0.78rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.15);
+}
+
+#modal_item_tipo_dano {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 .weight-warning-msg {
   grid-column: 1 / -1;
   color: var(--danger);

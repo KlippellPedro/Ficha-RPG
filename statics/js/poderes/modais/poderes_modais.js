@@ -7,31 +7,46 @@ let currentPodModEditIdx = null;
 
 function abrirModalPod(index) {
     podSendoEditadoIdx = index;
-    const nome = document.getElementById(`poder_nome_${index}`).value;
-    const desc = document.getElementById(`poder_desc_${index}`).value;
+    const nome    = document.getElementById(`poder_nome_${index}`).value;
+    const desc    = document.getElementById(`poder_desc_${index}`).value;
     const duracao = document.getElementById(`poder_duracao_${index}`).value;
     const alcance = document.getElementById(`poder_alcance_${index}`).value;
-    const acao = document.getElementById(`poder_acao_${index}`).value;
+    const acao    = document.getElementById(`poder_acao_${index}`).value;
+    const modo    = document.getElementById(`poder_modo_${index}`)?.value || 'Ativa';
 
     const titleEl = document.getElementById('modal-poder-title');
-    const body = document.getElementById('modal-poder-body');
-    const modal = document.getElementById('modal-poder');
+    const body    = document.getElementById('modal-poder-body');
+    const modal   = document.getElementById('modal-poder');
 
     if (!titleEl || !body || !modal) return;
 
     titleEl.innerText = `Detalhes: ${nome || "Poder"}`;
     body.innerHTML = `
         <div class="grid-2-cols">
+            <div class="input-group">
+                <label>Tipo de Efeito</label>
+                <select id="modal_pod_modo" class="inv-input">
+                    <option value="Ativa"   ${modo === 'Ativa'   ? 'selected' : ''}>Ativa</option>
+                    <option value="Passiva" ${modo === 'Passiva' ? 'selected' : ''}>Passiva</option>
+                </select>
+            </div>
+            <div class="input-group"><label>Ação</label><input type="text" id="modal_pod_acao" class="inv-input" value="${acao}"></div>
+        </div>
+        <div class="grid-2-cols">
             <div class="input-group"><label>Duração</label><input type="text" id="modal_pod_duracao" class="inv-input" value="${duracao}"></div>
             <div class="input-group"><label>Alcance</label><input type="text" id="modal_pod_alcance" class="inv-input" value="${alcance}"></div>
         </div>
-        <div class="input-group"><label>Ação</label><input type="text" id="modal_pod_acao" class="inv-input" value="${acao}"></div>
         <div class="input-group">
-            <label>Configurações de Buff (Passivo)</label>
-            <button type="button" class="btn-save-modal" style="width:100%; background: #16a34a; color: #fff;" onclick="abrirModalBuffPod('${index}')">Definir Bônus Automáticos</button>
+            <label style="display:flex;justify-content:space-between;align-items:center;">
+                <span>Buffs / Modificadores</span>
+                <small style="color:var(--text-muted);font-weight:normal;font-size:0.7rem;">
+                    ${modo === 'Passiva' ? '🔒 Sempre ativo' : 'Ativo ao usar'}
+                </small>
+            </label>
+            <button type="button" class="btn-save-modal" style="width:100%; background: #1e40af; color: #fff; border: 1px solid #2563eb;" onclick="abrirModalBuffPod('${index}')">Configurar Buffs do Poder</button>
         </div>
         <div class="input-group"><label>Descrição do Poder</label>
-            <textarea id="modal_pod_desc" class="inv-input" style="min-height: 150px">${desc}</textarea>
+            <textarea id="modal_pod_desc" class="inv-input" style="min-height: 130px">${desc}</textarea>
         </div>
     `;
 
@@ -40,22 +55,52 @@ function abrirModalPod(index) {
         footer.innerHTML = `<button type="button" class="btn-save-modal" style="width:100%" onclick="salvarDetalhesPod()">Salvar e Fechar</button>`;
     }
 
-    modal.style.display = 'flex';
+    modal.showModal();
 }
 
 function fecharModalPod() {
     const modal = document.getElementById('modal-poder');
-    if (modal) modal.style.display = 'none';
+    if (modal) modal.close();
     podSendoEditadoIdx = null;
 }
 
 function salvarDetalhesPod() {
     if (podSendoEditadoIdx === null) return;
     const idx = podSendoEditadoIdx;
-    document.getElementById(`poder_desc_${idx}`).value = document.getElementById('modal_pod_desc').value;
+    document.getElementById(`poder_desc_${idx}`).value    = document.getElementById('modal_pod_desc').value;
     document.getElementById(`poder_duracao_${idx}`).value = document.getElementById('modal_pod_duracao').value;
     document.getElementById(`poder_alcance_${idx}`).value = document.getElementById('modal_pod_alcance').value;
-    document.getElementById(`poder_acao_${idx}`).value = document.getElementById('modal_pod_acao').value;
+    document.getElementById(`poder_acao_${idx}`).value    = document.getElementById('modal_pod_acao').value;
+
+    // Salva o modo (Ativa / Passiva)
+    const novoModo = document.getElementById('modal_pod_modo')?.value || 'Ativa';
+    let modoInput = document.getElementById(`poder_modo_${idx}`);
+    if (!modoInput) {
+        // Cria campo caso ainda não exista (legacy)
+        modoInput = document.createElement('input');
+        modoInput.type = 'hidden';
+        modoInput.id = `poder_modo_${idx}`;
+        modoInput.className = 'save-input';
+        document.getElementById(`poder_desc_${idx}`)?.closest('div')?.appendChild(modoInput);
+    }
+    modoInput.value = novoModo;
+
+    // Atualiza visibilidade do botão Usar
+    const btnUsar = document.getElementById(`btn_usar_poder_${idx}`);
+    if (btnUsar) btnUsar.style.display = novoModo === 'Passiva' ? 'none' : '';
+
+    // Se mudou para Passiva, desativa buff ativo
+    if (novoModo === 'Passiva') {
+        const buffInput = document.getElementById(`poder_buff_ativo_${idx}`);
+        if (buffInput && buffInput.value === 'true') {
+            buffInput.value = 'false';
+            if (typeof _syncBotaoPoder === 'function') _syncBotaoPoder(idx);
+            let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            dados[`poder_buff_ativo_${idx}`] = 'false';
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        }
+    }
+
     fecharModalPod();
     atualizarTudo();
 }
@@ -79,11 +124,15 @@ function abrirModalBuffPod(index) {
     const btnSalvar = modal.querySelector('.btn-save-modal');
     if (btnSalvar) btnSalvar.setAttribute('onclick', 'salvarBuffsPoder()');
 
-    modal.style.display = 'flex';
+    // Garante que o botão "Adicionar Modificador" aponte para a função correta
+    const btnAdd = modal.querySelector('.btn-add-class');
+    if (btnAdd) btnAdd.setAttribute('onclick', 'adicionarLinhaBuffPod()');
+
+    modal.showModal();
 }
 
 function fecharModalBuffPod() {
-    document.getElementById('modal-pod-buffs').style.display = 'none';
+    document.getElementById('modal-pod-buffs').close();
     currentPodModEditIdx = null;
 }
 

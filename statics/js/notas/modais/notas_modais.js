@@ -56,7 +56,7 @@ function abrirModalNota(index) {
         campos.forEach(c => adicionarCampoDinamico(c.label, c.valor));
     }
 
-    document.getElementById('modal-nota').style.display = 'flex';
+    document.getElementById('modal-nota').showModal();
 }
 
 function adicionarCampoDinamico(label = "", valor = "") {
@@ -86,7 +86,7 @@ function adicionarTopicoExpandido() {
 }
 
 function fecharModalNota() {
-    document.getElementById('modal-nota').style.display = 'none';
+    document.getElementById('modal-nota').close();
     notaSendoEditadaIdx = null;
 }
 

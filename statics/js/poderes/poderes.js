@@ -2,6 +2,45 @@
  * Orquestrador dos Poderes
  */
 
+function _syncBotaoPoder(index) {
+    const buffInput = document.getElementById(`poder_buff_ativo_${index}`);
+    const btn       = document.getElementById(`btn_usar_poder_${index}`);
+    if (!buffInput || !btn) return;
+    const isAtivo = buffInput.value === 'true';
+    btn.textContent = isAtivo ? 'Ativo' : 'Usar';
+    btn.classList.toggle('buff-ativo', isAtivo);
+    btn.closest('.item-row')?.classList.toggle('has-active-buff', isAtivo);
+}
+
+function _ativarBuffPoder(index) {
+    const modsRaw = document.getElementById(`poder_mods_${index}`)?.value || '[]';
+    try { if (!JSON.parse(modsRaw).length) return; } catch { return; }
+    const buffInput = document.getElementById(`poder_buff_ativo_${index}`);
+    if (!buffInput) return;
+    buffInput.value = 'true';
+    _syncBotaoPoder(index);
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    dados[`poder_buff_ativo_${index}`] = 'true';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    if (typeof showNotification === 'function') showNotification("Buff de poder ativado! Clique em 'Ativo' para desativar.", "success", 3500);
+}
+
+function toggleBuffPoder(index) {
+    const buffInput = document.getElementById(`poder_buff_ativo_${index}`);
+    if (!buffInput) return;
+    if (buffInput.value === 'true') {
+        buffInput.value = 'false';
+        _syncBotaoPoder(index);
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        dados[`poder_buff_ativo_${index}`] = 'false';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        if (typeof showNotification === 'function') showNotification("Buff desativado.", "info");
+        atualizarTudo();
+    } else {
+        usarPoder(index);
+    }
+}
+
 function usarPoder(index) {
     const custoStr = document.getElementById(`poder_custo_${index}`).value.trim();
     const tipoCusto = document.getElementById(`poder_tipo_custo_${index}`).value;
@@ -25,6 +64,7 @@ function usarPoder(index) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         registrarHistorico(document.getElementById(`poder_nome_${index}`).value || "Poder", custo, tipoCusto);
         showNotification(`Poder usado! ${custo} PM subtraídos. Mana atual: ${recursoAtual}/${recursoMax}.`, 'success');
+        _ativarBuffPoder(index);
         atualizarTudo();
     } else if (tipoCusto === "PV") {
         let recursoAtual = parseInt(dados.pv_atual) || 0;
@@ -36,10 +76,12 @@ function usarPoder(index) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         registrarHistorico(document.getElementById(`poder_nome_${index}`).value || "Poder", custo, tipoCusto);
         showNotification(`Poder usado! ${custo} PV subtraídos. Vida atual: ${recursoAtual}/${recursoMax}.`, 'success');
+        _ativarBuffPoder(index);
         atualizarTudo();
     } else if (tipoCusto === "Outro") {
-        showNotification(`Poder custa ${custo} de um recurso "Outro". Gerencie isso manualmente.`, 'info');
-        atualizarTudo(); // Apenas para garantir que a UI seja atualizada
+        showNotification(`Poder usado (custo manual).`, 'info');
+        _ativarBuffPoder(index);
+        atualizarTudo();
     } else { showNotification("Gerencie esse custo manualmente.", 'info'); }
     // Não é necessário chamar atualizarEstiloCustoPoder(index) aqui, pois atualizarTudo() já fará isso globalmente.
 }
@@ -111,7 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 salvo[`poder_classe_${idx}`] || "",  // 10. classe
                 salvo[`poder_pv_bonus_${idx}`] || 0, // 11. pv_bonus
                 salvo[`poder_pm_bonus_${idx}`] || 0, // 12. pm_bonus
-                salvo[`poder_mods_${idx}`] || "[]"   // 13. mods
+                salvo[`poder_mods_${idx}`] || "[]",          // 13. mods
+                salvo[`poder_buff_ativo_${idx}`],            // 14. buffAtivo
+                salvo[`poder_modo_${idx}`] || 'Ativa'       // 15. modo (Ativa/Passiva)
             );
         });
     }

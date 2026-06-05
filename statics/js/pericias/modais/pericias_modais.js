@@ -62,5 +62,5 @@ function mostrarAjudaSkill(skillSlug) {
         </div>
     `;
 
-    modal.style.display = 'flex';
+    modal.showModal();
 }

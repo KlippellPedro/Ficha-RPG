@@ -197,7 +197,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3 class="modal-title" style="color: var(--primary-color)">Escolher Classe</h3>
                     <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
                 </div>
-                <div class="modal-body" id="modal-class-select-list" style="max-height: 60vh; overflow-y: auto;"></div>
+                <div style="padding: 4px 0 8px 0;">
+                    <input type="text" id="modal-class-search"
+                           placeholder="🔍  Buscar classe..."
+                           oninput="filtrarModalClasse(this.value)"
+                           style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:white;font-size:0.85rem;outline:none;box-sizing:border-box;"
+                    />
+                </div>
+                <div class="modal-body" id="modal-class-select-list" style="max-height: 55vh; overflow-y: auto;"></div>
             </div>
         </dialog>
     `;

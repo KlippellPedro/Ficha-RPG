@@ -94,7 +94,14 @@ function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
 
     const el = document.getElementById("pv_max");
     if (el) {
-        const finalTotal = Math.max(state.racaKey === "humano" ? 4 : 1, total);
+        // Ceifeiro tem pv_lvl 0.5 (não-inteiro) — garante valor inteiro na barra
+        const finalTotal = Math.max(state.racaKey === "humano" ? 4 : 1, Math.floor(total));
+
+        // Detecta se o Ceifeiro está ativo para adicionar nota no tooltip
+        const hasCeifeiro = Array.from(document.querySelectorAll('[id^="class_name_"]'))
+            .some(s => s.value === 'ceifeiro_almas');
+        if (hasCeifeiro) details.push('Ceifeiro: ×0.5 PV/nível | CON ÷ 2 (arredondado)');
+
         el.value = finalTotal;
         el.title = `Total PV: ${finalTotal} (${details.join(' | ')})`;
     }
@@ -141,7 +148,10 @@ function atualizarMana(mods, dados, bonusItens = {}, breakdown = null) {
     }
 
     const elInv = document.getElementById("invocacoes_max");
-    if (elInv) elInv.value = Math.max(0, Math.floor(modInt / 2));
+    if (elInv) {
+        const invBonus = (bonusItens['invocacoes_max'] || 0);
+        elInv.value = Math.max(0, Math.floor(modInt / 2) + invBonus);
+    }
 }
 
 function verificarStatusInicial(mods) {

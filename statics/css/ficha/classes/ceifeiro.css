@@ -1,67 +1,112 @@
 /* Estilo Específico para o Ceifeiro (Verde Alma) */
 .ceifeiro-class-row {
   border: 1px solid #00ffd2 !important;
-  background: rgba(0, 255, 210, 0.08) !important;
-  box-shadow: 0 0 20px rgba(0, 255, 210, 0.2);
+  background: rgba(0, 255, 210, 0.06) !important;
+  box-shadow: 0 0 24px rgba(0, 255, 210, 0.25), 0 0 50px rgba(0, 180, 150, 0.08);
+  animation: ceifeiro-row-pulse 4s infinite ease-in-out;
 }
 
 .ceifeiro-class-row label {
   color: #00ffd2 !important;
+  text-shadow: 0 0 10px rgba(0, 255, 210, 0.7);
 }
 
-/* Partículas de Alma */
+@keyframes ceifeiro-row-pulse {
+  0%, 100% { box-shadow: 0 0 24px rgba(0,255,210,0.25), 0 0 50px rgba(0,180,150,0.08); }
+  50%       { box-shadow: 0 0 36px rgba(0,255,210,0.45), 0 0 70px rgba(0,200,160,0.15); }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   PARTÍCULA: Alma flutuante (fantasma estilizado)
+   ────────────────────────────────────────────────────────────────── */
 .particle-soul {
   position: fixed;
-  bottom: -20px;
   pointer-events: none;
   z-index: 9999;
-  width: 4px;
-  height: 12px;
-  background: linear-gradient(to top, transparent, #00ffd2);
-  border-radius: 50% 50% 0 0;
-  filter: blur(1px);
-  animation: rise-and-fade var(--duration) ease-in infinite;
+
+  /* Corpo do fantasma: oval por cima, ondulado por baixo */
+  width: 10px;
+  height: 16px;
+  border-radius: 50% 50% 40% 40% / 60% 60% 30% 30%;
+
+  background: radial-gradient(
+    ellipse at 45% 35%,
+    rgba(220, 255, 248, 0.95) 0%,
+    rgba(0, 255, 210, 0.75) 40%,
+    rgba(0, 120, 100, 0.4) 75%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 10px rgba(0, 255, 200, 0.8),
+    0 0 20px rgba(0, 200, 160, 0.45),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+
+  filter: blur(0.6px);
+  animation: soul-float var(--duration, 5s) ease-in-out forwards;
 }
 
-/* Efeito de Fumaça/Alma escapando */
+/* Olhinhos do fantasma usando pseudo-elementos */
+.particle-soul::before,
+.particle-soul::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 3px;
+  background: rgba(0, 30, 25, 0.7);
+  border-radius: 50%;
+  top: 30%;
+}
+.particle-soul::before { left: 25%; }
+.particle-soul::after  { right: 25%; }
+
+/* ──────────────────────────────────────────────────────────────────
+   EFEITO DE SAÍDA — alma escapando (removeção de classe)
+   ────────────────────────────────────────────────────────────────── */
 .smoke-particle {
   position: fixed;
   pointer-events: none;
-  background: radial-gradient(circle, rgba(0, 255, 200, 0.6) 0%, rgba(0, 50, 40, 0.8) 50%, transparent 100%);
-  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(180, 255, 240, 0.7) 0%,
+    rgba(0, 255, 200, 0.5) 35%,
+    rgba(0, 80, 60, 0.6) 65%,
+    transparent 100%
+  );
+  border-radius: 50% 50% 40% 40% / 60% 60% 30% 30%;
   z-index: 10001;
-  filter: blur(4px);
-  animation: soul-escape 2s ease-out forwards;
+  filter: blur(3px);
+  animation: soul-escape 2.2s ease-out forwards;
 }
 
-@keyframes rise-and-fade {
-  0% {
-    transform: translateY(0) rotate(0deg);
+/* ──────────────────────────────────────────────────────────────────
+   ANIMAÇÕES
+   ────────────────────────────────────────────────────────────────── */
+
+/* Alma flutuando: sobe, balança e desaparece */
+@keyframes soul-float {
+  0%   {
+    transform: translateY(0) translateX(0) rotate(-5deg) scale(0.7);
     opacity: 0;
   }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
+  8%   { opacity: 0.9; transform: translateY(-6vh) translateX(2px) rotate(5deg) scale(1); }
+  25%  { transform: translateY(-25vh) translateX(-6px) rotate(-8deg) scale(0.95); }
+  50%  { transform: translateY(-52vh) translateX(8px) rotate(6deg) scale(0.85); opacity: 0.7; }
+  75%  { transform: translateY(-78vh) translateX(-4px) rotate(-4deg) scale(0.7); opacity: 0.4; }
   100% {
-    transform: translateY(-110vh) rotate(360deg);
+    transform: translateY(-115vh) translateX(var(--dx, 0px)) rotate(10deg) scale(0.3);
     opacity: 0;
+    filter: blur(4px);
   }
 }
 
+/* Efeito de escape dramático */
 @keyframes soul-escape {
-  0% {
-    transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.8;
-  }
+  0%   { transform: translate(-50%, -50%) scale(0.3) rotate(0deg); opacity: 0; }
+  15%  { opacity: 0.9; transform: translate(-50%, -50%) scale(1.2) rotate(10deg); }
+  50%  { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 120px)) scale(0.85) rotate(-20deg); opacity: 0.7; }
   100% {
-    transform: translate(-50%, -300%) scale(2.5) rotate(180deg);
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 340px)) scale(0.15) rotate(200deg);
     opacity: 0;
-    filter: blur(10px);
+    filter: blur(12px);
   }
 }

@@ -3,11 +3,15 @@
  */
 
 window.aplicarBonusVisuais = function (bonusItens, dadosObj, breakdown = null) {
-    ['movimentacao', 'defesa', 'status_info'].forEach(id => {
+    // Campos que ficam coloridos quando têm bônus de item ativos
+    ['movimentacao', 'defesa', 'status_info', 'sanidade_max', 'invocacoes_max'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const bonus = bonusItens[id] || 0;
         el.style.color = bonus > 0 ? '#4ade80' : (bonus < 0 ? '#ef4444' : 'var(--text-main)');
+        if (bonus !== 0) {
+            el.title = `Base: ${parseInt(el.value || 0) - bonus} | Bônus de Item: ${bonus > 0 ? '+' : ''}${bonus} | Total: ${el.value}`;
+        }
     });
 }
 
@@ -21,12 +25,16 @@ window.atualizarBarras = function (bonusItens = {}, dadosObj = null) {
     const dados = dadosObj || (JSON.parse(localStorage.getItem(STORAGE_KEY)) || {});
     const isCorrompido = dados.raca === "corrompido" || dados.hibrido_raca_1 === "corrompido" || dados.hibrido_raca_2 === "corrompido";
 
+    // Stats que não têm função própria de cálculo: o bonus de item precisa ser somado manualmente
+    const statsComCalculo = new Set(['pv_max', 'pm_max']); // Calculados por atualizarVida/atualizarMana
+
     stats.forEach(s => {
         const elAtual = document.getElementById(s.atual);
         const elMax = document.getElementById(s.max);
         const current = elAtual ? (parseInt(elAtual.value) || 0) : (parseInt(dados[s.atual]) || 0);
         let max = parseInt(elMax?.tagName === 'INPUT' ? elMax.value : elMax?.innerText) || parseInt(dados[s.max]) || 1;
-        if (!elMax && bonusItens[s.max]) max += bonusItens[s.max];
+        // Aplica bônus de item para stats sem função de cálculo própria (ex: sanidade_max)
+        if (!statsComCalculo.has(s.max) && bonusItens[s.max]) max += bonusItens[s.max];
 
         const barEl = document.getElementById(s.bar);
         if (barEl) {

@@ -2,6 +2,45 @@
  * Orquestrador das Magias
  */
 
+function _syncBotaoMagia(index) {
+    const buffInput = document.getElementById(`mag_buff_ativo_${index}`);
+    const btn       = document.getElementById(`btn_usar_mag_${index}`);
+    if (!buffInput || !btn) return;
+    const isAtivo = buffInput.value === 'true';
+    btn.textContent = isAtivo ? 'Ativo' : 'Usar';
+    btn.classList.toggle('buff-ativo', isAtivo);
+    btn.closest('.item-row')?.classList.toggle('has-active-buff', isAtivo);
+}
+
+function _ativarBuffMagia(index) {
+    const modsRaw = document.getElementById(`mag_mods_${index}`)?.value || '[]';
+    try { if (!JSON.parse(modsRaw).length) return; } catch { return; }
+    const buffInput = document.getElementById(`mag_buff_ativo_${index}`);
+    if (!buffInput) return;
+    buffInput.value = 'true';
+    _syncBotaoMagia(index);
+    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    dados[`mag_buff_ativo_${index}`] = 'true';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    if (typeof showNotification === 'function') showNotification("Efeito mágico ativo! Clique em 'Ativo' para desativar.", "success", 3500);
+}
+
+function toggleBuffMagia(index) {
+    const buffInput = document.getElementById(`mag_buff_ativo_${index}`);
+    if (!buffInput) return;
+    if (buffInput.value === 'true') {
+        buffInput.value = 'false';
+        _syncBotaoMagia(index);
+        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        dados[`mag_buff_ativo_${index}`] = 'false';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        if (typeof showNotification === 'function') showNotification("Efeito mágico desativado.", "info");
+        atualizarTudo();
+    } else {
+        usarMagia(index);
+    }
+}
+
 function usarMagia(index) {
     const custoStr = document.getElementById(`mag_custo_${index}`).value.trim();
     const tipoCusto = document.getElementById(`mag_tipo_custo_${index}`).value;
@@ -27,9 +66,11 @@ function usarMagia(index) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         registrarHistorico(nome, custo, (tipoCusto === "PM" && isCorrompido) ? "Corrupção" : tipoCusto);
         showNotification(`${nome} conjurada! -${custo} ${isCorrompido && tipoCusto === "PM" ? "Vitalidade" : tipoCusto}`, 'success');
+        _ativarBuffMagia(index);
         atualizarTudo();
     } else {
         showNotification(`Magia conjurada (Custo: ${custo} Outro).`, 'info');
+        _ativarBuffMagia(index);
     }
 }
 
@@ -181,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
     indices.forEach(idx => {
-        adicionarMagiaUI(salvo[`mag_nome_${idx}`], salvo[`mag_tipo_${idx}`], salvo[`mag_nivel_${idx}`], salvo[`mag_custo_${idx}`], salvo[`mag_tipo_custo_${idx}`], salvo[`mag_desc_${idx}`], idx, salvo[`mag_duracao_${idx}`], salvo[`mag_alcance_${idx}`], salvo[`mag_acao_${idx}`], salvo[`mag_teste_${idx}`]); // `renderizarCampoNivel` will format `mag_nivel_${idx}`
+        adicionarMagiaUI(salvo[`mag_nome_${idx}`], salvo[`mag_tipo_${idx}`], salvo[`mag_nivel_${idx}`], salvo[`mag_custo_${idx}`], salvo[`mag_tipo_custo_${idx}`], salvo[`mag_desc_${idx}`], idx, salvo[`mag_duracao_${idx}`], salvo[`mag_alcance_${idx}`], salvo[`mag_acao_${idx}`], salvo[`mag_teste_${idx}`], salvo[`mag_mods_${idx}`] || '[]', salvo[`mag_buff_ativo_${idx}`] || 'false');
     });
 
     loadMagiasOrder();

@@ -24,20 +24,22 @@ function atualizarFiltroHabilidadesUI() {
     if (filterSelect) filterSelect.innerHTML = `<option value="todos">Todas as Fontes</option>` + getOpcoesClassesHab(filterSelect.value);
 }
 
-function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "", mods = "[]") {
+function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "", mods = "[]", buffAtivo = "false") {
     const container = document.getElementById('habilidades-container');
     if (!container) return;
     const index = idIndex !== null ? idIndex : Date.now();
+    const isPassiva = tipo === 'Passiva';
+    const isAtivo   = buffAtivo === 'true';
 
     const row = document.createElement('div');
-    row.className = 'item-row hab-row-grid draggable';
+    row.className = `item-row hab-row-grid draggable${isAtivo ? ' has-active-buff' : ''}`;
     row.draggable = true;
     row.dataset.index = index;
     row.dataset.tipo = tipo;
     row.innerHTML = `
         <input type="text" id="hab_nome_${index}" class="save-input inv-input" placeholder="Nome" value="${nome}">
-        <select id="hab_classe_${index}" class="save-input inv-input"> <-- CORRETO: Único para cada linha
-            ${getOpcoesClassesHab(classe)} 
+        <select id="hab_classe_${index}" class="save-input inv-input">
+            ${getOpcoesClassesHab(classe)}
         </select>
         <div style="display:flex; gap:5px;">
             <input type="text" id="hab_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
@@ -48,7 +50,12 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
             </select>
         </div>
         <button type="button" class="btn-open-desc" onclick="abrirModalHab('${index}')">🔍</button>
-        <button type="button" class="btn-use-skill" onclick="usarHabilidade('${index}')">Usar</button>
+        <button type="button" id="btn_usar_hab_${index}"
+                class="btn-use-skill${isAtivo ? ' buff-ativo' : ''}${isPassiva ? ' hidden-btn' : ''}"
+                onclick="toggleBuffHabilidade('${index}')"
+                style="${isPassiva ? 'display:none' : ''}">
+            ${isAtivo ? 'Ativo' : 'Usar'}
+        </button>
         <button type="button" class="btn-duplicate" onclick="duplicarHabilidade('${index}')" title="Duplicar">📋</button>
         <button type="button" class="btn-remove-class" onclick="removerHabilidade(this)">×</button>
 
@@ -59,6 +66,7 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
             <input type="hidden" id="hab_alcance_${index}" class="save-input" value="${alcance}">
             <input type="hidden" id="hab_acao_${index}" class="save-input" value="${acao}">
             <input type="hidden" id="hab_mods_${index}" class="save-input" value='${mods}'>
+            <input type="hidden" id="hab_buff_ativo_${index}" class="save-input" value="${buffAtivo}">
         </div>
     `;
     container.appendChild(row);
@@ -68,7 +76,8 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
 function duplicarHabilidade(index) {
     const fields = ['nome', 'tipo', 'classe', 'custo', 'tipo_custo', 'desc', 'duracao', 'alcance', 'acao', 'mods'];
     const vals = fields.map(f => document.getElementById(`hab_${f}_${index}`)?.value || "");
-    adicionarHabilidadeUI(vals[0] + " (Cópia)", vals[1], vals[3], vals[4], vals[5], null, vals[6], vals[7], vals[8], vals[2], vals[9]);
+    // Buff nunca é copiado para duplicata (começa desativado)
+    adicionarHabilidadeUI(vals[0] + " (Cópia)", vals[1], vals[3], vals[4], vals[5], null, vals[6], vals[7], vals[8], vals[2], vals[9], "false");
 }
 
 function removerHabilidade(btn) {
