@@ -2,6 +2,37 @@
  * Engine de Cálculos - Atributos, Nível e Bônus de Itens/Poderes
  */
 
+/**
+ * Soma uma lista de ajustes personalizados (buffs/debuffs manuais) salva em formato JSON
+ * em um campo da ficha. Usado para Vida, Mana e Sanidade Máximas — ganhos ou perdas que
+ * NÃO vêm de poderes, habilidades, itens ou raça (maldições, bênçãos, eventos, regras de mesa, etc).
+ * Cada entrada da lista tem o formato { valor: number, motivo: string }.
+ *
+ * @param {object} dados - Objeto de dados da ficha (coletado pelo atualizarTudo)
+ * @param {string} campo - Nome do campo onde a lista (string JSON) está salva
+ * @returns {{ total: number, detalhes: string[] }} Soma total e linhas formatadas para exibição
+ */
+window.somarAjustesManuais = function (dados, campo) {
+    let lista = [];
+    try {
+        const raw = dados ? dados[campo] : null;
+        if (raw) lista = JSON.parse(raw);
+    } catch (e) { lista = []; }
+    if (!Array.isArray(lista)) lista = [];
+
+    let total = 0;
+    const detalhes = [];
+    lista.forEach(item => {
+        const valor = parseInt(item && item.valor) || 0;
+        if (valor === 0) return;
+        total += valor;
+        const motivo = ((item && item.motivo) || '').trim();
+        detalhes.push(`Ajuste Personalizado: ${valor >= 0 ? '+' : ''}${valor}${motivo ? ` (${motivo})` : ''}`);
+    });
+
+    return { total, detalhes };
+};
+
 window.getClassesAtivas = function (dados) {
     const classes = [];
     const container = document.getElementById('classes-container');

@@ -247,7 +247,10 @@
             <div id="pv-stat-group" class="stat-group">
               <div class="stat-labels">
                 <label>VIDA (P.V.)</label>
-                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculo('vida')" title="Ver cálculo de Vida">?</button>
+                <div class="stat-label-actions">
+                  <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculo('vida')" title="Ver cálculo de Vida">?</button>
+                  <button type="button" class="btn-calc-ajuste" onclick="abrirAjustePersonalizado('vida')" title="Ajuste personalizado de Vida Máxima (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+                </div>
               </div>
               <div class="bar-controls">
                 <div class="bar-btn-group">
@@ -280,12 +283,17 @@
                   </div>
                 </div>
               </div>
+              <!-- Ajustes personalizados de Vida Máxima (lista em JSON: situações fora de poderes/itens/raça) -->
+              <input type="hidden" id="pv_ajustes_manuais" class="save-input" value="" />
             </div>
             <!-- Barra de Mana -->
             <div id="pm-stat-group" class="stat-group">
               <div class="stat-labels">
                 <label>MANA (P.M.)</label>
-                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculo('mana')" title="Ver cálculo de Mana">?</button>
+                <div class="stat-label-actions">
+                  <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculo('mana')" title="Ver cálculo de Mana">?</button>
+                  <button type="button" class="btn-calc-ajuste" onclick="abrirAjustePersonalizado('mana')" title="Ajuste personalizado de Mana Máxima (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+                </div>
               </div>
               <div class="bar-controls">
                 <div class="bar-btn-group">
@@ -318,14 +326,19 @@
                   </div>
                 </div>
               </div>
+              <!-- Ajustes personalizados de Mana Máxima (lista em JSON: situações fora de poderes/itens/raça) -->
+              <input type="hidden" id="pm_ajustes_manuais" class="save-input" value="" />
             </div>
             <!-- Barra de Sanidade -->
             <div id="sanidade-stat-group" class="stat-group">
               <div class="stat-labels">
                 <label>SANIDADE</label>
-                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculoGenerico('sanidade_max')" title="Ver cálculo de Sanidade">
-                  ?
-                </button>
+                <div class="stat-label-actions">
+                  <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculoGenerico('sanidade_max')" title="Ver cálculo de Sanidade">
+                    ?
+                  </button>
+                  <button type="button" class="btn-calc-ajuste" onclick="abrirAjustePersonalizado('sanidade')" title="Ajuste personalizado de Sanidade Máxima (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+                </div>
               </div>
               <div class="bar-controls">
                 <div class="bar-btn-group">
@@ -348,6 +361,8 @@
                   <button type="button" class="btn-qty btn-qty-5" onclick="alterarValor('sanidade_atual', 5)" title="+5 Sanidade">+5</button>
                 </div>
               </div>
+              <!-- Ajustes personalizados de Sanidade Máxima (lista em JSON: situações fora de poderes/itens/raça) -->
+              <input type="hidden" id="sanidade_ajustes_manuais" class="save-input" value="" />
             </div>
           </div>
         </section>

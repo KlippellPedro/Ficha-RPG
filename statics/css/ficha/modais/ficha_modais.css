@@ -25,6 +25,34 @@
   border-color: #ff4444;
 }
 
+/* Linhas de modificadores no modal de Ajustes Personalizados (Vida/Mana/Sanidade) */
+.ajuste-vital-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 30px;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 3px solid #f59e0b;
+}
+
+.ajuste-vital-row .header-input {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 100%;
+  outline: none;
+}
+
+.ajuste-vital-row .header-input:focus {
+  border-color: #f59e0b;
+}
+
 .btn-status-pos {
   background: #1e3a8a;
   border: 1px solid #3b82f6;
