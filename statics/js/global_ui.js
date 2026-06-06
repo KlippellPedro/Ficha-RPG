@@ -34,7 +34,13 @@ window.atualizarBarras = function (bonusItens = {}, dadosObj = null) {
         const current = elAtual ? (parseInt(elAtual.value) || 0) : (parseInt(dados[s.atual]) || 0);
         let max = parseInt(elMax?.tagName === 'INPUT' ? elMax.value : elMax?.innerText) || parseInt(dados[s.max]) || 1;
         // Aplica bônus de item para stats sem função de cálculo própria (ex: sanidade_max)
-        if (!statsComCalculo.has(s.max) && bonusItens[s.max]) max += bonusItens[s.max];
+        if (!statsComCalculo.has(s.max)) {
+            if (bonusItens[s.max]) max += bonusItens[s.max];
+            // Soma ajustes personalizados (buffs/debuffs manuais fora de poderes/itens/raça)
+            if (s.max === 'sanidade_max' && typeof somarAjustesManuais === 'function') {
+                max += somarAjustesManuais(dados, 'sanidade_ajustes_manuais').total;
+            }
+        }
 
         const barEl = document.getElementById(s.bar);
         if (barEl) {

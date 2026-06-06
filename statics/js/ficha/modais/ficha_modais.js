@@ -149,6 +149,115 @@ function cancelarClasseUnica() {
 }
 
 /**
+ * MODAL DE AJUSTES PERSONALIZADOS: Vida/Mana/Sanidade Máximas fora de poderes/itens/raça
+ * Permite ao jogador registrar uma LISTA de ganhos e/ou perdas (buffs e debuffs) dos
+ * valores máximos vindos de situações especiais — maldições, bênçãos, eventos únicos,
+ * regras de mesa, etc — podendo ter quantos modificadores forem necessários.
+ * Cada entrada é salva como { valor, motivo } em uma lista JSON por status.
+ */
+let ajusteVitalAtual = null;
+
+const AJUSTE_VITAL_MAP = {
+    vida: { campo: 'pv_ajustes_manuais', label: 'Vida' },
+    mana: { campo: 'pm_ajustes_manuais', label: 'Mana' },
+    sanidade: { campo: 'sanidade_ajustes_manuais', label: 'Sanidade' }
+};
+
+function abrirAjustePersonalizado(tipo) {
+    const cfg = AJUSTE_VITAL_MAP[tipo];
+    if (!cfg) return;
+
+    const modal = document.getElementById('modal-ajuste-vital');
+    const title = document.getElementById('modal-ajuste-vital-title');
+    const container = document.getElementById('ajuste-vital-container');
+    if (!modal || !title || !container) return;
+
+    ajusteVitalAtual = tipo;
+    title.innerText = `Ajustes Personalizados de ${cfg.label} Máxima`;
+    container.innerHTML = '';
+
+    let lista = [];
+    try {
+        const raw = document.getElementById(cfg.campo)?.value;
+        if (raw) lista = JSON.parse(raw);
+    } catch (e) { lista = []; }
+    if (!Array.isArray(lista)) lista = [];
+    if (lista.length === 0) lista = [{ valor: 0, motivo: '' }];
+
+    lista.forEach(item => adicionarLinhaAjusteVital(item));
+
+    modal.showModal();
+}
+
+function adicionarLinhaAjusteVital(data = { valor: 0, motivo: '' }) {
+    const container = document.getElementById('ajuste-vital-container');
+    if (!container) return;
+
+    const div = document.createElement('div');
+    div.className = 'ajuste-vital-row';
+    div.innerHTML = `
+        <input type="number" class="ajuste-vital-valor header-input" value="${parseInt(data.valor) || 0}" title="Valor do ajuste (use negativo para penalidades)" placeholder="+/-" />
+        <input type="text" class="ajuste-vital-motivo header-input" value="${(data.motivo || '').replace(/"/g, '&quot;')}" placeholder="Motivo / Origem (opcional)" />
+        <button type="button" class="btn-remove-class" onclick="this.closest('.ajuste-vital-row').remove()">×</button>
+    `;
+    container.appendChild(div);
+}
+
+function salvarAjustePersonalizado() {
+    const cfg = AJUSTE_VITAL_MAP[ajusteVitalAtual];
+    if (!cfg) return;
+
+    const container = document.getElementById('ajuste-vital-container');
+    const linhas = container ? container.querySelectorAll('.ajuste-vital-row') : [];
+    const lista = [];
+
+    linhas.forEach(row => {
+        const valor = parseInt(row.querySelector('.ajuste-vital-valor')?.value) || 0;
+        const motivo = (row.querySelector('.ajuste-vital-motivo')?.value || '').trim();
+        if (valor !== 0 || motivo !== '') lista.push({ valor, motivo });
+    });
+
+    const destino = document.getElementById(cfg.campo);
+    if (destino) destino.value = lista.length ? JSON.stringify(lista) : '';
+
+    const modal = document.getElementById('modal-ajuste-vital');
+    if (modal) modal.close();
+
+    const tipoSalvo = ajusteVitalAtual;
+    ajusteVitalAtual = null;
+    atualizarTudo();
+
+    if (typeof showNotification === 'function') {
+        const cfgLabel = AJUSTE_VITAL_MAP[tipoSalvo]?.label || '';
+        showNotification(`Ajustes personalizados de ${cfgLabel} Máxima salvos!`, 'success');
+    }
+}
+
+/**
+ * Atualiza o tooltip dos botões "±" de Vida/Mana/Sanidade com um resumo dos
+ * ajustes personalizados ativos no momento (chamado a cada recálculo da ficha).
+ */
+function atualizarAjustesPersonalizadosUI(dados) {
+    if (typeof somarAjustesManuais !== 'function') return;
+
+    Object.keys(AJUSTE_VITAL_MAP).forEach(tipo => {
+        const cfg = AJUSTE_VITAL_MAP[tipo];
+        const btn = document.querySelector(`.btn-calc-ajuste[onclick="abrirAjustePersonalizado('${tipo}')"]`);
+        if (!btn) return;
+
+        const resultado = somarAjustesManuais(dados, cfg.campo);
+        if (resultado.total === 0 || resultado.detalhes.length === 0) {
+            btn.title = `Ajuste personalizado de ${cfg.label} Máxima (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)`;
+            btn.classList.remove('btn-calc-ajuste-ativo');
+        } else {
+            const resumo = resultado.detalhes.map(d => d.replace('Ajuste Personalizado: ', '')).join(' | ');
+            btn.title = `Ajustes ativos (total ${resultado.total >= 0 ? '+' : ''}${resultado.total}): ${resumo}`;
+            btn.classList.add('btn-calc-ajuste-ativo');
+        }
+    });
+}
+
+/**
  * MODAL DE RAÇA E STATUS
  */
 function escolherPoderEspirito(poder) {

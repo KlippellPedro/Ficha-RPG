@@ -454,6 +454,25 @@ document.addEventListener('DOMContentLoaded', () => {
         </dialog>
     `;
 
+    // Modal de Ajustes Personalizados de Vida/Mana/Sanidade Máximas (situações fora de poderes/itens/raça)
+    const ajusteVitalModalHtml = `
+        <dialog id="modal-ajuste-vital" class="modal-overlay">
+            <div class="modal-content" style="max-width: 480px;">
+                <div class="modal-header">
+                    <h3 id="modal-ajuste-vital-title" class="modal-title" style="color: var(--primary-color)">Ajustes Personalizados</h3>
+                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div id="ajuste-vital-container"></div>
+                    <button type="button" class="btn-add-class" style="width: 100%; margin-top: 5px;" onclick="adicionarLinhaAjusteVital()">+ Adicionar Modificador</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-save-modal" style="width: 100%" onclick="salvarAjustePersonalizado()">Salvar Ajustes</button>
+                </div>
+            </div>
+        </dialog>
+    `;
+
     // Modal de Buffs de Aliados para o Dono
     const allyBuffsModalHtml = `
         <dialog id="modal-ally-buffs" class="modal-overlay">
@@ -499,6 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
     body.insertAdjacentHTML('beforeend', buffsModalHtml);
     body.insertAdjacentHTML('beforeend', levelUpModalHtml);
     body.insertAdjacentHTML('beforeend', imageManagerModalHtml);
+    body.insertAdjacentHTML('beforeend', ajusteVitalModalHtml);
     body.insertAdjacentHTML('beforeend', allyBuffsModalHtml);
     body.insertAdjacentHTML('beforeend', classSelectModalHtml);
 

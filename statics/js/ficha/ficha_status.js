@@ -66,6 +66,11 @@ function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
     const extraRaca = parseInt(dados.pv_extra_raca) || 0;
     if (extraRaca !== 0) details.push(`Bônus Raça: +${extraRaca}`);
 
+    // Ajustes personalizados: lista de ganhos/perdas de Vida Máxima fora de poderes/itens/raça
+    // (maldições, bênçãos, eventos especiais, regras de mesa, etc — definidos manualmente pelo jogador)
+    const ajustesPV = typeof somarAjustesManuais === 'function' ? somarAjustesManuais(dados, 'pv_ajustes_manuais') : { total: 0, detalhes: [] };
+    ajustesPV.detalhes.forEach(d => details.push(d));
+
     if (breakdown) {
         const sources = [
             ...(breakdown.itens['pv_max'] || []),
@@ -77,7 +82,7 @@ function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
         sources.forEach(s => details.push(s));
     }
 
-    let total = vidaInicial + vidaGanha + (bonusItens['pv_max'] || 0) + racaBonus;
+    let total = vidaInicial + vidaGanha + (bonusItens['pv_max'] || 0) + racaBonus + ajustesPV.total;
     if (state.isVampiro && state.formaMorcego) {
         total = Math.floor(total / 2);
         details.push("Forma de Morcego: Vida Reduzida (50%)");
@@ -105,6 +110,9 @@ function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
         el.value = finalTotal;
         el.title = `Total PV: ${finalTotal} (${details.join(' | ')})`;
     }
+
+    // Atualiza o resumo dos ajustes personalizados nos botões "±" (Vida/Mana/Sanidade)
+    if (typeof atualizarAjustesPersonalizadosUI === 'function') atualizarAjustesPersonalizadosUI(dados);
 }
 
 function atualizarMana(mods, dados, bonusItens = {}, breakdown = null) {
@@ -122,6 +130,11 @@ function atualizarMana(mods, dados, bonusItens = {}, breakdown = null) {
     const extraRaca = parseInt(dados.pm_extra_raca) || 0;
     if (extraRaca !== 0) details.push(`Bônus Raça: +${extraRaca}`);
 
+    // Ajustes personalizados: lista de ganhos/perdas de Mana Máxima fora de poderes/itens/raça
+    // (maldições, bênçãos, eventos especiais, regras de mesa, etc — definidos manualmente pelo jogador)
+    const ajustesPM = typeof somarAjustesManuais === 'function' ? somarAjustesManuais(dados, 'pm_ajustes_manuais') : { total: 0, detalhes: [] };
+    ajustesPM.detalhes.forEach(d => details.push(d));
+
     if (breakdown) {
         const sources = [
             ...(breakdown.itens['pm_max'] || []),
@@ -132,7 +145,7 @@ function atualizarMana(mods, dados, bonusItens = {}, breakdown = null) {
         ];
         sources.forEach(s => details.push(s));
     }
-    let total = manaInicial + manaGanha + (bonusItens['pm_max'] || 0) + racaBonus;
+    let total = manaInicial + manaGanha + (bonusItens['pm_max'] || 0) + racaBonus + ajustesPM.total;
     if (state.isVampiro && state.formaMorcego) {
         total = Math.floor(total / 2);
         details.push("Forma de Morcego: Mana Reduzida (50%)");
