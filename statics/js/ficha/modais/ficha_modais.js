@@ -278,6 +278,24 @@ function escolherPoderMortoVivo(poder) {
     }
 }
 
+function escolherPoderAnimalia(poder) {
+    const inputPoder = document.getElementById("animalia_poder");
+    if (inputPoder) {
+        inputPoder.value = poder;
+        document.getElementById('modal-poder-animalia').close();
+        atualizarTudo();
+    }
+}
+
+function escolherFamiliaFada(familia) {
+    const input = document.getElementById("fada_familia");
+    if (input) {
+        input.value = familia;
+        document.getElementById('modal-familia-fada').close();
+        atualizarTudo();
+    }
+}
+
 function escolherStatus(valor) {
     const inputStatus = document.getElementById('status_info');
     if (inputStatus) inputStatus.value = (valor > 0 ? "+" : "") + valor;

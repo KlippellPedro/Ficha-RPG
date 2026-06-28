@@ -2,6 +2,116 @@
  * Lógica para modais globais (Confirmação, Histórico, Ajuda de Cálculo)
  */
 
+/**
+ * Fonte única dos poderes de raça que o jogador ESCOLHE (1 entre os listados).
+ * Usado tanto pelo modal de seleção quanto pelo display da ficha, garantindo
+ * que as chaves (keys) sempre batam entre os dois.
+ */
+window.PODERES_ESPIRITO = {
+    teliii: {
+        nome: 'TELIII...alguma coisa',
+        desc: 'Você pode mover pequenos objetos com a mente (do tamanho de uma pistola). Máx: 1. Nos níveis 5, 10, 15, 20, 25 e 30 aumenta o máximo e o tamanho em 1.',
+        custo: 'Custo: 10 P.M por objeto | Duração: Cena | Alcance: Curto'
+    },
+    assustador: {
+        nome: 'ASSUSTADOR!',
+        desc: 'Você pode assustar seres vivos rodando um teste de Intimidação contra a Vontade do alvo. Se os alvos tirarem menos, ficam assustados por 1dX rodadas, onde X é seu nível dividido por 3 - 1 (mínimo 1).',
+        custo: 'Custo: 7 P.M | Se torna treinado em Intimidação | Até 3 alvos em alcance médio'
+    },
+    possessao: {
+        nome: 'TEU CORPO MINHAS REGRAS!',
+        desc: 'Você recebe Ofício de Possessão, usado para tentar possuir algo ou alguém. Para isso, deve tirar no teste mais do que a (Vontade + n/2) do alvo.',
+        custo: 'Custo: 9 P.M | Regras da Possessão'
+    }
+};
+
+window.PODERES_MORTO = {
+    nao_reflete_luz: {
+        nome: 'Não reflete mais luz',
+        desc: 'Por conta de um fungo raro ter comido os sensores de seus olhos, recebe visão noturna, porém camuflagens têm o dobro de efeito em você.'
+    },
+    morto_nao_vivo: {
+        nome: 'Morto não vivo',
+        desc: 'Magias de cura lhe dão dano, porém magias do elemento de morte lhe curam.'
+    },
+    eu_to_morto: {
+        nome: 'Eu tô morto?',
+        desc: 'É impossível descobrir que você está morto sem utilizar magia/habilidades, por isso não perde 1 de Carisma, mas perde o +4 em Intimidação.'
+    }
+};
+
+window.PODERES_ANIMALIA = {
+    todos_animais: {
+        nome: 'Todos nós somos animais',
+        desc: 'Consegue conversar com qualquer animal/monstro.'
+    },
+    raizes_animais: {
+        nome: 'Raízes animais',
+        desc: 'Pode deixar de ser um ser racional. Uma vez ativado, só desativa após uma cena. Enquanto ativo, atacará qualquer ser, mas também recebe seu nível como dano extra do mesmo tipo e vantagem nos ataques.'
+    },
+    lider_matilha: {
+        nome: 'Líder da Matilha',
+        desc: 'Caso esteja disputando contra outro Animalia, tem vantagem em qualquer teste.'
+    }
+};
+
+/**
+ * Famílias das Fadas. O jogador escolhe uma e suas infos aparecem na ficha.
+ * `magias` é só referência textual; a concessão na aba de Magias é tratada à parte.
+ */
+window.FAMILIAS_FADA = {
+    inverno: {
+        nome: 'Família do Inverno',
+        cor: '#7dd3fc',
+        desc: 'Por conta do frio dos locais onde vivem, não praticam tanto atividades físicas e voo, focando assim em suas mentes e poderes.',
+        cores: 'Azul, Branco, Preto',
+        bonus: ['6 de resistência a danos de Mana'],
+        magias: ['Nível 0 — Falsas Memória (Magia I)', 'Nível 7 — Cérebro Congelante (Magia II)'],
+        grants: [
+            { key: 'falsas_memoria', nome: 'Falsas Memória', tier: 1, nivel: 0 },
+            { key: 'cerebro_congelante', nome: 'Cérebro Congelante', tier: 2, nivel: 7 }
+        ]
+    },
+    verao: {
+        nome: 'Família do Verão',
+        cor: '#fbbf24',
+        desc: 'Fadas do Verão se destacam por suas capacidades físicas e focam no combate corpo a corpo.',
+        cores: 'Amarelo, Verde',
+        bonus: ['+4 de vida máxima'],
+        magias: ['Nível 0 — Corpo Enrijecido (Magia I)', 'Nível 7 — Roubo de Vida (Magia II)', 'Nível 7 — Fogo nos Olhos (Magia II)'],
+        grants: [
+            { key: 'corpo_enrijecido', nome: 'Corpo Enrijecido', tier: 1, nivel: 0 },
+            { key: 'roubo_de_vida', nome: 'Roubo de Vida', tier: 2, nivel: 7 },
+            { key: 'fogo_nos_olhos', nome: 'Fogo nos Olhos', tier: 2, nivel: 7 }
+        ]
+    },
+    outono: {
+        nome: 'Família do Outono',
+        cor: '#fb923c',
+        desc: 'Fadas do Outono são conhecidas por serem muito inteligentes e, por conta disso, procuram evitar conflitos.',
+        cores: 'Vermelho, Laranja',
+        bonus: ["As DT's para resistir e realizar suas magias são aumentadas e reduzidas, respectivamente, em 1 e 2"],
+        magias: ['Nível 0 — Sexto Sentido (Magia I)', 'Nível 0 — Hora do Cochilo (Magia I)', 'Nível 7 — Medicina 2 (Magia II)', 'Nível 7 — Local Fantasmagórico (Magia II)'],
+        grants: [
+            { key: 'sexto_sentido', nome: 'Sexto Sentido', tier: 1, nivel: 0 },
+            { key: 'hora_do_cochilo', nome: 'Hora do Cochilo', tier: 1, nivel: 0 },
+            { key: 'medicina_2', nome: 'Medicina 2', tier: 2, nivel: 7 },
+            { key: 'local_fantasmagorico', nome: 'Local Fantasmagórico', tier: 2, nivel: 7 }
+        ]
+    },
+    primavera: {
+        nome: 'Família da Primavera',
+        cor: '#f9a8d4',
+        desc: 'Fadas da Primavera são conhecidas por seu grande poder ao chegarem na fase adulta.',
+        cores: 'Rosa, Roxo',
+        bonus: ['Ao chegar na fase adulta (Nível 10), suas magias dão mais 1 dado de dano/cura'],
+        magias: ['Nível 7 — Uma Magia III (Livre)'],
+        grants: [
+            { key: 'magia_livre', nome: 'Magia III — Livre (Primavera)', tier: 3, nivel: 7 }
+        ]
+    }
+};
+
 let confirmCallback = null;
 
 /**
@@ -356,17 +466,40 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     // Modal de Poderes de Raça (Espírito e Morto-Vivo)
+    // As opções são geradas a partir de window.PODERES_ESPIRITO / window.PODERES_MORTO
+    const montarOpcoesPoder = (poderes, fn) => Object.entries(poderes).map(([key, p]) => `
+                <div class="selection-option" onclick="${fn}('${key}')">
+                    <strong>${p.nome}</strong>
+                    <p>${p.desc}</p>
+                    ${p.custo ? `<p style="margin-top:6px;color:var(--primary-color);font-size:0.72rem;font-weight:bold;">${p.custo}</p>` : ''}
+                </div>`).join('');
+
     const racePowersModalHtml = `
         <dialog id="modal-poder-espirito" class="modal-overlay">
-            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Espírito</h3></div><div class="modal-body"><div class="modal-selection-list">
-                <div class="selection-option" onclick="escolherPoderEspirito('assustador')"><strong>Assustador</strong><p>Ganha bônus em Intimidação.</p></div>
-                <div class="selection-option" onclick="escolherPoderEspirito('possessao')"><strong>Possessão</strong><p>Ganha Ofício: Possessão.</p></div>
+            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Espírito</h3><button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button></div><div class="modal-body"><div class="modal-selection-list">
+                ${montarOpcoesPoder(window.PODERES_ESPIRITO, 'escolherPoderEspirito')}
             </div></div></div>
         </dialog>
         <dialog id="modal-poder-morto" class="modal-overlay">
-            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Morto-Vivo</h3></div><div class="modal-body"><div class="modal-selection-list">
-                <div class="selection-option" onclick="escolherPoderMortoVivo('resistente')"><strong>Resistência</strong><p>Ignora penalidades leves.</p></div>
-                <div class="selection-option" onclick="escolherPoderMortoVivo('fome')"><strong>Fome</strong><p>Cura ao consumir carne.</p></div>
+            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Morto-Vivo</h3><button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button></div><div class="modal-body"><div class="modal-selection-list">
+                ${montarOpcoesPoder(window.PODERES_MORTO, 'escolherPoderMortoVivo')}
+            </div></div></div>
+        </dialog>
+        <dialog id="modal-poder-animalia" class="modal-overlay">
+            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Animalia</h3><button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button></div><div class="modal-body"><div class="modal-selection-list">
+                ${montarOpcoesPoder(window.PODERES_ANIMALIA, 'escolherPoderAnimalia')}
+            </div></div></div>
+        </dialog>
+        <dialog id="modal-familia-fada" class="modal-overlay">
+            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Família das Fadas</h3><button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button></div><div class="modal-body"><div class="modal-selection-list">
+                ${Object.entries(window.FAMILIAS_FADA).map(([key, f]) => `
+                <div class="selection-option" onclick="escolherFamiliaFada('${key}')">
+                    <strong style="color:${f.cor}">${f.nome}</strong>
+                    <p>${f.desc}</p>
+                    <p style="margin-top:6px;font-size:0.72rem;"><b>Cores:</b> ${f.cores}</p>
+                    <p style="font-size:0.72rem;">${f.bonus.join('<br>')}</p>
+                    <p style="margin-top:6px;color:var(--primary-color);font-size:0.7rem;font-weight:bold;">Magias: ${f.magias.join(' • ')}</p>
+                </div>`).join('')}
             </div></div></div>
         </dialog>
     `;

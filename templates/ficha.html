@@ -106,10 +106,6 @@
             <label>Espécie Animal</label>
             <input type="text" id="animal_especie" class="save-input header-input" placeholder="Ex: Lobo, Coruja..." />
           </div>
-          <div id="fada-extra" class="input-group" style="display: none">
-            <label>Família da Fada</label>
-            <input type="text" id="fada_familia" class="save-input header-input" placeholder="Ex: Inverno" />
-          </div>
           <div id="deus-raca-header" class="input-group" style="display: none">
             <label>Deus do(a)</label>
             <input type="text" id="deus_dominio_raca" class="save-input header-input" placeholder="Ex: Trovão" />
@@ -746,6 +742,41 @@ MUDANÇAS: Não precisa mais comer e dormir, porém deve consumir sangue 4x por 
         <span id="display-poder-espirito" class="extra-section-display">Nenhum poder selecionado</span>
         <button type="button" class="btn-add-class" onclick="document.getElementById('modal-poder-espirito').showModal()">
           Escolher Poder
+        </button>
+      </div>
+      <div id="section-condicao-animalia" class="extra-section-block">
+        <label class="extra-section-label">CONDIÇÃO DE ANIMALIA — BASE ANIMAL</label>
+        <p style="text-align: center; color: #888; font-size: 0.78rem; margin: 0 0 10px">
+          Com base no animal escolhido, junto do mestre, crie um poder "primitivo" seu. Ex: Animal — Coruja, Poder — Ver no escuro.
+        </p>
+        <textarea
+          id="animalia_base_animal"
+          class="save-input trait-textarea"
+          style="height: 70px; text-align: left"
+          placeholder="Descreva o poder primitivo criado com o mestre..."
+          oninput="atualizarTudo()"
+        ></textarea>
+      </div>
+      <div id="section-poder-animalia" class="extra-section-block">
+        <label class="extra-section-label">PODER DE ANIMALIA</label>
+        <input type="hidden" id="animalia_poder" class="save-input" value="" />
+        <span id="display-poder-animalia" class="extra-section-display">Nenhum poder selecionado</span>
+        <button type="button" class="btn-add-class" onclick="document.getElementById('modal-poder-animalia').showModal()">
+          Escolher Poder
+        </button>
+      </div>
+      <div id="section-condicao-fada" class="extra-section-block">
+        <label class="extra-section-label">CONDIÇÃO DE FADA — ASA</label>
+        <textarea class="trait-textarea" style="height: 90px; text-align: left" readonly>
+Toda fada tem asas, as quais são uma parte importante da mesma. As Asas são consideradas como item mágico com CD igual à sua Vida MAX. Caso as mesmas sejam arrancadas, não há mais como soltar magias e perde todos os buffs de sua família e raça. Voar dobra seu Movimento.</textarea
+        >
+      </div>
+      <div id="section-familia-fada" class="extra-section-block">
+        <label class="extra-section-label">FAMÍLIA DAS FADAS</label>
+        <input type="hidden" id="fada_familia" class="save-input" value="" />
+        <div id="display-familia-fada" class="extra-section-display">Nenhuma família selecionada</div>
+        <button type="button" class="btn-add-class" onclick="document.getElementById('modal-familia-fada').showModal()">
+          Escolher Família
         </button>
       </div>
 

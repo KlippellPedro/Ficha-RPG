@@ -4,23 +4,32 @@
 
 // ── Configuração visual das raças (cor de destaque) ───────────────
 const RACA_VISUAL = {
-    humano:     { cor: '#a0a0b0', desc: 'Versáteis e adaptáveis.' },
-    vampiro:    { cor: '#8b0000', desc: 'Imortais sedentos de sangue.' },
-    espirito:   { cor: '#00d4ff', desc: 'Seres etéreos além do véu.' },
-    morto_vivo: { cor: '#660066', desc: 'Mantidos pela força da morte.' },
-    animalia:   { cor: '#c97b2c', desc: 'Fusão entre humano e besta.' },
-    goblin:     { cor: '#4ade80', desc: 'Pequenos, espertos e ágeis.' },
-    fada:       { cor: '#f0abfc', desc: 'Criaturas mágicas da natureza.' },
-    anao:       { cor: '#a0522d', desc: 'Fortes e resistentes como pedra.' },
-    elfo:       { cor: '#86efac', desc: 'Longevos e refinados.' },
-    demonio:    { cor: '#ff4444', desc: 'Nascidos do caos infernal.' },
-    anjo:       { cor: '#f59e0b', desc: 'Guardiões da ordem divina.' },
-    semideus:   { cor: '#a78bfa', desc: 'Sangue de deuses nas veias.' },
-    deus:       { cor: '#ffd700', desc: 'Poder absoluto e eterno.' },
-    escolhido:  { cor: '#fb923c', desc: 'Marcados pelo destino.' },
-    corrompido: { cor: '#7e22ce', desc: 'Consumidos pela corrupção.' },
-    hibrido:    { cor: '#22d3ee', desc: 'Duas raças, um ser.' },
-    kitsune:    { cor: '#ff7043', desc: 'Raposas místicas do Olimpo.' },
+    humano:     { cor: '#a0a0b0' },
+    vampiro:    { cor: '#8b0000' },
+    espirito:   { cor: '#00d4ff' },
+    morto_vivo: { cor: '#660066' },
+    animalia:   { cor: '#c97b2c' },
+    goblin:     { cor: '#4ade80' },
+    fada:       { cor: '#f0abfc' },
+    anao:       { cor: '#a0522d' },
+    elfo:       { cor: '#86efac' },
+    demonio:    { cor: '#ff4444' },
+    anjo:       { cor: '#f59e0b' },
+    semideus:   { cor: '#a78bfa' },
+    deus:       { cor: '#ffd700' },
+    escolhido:  { cor: '#fb923c' },
+    corrompido: { cor: '#7e22ce' },
+    hibrido:    { cor: '#22d3ee' },
+    kitsune:    { cor: '#ff7043' },
+};
+
+// ── Nome amigável de cada expansão (DLC) ──────────────────────────
+const RACA_DLC_NOME = {
+    atual: 'Atual',
+    normalidade: 'Normalidade',
+    passado: 'Passado',
+    futuro: 'Futuro',
+    olimpo: 'Olimpo',
 };
 
 // ── Modal de seleção de raça ─────────────────────────────────────
@@ -39,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                            style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:white;font-size:0.85rem;outline:none;box-sizing:border-box;"
                     />
                 </div>
-                <div class="modal-body" id="modal-raca-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:60vh;overflow-y:auto;padding:4px 2px;"></div>
+                <div class="modal-body" id="modal-raca-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;max-height:64vh;overflow-y:auto;padding:6px 2px;"></div>
             </div>
         </dialog>
     `;
@@ -58,27 +67,26 @@ window.abrirModalSelecionarRaca = function () {
         .filter(key => !racasDB[key].dlc || isDlcAtiva(racasDB[key].dlc))
         .map(key => {
             const r = racasDB[key];
-            const vis = RACA_VISUAL[key] || { cor: '#888', desc: '' };
+            const vis = RACA_VISUAL[key] || { cor: '#888' };
             const isSelected = key === currentVal;
-            const size = r.tamanho ? `<small style="opacity:0.5;font-size:0.55rem;">${r.tamanho}</small>` : '';
-            const dlcBadge = r.dlc && r.dlc !== 'atual'
-                ? `<span style="font-size:0.45rem;background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 4px;opacity:0.6;">${r.dlc.toUpperCase()}</span>`
+            const expansao = RACA_DLC_NOME[r.dlc] || (r.dlc ? r.dlc.charAt(0).toUpperCase() + r.dlc.slice(1) : '');
+            const dlcBadge = expansao
+                ? `<span style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;background:rgba(${hexToRgbStr(vis.cor)},0.12);color:${vis.cor};border:1px solid rgba(${hexToRgbStr(vis.cor)},0.3);border-radius:4px;padding:2px 8px;opacity:0.85;">${expansao}</span>`
                 : '';
             return `
                 <div data-raca-card data-raca-nome="${r.nome.toLowerCase()}"
                      onclick="confirmarSelecionarRaca('${key}')"
                      style="
-                        cursor:pointer;border-radius:8px;padding:14px 10px;text-align:center;
+                        cursor:pointer;border-radius:10px;padding:24px 16px;text-align:center;
                         border:1px solid ${isSelected ? vis.cor : 'rgba(255,255,255,0.07)'};
                         background:${isSelected ? `rgba(${hexToRgbStr(vis.cor)},0.15)` : 'rgba(255,255,255,0.02)'};
-                        box-shadow:${isSelected ? `0 0 12px rgba(${hexToRgbStr(vis.cor)},0.3)` : 'none'};
-                        transition:all 0.2s;display:flex;flex-direction:column;gap:5px;align-items:center;
+                        box-shadow:${isSelected ? `0 0 16px rgba(${hexToRgbStr(vis.cor)},0.35)` : 'none'};
+                        transition:all 0.2s;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;min-height:96px;
                      "
                      onmouseenter="this.style.borderColor='${vis.cor}';this.style.background='rgba(${hexToRgbStr(vis.cor)},0.1)';this.style.transform='translateY(-3px)'"
                      onmouseleave="this.style.borderColor='${isSelected ? vis.cor : 'rgba(255,255,255,0.07)'}';this.style.background='${isSelected ? `rgba(${hexToRgbStr(vis.cor)},0.15)` : 'rgba(255,255,255,0.02)'}';this.style.transform=''">
-                    <span style="font-family:var(--font-heading,serif);font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:${vis.cor};text-shadow:0 0 8px rgba(${hexToRgbStr(vis.cor)},0.4);">${r.nome}</span>
-                    ${size} ${dlcBadge}
-                    <span style="font-size:0.5rem;opacity:0.45;line-height:1.3;">${vis.desc}</span>
+                    <span style="font-family:var(--font-heading,serif);font-size:1.05rem;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:${vis.cor};text-shadow:0 0 10px rgba(${hexToRgbStr(vis.cor)},0.45);">${r.nome}</span>
+                    ${dlcBadge}
                 </div>`;
         }).join('');
 
@@ -232,8 +240,94 @@ function verificarAvisoAnimalia(dados) { // dados is already passed
 
 function verificarExtraFada(dados) { // dados is already passed
     const active = isRacaAtiva("fada", dados);
-    const extraEl = document.getElementById("fada-extra");
-    if (extraEl) extraEl.style.display = active ? 'flex' : 'none';
+    const condSection = document.getElementById("section-condicao-fada");
+    const famSection = document.getElementById("section-familia-fada");
+    if (condSection) condSection.style.display = active ? 'block' : 'none';
+    if (famSection) famSection.style.display = active ? 'block' : 'none';
+
+    const familiaKey = dados.fada_familia || document.getElementById("fada_familia")?.value;
+    const display = document.getElementById("display-familia-fada");
+    if (display) {
+        const f = (window.FAMILIAS_FADA || {})[familiaKey];
+        if (f) {
+            display.style.color = "";
+            display.innerHTML =
+                `<strong style="color:${f.cor};font-size:0.95rem;">${f.nome}</strong>` +
+                `<br><span style="color:#ccc;font-size:0.8rem;line-height:1.4;">${f.desc}</span>` +
+                `<br><span style="font-size:0.78rem;"><b>Cores:</b> ${f.cores}</span>` +
+                `<br><span style="color:#ccc;font-size:0.78rem;">${f.bonus.join('<br>')}</span>` +
+                `<br><span style="color:var(--primary-color);font-size:0.75rem;font-weight:bold;">Magias: ${f.magias.join(' • ')}</span>`;
+        } else {
+            display.innerHTML = "Nenhuma família selecionada";
+            display.style.color = "#ccc";
+        }
+    }
+}
+
+/**
+ * Concede/remove automaticamente as magias da Família das Fadas conforme o nível.
+ * - Adiciona a magia na aba de Magias (entrada com nome + tier) quando o nível é atingido.
+ * - Avisa o desbloqueio ("Você desbloqueou X pela raça Fada (Família Y)").
+ * - Remove as magias da família anterior ao trocar de família ou deixar de ser Fada.
+ * - Respeita remoção manual: uma magia já concedida não volta sozinha se a pessoa apagar.
+ * As mudanças são feitas no objeto `dados`, que é persistido no fim de atualizarTudo().
+ */
+function aplicarMagiasFamiliaFada(dados) {
+    if (typeof window.FAMILIAS_FADA === 'undefined') return;
+
+    const fadaAtiva = isRacaAtiva('fada', dados);
+    const familiaKey = dados.fada_familia || document.getElementById('fada_familia')?.value || '';
+    const familia = window.FAMILIAS_FADA[familiaKey];
+    const nivel = parseInt(dados.nivel) || 1;
+
+    // idx válidos AGORA: Fada ativa + família escolhida + nível suficiente
+    const validos = {};
+    if (fadaAtiva && familia && Array.isArray(familia.grants)) {
+        familia.grants.forEach(g => {
+            if (nivel >= g.nivel) validos[`fada_${familiaKey}_${g.key}`] = { g, familia };
+        });
+    }
+
+    let concedidas = Array.isArray(dados.fada_magias_dadas) ? dados.fada_magias_dadas.slice() : [];
+
+    // 1. Remove as que não são mais válidas (troca de família/raça ou queda de nível)
+    concedidas.filter(idx => !validos[idx]).forEach(idx => {
+        Object.keys(dados).forEach(k => { if (k.startsWith('mag_') && k.endsWith(`_${idx}`)) delete dados[k]; });
+        const row = document.querySelector(`.item-row[data-index="${idx}"]`);
+        if (row) row.remove();
+    });
+    concedidas = concedidas.filter(idx => validos[idx]);
+
+    // 2. Adiciona as novas válidas ainda não concedidas
+    Object.keys(validos).forEach(idx => {
+        if (concedidas.includes(idx)) return; // já concedida antes — respeita remoção manual
+        const { g, familia: fam } = validos[idx];
+        dados[`mag_nome_${idx}`] = g.nome;
+        dados[`mag_tipo_${idx}`] = 'Comum';
+        dados[`mag_nivel_${idx}`] = String(g.tier);
+        dados[`mag_custo_${idx}`] = '';
+        dados[`mag_tipo_custo_${idx}`] = 'PM';
+        dados[`mag_desc_${idx}`] = `Magia concedida pela raça Fada — ${fam.nome}.`;
+        dados[`mag_duracao_${idx}`] = '';
+        dados[`mag_alcance_${idx}`] = '';
+        dados[`mag_acao_${idx}`] = '';
+        dados[`mag_teste_${idx}`] = '';
+        dados[`mag_mods_${idx}`] = '[]';
+        dados[`mag_buff_ativo_${idx}`] = 'false';
+        concedidas.push(idx);
+
+        // Renderiza ao vivo caso esteja na aba de Magias
+        if (typeof adicionarMagiaUI === 'function' && document.getElementById('magias-container') &&
+            !document.querySelector(`.item-row[data-index="${idx}"]`)) {
+            adicionarMagiaUI(g.nome, 'Comum', String(g.tier), '', 'PM', dados[`mag_desc_${idx}`], idx, '', '', '', '', '[]', 'false');
+        }
+
+        if (typeof showNotification === 'function') {
+            showNotification(`Você desbloqueou "${g.nome}" pela raça Fada (${fam.nome})!`, 'success', 5000);
+        }
+    });
+
+    dados.fada_magias_dadas = concedidas;
 }
 
 function verificarExtraEspirito(dados) { // Add dados as argument
@@ -248,12 +342,12 @@ function verificarExtraEspirito(dados) { // Add dados as argument
     const poderAtivo = dados.espirito_poder || document.getElementById("espirito_poder")?.value;
     const displayPoder = document.getElementById("display-poder-espirito");
     if (displayPoder) {
-        if (poderAtivo) {
-            const nomesPoderes = { 'teliii': 'TELIII...alguma coisa', 'assustador': 'ASSUSTADOR!', 'possessao': 'TEU CORPO MINHAS REGRAS!' };
-            displayPoder.innerText = nomesPoderes[poderAtivo] || "Nenhum selecionado";
-            displayPoder.style.color = "#ff4444";
+        const p = (window.PODERES_ESPIRITO || {})[poderAtivo];
+        if (p) {
+            displayPoder.style.color = "";
+            displayPoder.innerHTML = `<strong style="color:#ff4444;">${p.nome}</strong><br><span style="color:#ccc;font-size:0.8rem;line-height:1.4;">${p.desc}</span>${p.custo ? `<br><span style="color:var(--primary-color);font-size:0.72rem;font-weight:bold;">${p.custo}</span>` : ''}`;
         } else {
-            displayPoder.innerText = "Nenhum poder selecionado";
+            displayPoder.innerHTML = "Nenhum poder selecionado";
             displayPoder.style.color = "#ccc";
         }
     }
@@ -279,11 +373,33 @@ function verificarExtraMortoVivo(dados) { // dados is already passed
     const poderAtivo = dados.morto_vivo_poder || document.getElementById("morto_vivo_poder")?.value;
     const displayPoder = document.getElementById("display-poder-morto");
     if (displayPoder) {
-        if (poderAtivo) {
-            displayPoder.innerText = { 'nao_reflete_luz': 'NAO REFLETE MAIS LUZ', 'morto_nao_vivo': 'MORTO NÃO VIVO', 'eu_to_morto': 'EU TO MORTO?' }[poderAtivo] || "Nenhum selecionado";
-            displayPoder.style.color = "#ff4444";
+        const p = (window.PODERES_MORTO || {})[poderAtivo];
+        if (p) {
+            displayPoder.style.color = "";
+            displayPoder.innerHTML = `<strong style="color:#ff4444;">${p.nome}</strong><br><span style="color:#ccc;font-size:0.8rem;line-height:1.4;">${p.desc}</span>`;
         } else {
-            displayPoder.innerText = "Nenhum poder selecionado";
+            displayPoder.innerHTML = "Nenhum poder selecionado";
+            displayPoder.style.color = "#ccc";
+        }
+    }
+}
+
+function verificarExtraAnimalia(dados) {
+    const active = isRacaAtiva("animalia", dados);
+    const condSection = document.getElementById("section-condicao-animalia");
+    const powerSection = document.getElementById("section-poder-animalia");
+    if (condSection) condSection.style.display = active ? 'block' : 'none';
+    if (powerSection) powerSection.style.display = active ? 'block' : 'none';
+
+    const poderAtivo = dados.animalia_poder || document.getElementById("animalia_poder")?.value;
+    const displayPoder = document.getElementById("display-poder-animalia");
+    if (displayPoder) {
+        const p = (window.PODERES_ANIMALIA || {})[poderAtivo];
+        if (p) {
+            displayPoder.style.color = "";
+            displayPoder.innerHTML = `<strong style="color:#ff4444;">${p.nome}</strong><br><span style="color:#ccc;font-size:0.8rem;line-height:1.4;">${p.desc}</span>`;
+        } else {
+            displayPoder.innerHTML = "Nenhum poder selecionado";
             displayPoder.style.color = "#ccc";
         }
     }
