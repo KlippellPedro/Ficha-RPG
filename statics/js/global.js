@@ -387,7 +387,11 @@ function atualizarTudo() {
     // Mescla bônus de perícias da raça nos bônus de itens para o cálculo das perícias
     const racaData = (typeof RACAS_DATA !== 'undefined') ? RACAS_DATA[racaKey] : null;
     if (racaData && racaData.skillBonus) {
+        // Poder "Eu tô morto?" (Morto-Vivo): remove o +4 de Intimidação da raça
+        const mortoPoder = dados.morto_vivo_poder || document.getElementById('morto_vivo_poder')?.value || '';
+        const cancelaIntimidacao = racaKey === 'morto_vivo' && mortoPoder === 'eu_to_morto';
         Object.keys(racaData.skillBonus).forEach(sk => {
+            if (cancelaIntimidacao && sk.toLowerCase() === 'intimidação') return;
             const slug = sk.toLowerCase().replace(/\s/g, '_');
             bonusItens[slug] = (bonusItens[slug] || 0) + racaData.skillBonus[sk];
         });
@@ -407,10 +411,12 @@ function atualizarTudo() {
     if (typeof verificarAtributoVampiro === 'function') verificarAtributoVampiro(infoAttr, dados);
     if (typeof verificarAvisoAnimalia === 'function') verificarAvisoAnimalia(dados);
     if (typeof verificarExtraFada === 'function') verificarExtraFada(dados);
+    if (typeof aplicarMagiasFamiliaFada === 'function') aplicarMagiasFamiliaFada(dados);
     if (typeof verificarExtraHibrido === 'function') verificarExtraHibrido(dados); // Movemos híbrido para cima
     if (typeof verificarExtraVampiro === 'function') verificarExtraVampiro(dados); // Nova chamada para verificar campos de Vampiro
     if (typeof verificarExtraEspirito === 'function') verificarExtraEspirito(dados); // Nova chamada para verificar campos de Espírito
     if (typeof verificarExtraMortoVivo === 'function') verificarExtraMortoVivo(dados); // Nova chamada para verificar campos de Morto-Vivo
+    if (typeof verificarExtraAnimalia === 'function') verificarExtraAnimalia(dados); // Verifica seção de poder/condição de Animalia
     if (typeof atualizarPericias === 'function') {
         atualizarPericias(nivelTotal, infoAttr.mods, bonusItens, dados, breakdown);
     }

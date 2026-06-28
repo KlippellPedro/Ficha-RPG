@@ -170,6 +170,14 @@ window.engineCalcularAtributos = function (dadosObj, bonusItens = {}, racaKey, b
         processarRaca(dadosObj.hibrido_raca_2);
     }
 
+    // Poder "Eu tô morto?" (Morto-Vivo): cancela a penalidade de -1 de Carisma da raça
+    const mortoVivoAtivo = racaKey === 'morto_vivo' ||
+        (racaKey === 'hibrido' && (dadosObj.hibrido_raca_1 === 'morto_vivo' || dadosObj.hibrido_raca_2 === 'morto_vivo'));
+    const mortoVivoPoder = dadosObj.morto_vivo_poder || document.getElementById('morto_vivo_poder')?.value || '';
+    if (mortoVivoAtivo && mortoVivoPoder === 'eu_to_morto') {
+        bonusRaca.carisma = (bonusRaca.carisma || 0) + 1;
+    }
+
     const attrs = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma", "aura", "status_info"];
 
     attrs.forEach(id => {

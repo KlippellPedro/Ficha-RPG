@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Pokemania Estatico",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5500", "--directory", "C:\\Users\\Pedro\\OneDrive\\Documentos\\D.E.V\\T.D.S\\Maruan\\Pokemania-Supremacia-do-Protesto"],
+      "port": 5500
+    }
+  ]
+}
