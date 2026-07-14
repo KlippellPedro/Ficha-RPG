@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="../statics/css/menu.css" />
     <link rel="stylesheet" href="../statics/css/inventario/inventario.css" />
     <link rel="stylesheet" href="../statics/css/habilidades/habilidades.css" />
+    <link rel="stylesheet" href="../statics/css/poderes/poderes.css" />
     <link rel="stylesheet" href="../statics/css/poderes/poderes_responsive.css" />
     <link rel="stylesheet" href="../statics/css/responsive.css" />
+    <link rel="stylesheet" href="../statics/css/design_system.css" />
     <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/global.js"></script>
     <script src="../statics/js/global_calculations.js"></script>
@@ -19,12 +21,13 @@
     <script src="../statics/js/global_images.js"></script>
     <script src="../statics/js/global_modals.js"></script>
     <script src="../statics/js/menu.js"></script>
-    <script src="../statics/js/inventario/inventario.js"></script>
+    <script src="../statics/js/global_dragdrop.js"></script>
     <script src="../statics/js/poderes/poderes_ui.js"></script>
     <script src="../statics/js/poderes/modais/poderes_modais.js"></script>
     <script src="../statics/js/poderes/poderes.js"></script>
+    <script src="../statics/js/design_system.js"></script>
   </head>
-  <body>
+  <body class="page-poderes">
     <nav class="top-menu">
       <div class="menu-links"></div>
     </nav>
@@ -35,48 +38,52 @@
       <span class="message"></span>
     </div>
 
-    <div class="container">
-      <header>
-        <h1>PODERES</h1>
+    <main class="container">
+      <header class="page-hero ui-reveal">
+        <div class="page-hero-copy">
+          <span class="page-eyebrow">Manifestação de supremacia</span>
+          <h1>Poderes</h1>
+          <p>Organize talentos, técnicas e efeitos permanentes do personagem em um só grimório.</p>
+        </div>
+        <div class="page-hero-summary" aria-live="polite">
+          <strong id="poderes-summary-count">0</strong>
+          <span>poderes visíveis</span>
+        </div>
       </header>
 
-      <div class="filter-bar">
+      <div class="filter-bar page-toolbar ui-reveal" role="search" aria-label="Filtros de poderes">
         <div class="search-group">
-          <input type="text" id="search-poder" class="inv-input" placeholder="🔍 Pesquisar poder pelo nome..." oninput="filtrarPoderes()" />
+          <input type="text" id="search-poder" class="inv-input" placeholder="Buscar poder pelo nome..." aria-label="Buscar poder" oninput="filtrarPoderes()" />
         </div>
-        <select id="filter-poder-tipo" class="inv-input" style="max-width: 150px" onchange="filtrarPoderes()">
+        <select id="filter-poder-tipo" class="inv-input toolbar-select" aria-label="Filtrar por origem" onchange="filtrarPoderes()">
           <option value="todos">Todos os Tipos</option>
           <option value="Poder de Classe">Classe</option>
           <option value="Poder de Povo">Povo</option>
           <option value="Poder de Raça">Raça</option>
           <option value="Outro">Outro</option>
         </select>
-        <button type="button" class="btn-open-desc" onclick="resetarFiltrosPoderes()" title="Limpar Filtros">🔄</button>
+        <button type="button" class="btn-open-desc toolbar-reset" onclick="resetarFiltrosPoderes()" title="Limpar filtros">Limpar</button>
       </div>
 
-      <div
-        id="poderes-counter"
-        style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; padding-left: 5px"
-      >
-        Poderes visíveis: 0
-      </div>
+      <section class="collection-panel ui-reveal" aria-labelledby="poderes-list-title">
+        <div class="collection-heading poderes-list-header">
+          <div>
+            <span class="page-section-eyebrow poderes-eyebrow">Grimório pessoal</span>
+            <h2 id="poderes-list-title">Todos os poderes</h2>
+            <p class="poderes-drag-hint">Arraste os cards para reorganizar.</p>
+          </div>
+          <strong id="poderes-counter" class="page-counter">0 poderes visíveis</strong>
+        </div>
 
-      <div class="inv-header pod-header-grid">
-        <span>Nome</span>
-        <span>Tipo</span>
-        <span>Custo</span>
-        <span>Info</span>
-        <span>Usar</span>
-        <span>Dup</span>
-        <span>X</span>
-      </div>
+        <section id="poderes-container" class="poderes-grid ui-card-grid" aria-live="polite">
+          <!-- Injetado via JS -->
+        </section>
 
-      <section id="poderes-container" class="inventory-list">
-        <!-- Injetado via JS -->
+        <div class="collection-footer page-actions poderes-footer-actions">
+          <button type="button" class="btn-clear-inventory" onclick="limparPoderes()">Limpar poderes</button>
+          <button type="button" class="btn-add-card" onclick="adicionarPoderUI()">+ Novo poder</button>
+        </div>
       </section>
-
-      <button type="button" class="btn-add-card" onclick="adicionarPoderUI()">+ Novo Poder</button>
-      <button type="button" class="btn-clear-inventory" onclick="limparPoderes()">Limpar Poderes</button>
-    </div>
+    </main>
   </body>
 </html>

@@ -112,6 +112,55 @@ window.FAMILIAS_FADA = {
     }
 };
 
+/**
+ * Fecha um <dialog> reproduzindo a animação de saída antes do close() nativo
+ * (que, sem isso, fecha instantaneamente). Ponto único usado por toda a ficha
+ * para fechar modais, garantindo consistência visual em todo o app.
+ */
+function fecharDialogoAnimado(dialogEl) {
+    if (!dialogEl || !dialogEl.open) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        dialogEl.close();
+        return;
+    }
+
+    let jaFechou = false;
+    const finalizarFechamento = () => {
+        if (jaFechou) return;
+        jaFechou = true;
+        dialogEl.classList.remove('modal-closing');
+        dialogEl.close();
+    };
+
+    dialogEl.classList.add('modal-closing');
+    dialogEl.addEventListener('animationend', finalizarFechamento, { once: true });
+    // Rede de segurança: se por qualquer motivo a animação não disparar
+    // 'animationend' (aba em segundo plano, navegador que suspende animações
+    // CSS, etc), força o fechamento mesmo assim — um modal preso aberto é
+    // pior do que perder a animação de saída.
+    setTimeout(finalizarFechamento, 250);
+}
+window.fecharDialogoAnimado = fecharDialogoAnimado;
+
+// Clique no backdrop fecha o modal — showModal() não faz isso por padrão,
+// então detectamos cliques no próprio <dialog> (fora do .modal-content).
+document.addEventListener('click', (e) => {
+    if (e.target.matches && e.target.matches('dialog.modal-overlay') && e.target.open) {
+        fecharDialogoAnimado(e.target);
+    }
+});
+
+// Tecla Escape dispara o evento 'cancel' no <dialog> (não borbulha — por isso
+// o listener é registrado na fase de captura). Interceptamos para fechar com
+// a mesma animação usada em todo o resto do app, em vez do close() instantâneo
+// que o navegador faria por padrão.
+document.addEventListener('cancel', (e) => {
+    if (e.target.matches && e.target.matches('dialog.modal-overlay')) {
+        e.preventDefault();
+        fecharDialogoAnimado(e.target);
+    }
+}, true);
+
 let confirmCallback = null;
 
 /**
@@ -143,7 +192,7 @@ function showConfirm(message, onConfirm, onCancel = () => { }, title = "Confirma
 }
 
 function fecharModalConfirm() {
-    document.getElementById('modal-confirm').close();
+    fecharDialogoAnimado(document.getElementById('modal-confirm'));
     confirmCallback = null;
 }
 
@@ -168,7 +217,7 @@ function abrirEditorTexto(targetId, title = "Editor de Texto") {
 
 function fecharEditorTexto() {
     const modal = document.getElementById('modal-text-editor');
-    if (modal) modal.close();
+    if (modal) fecharDialogoAnimado(modal);
     targetTextareaId = null;
 }
 
@@ -206,15 +255,52 @@ function abrirModalHistorico() {
     const container = document.getElementById('historico-lista');
     if (!modal || !container) return;
 
-    // Usa a constante global que agora já é sensível ao contexto de aliado
-    let historico = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    const titulo = document.getElementById('modal-historico-title');
+    if (titulo) {
+        titulo.textContent = document.body.classList.contains('page-magias')
+            ? 'Histórico de conjuração'
+            : 'Histórico de uso';
+    }
 
-    container.innerHTML = historico.length ? historico.map(h => `
-        <div style="display:flex; justify-content:space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;">
-            <span><strong style="color:var(--primary-color)">${h.nome}</strong> <small style="color:#888; margin-left:8px;">${h.timestamp}</small></span>
-            <span style="color:#4ade80">-${h.custo} ${h.tipoCusto}</span>
-        </div>
-    `).join('') : '<p style="text-align:center; color:#888; padding:30px;">Nenhum uso registrado recentemente.</p>';
+    let historico = [];
+    try {
+        const dadosSalvos = JSON.parse(localStorage.getItem(HISTORY_KEY));
+        historico = Array.isArray(dadosSalvos) ? dadosSalvos : [];
+    } catch {
+        historico = [];
+    }
+
+    container.replaceChildren();
+
+    if (!historico.length) {
+        const vazio = document.createElement('p');
+        vazio.className = 'history-empty-state';
+        vazio.textContent = 'Nenhum uso registrado recentemente.';
+        container.appendChild(vazio);
+    } else {
+        historico.slice(0, 20).forEach(registro => {
+            const linha = document.createElement('div');
+            linha.className = 'history-entry';
+
+            const identificacao = document.createElement('span');
+            identificacao.className = 'history-entry-label';
+
+            const nome = document.createElement('strong');
+            nome.textContent = String(registro?.nome ?? 'Ação sem nome');
+
+            const horario = document.createElement('small');
+            horario.textContent = String(registro?.timestamp ?? '');
+
+            identificacao.append(nome, horario);
+
+            const custo = document.createElement('span');
+            custo.className = 'history-entry-cost';
+            custo.textContent = `-${String(registro?.custo ?? 0)} ${String(registro?.tipoCusto ?? '')}`.trim();
+
+            linha.append(identificacao, custo);
+            container.appendChild(linha);
+        });
+    }
 
     modal.showModal();
 }
@@ -254,13 +340,13 @@ document.addEventListener('DOMContentLoaded', () => {
         <dialog id="modal-historico" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 style="color: var(--primary-color); margin: 0">Histórico de Conjuração</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <h3 id="modal-historico-title" class="modal-title">Histórico de uso</h3>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body" id="historico-lista"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn-save-modal" style="background: transparent; border: 1px dashed var(--primary-color); color: var(--primary-color); flex: 1;" onclick="limparHistorico()">Limpar</button>
-                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; flex: 2;" onclick="this.closest('dialog').close()">Fechar</button>
+                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; flex: 2;" onclick="fecharDialogoAnimado(this.closest('dialog'))">Fechar</button>
                 </div>
             </div>
         </dialog>
@@ -272,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-content" style="max-width: 400px;">
                 <div class="modal-header">
                     <h3 style="color: var(--primary-color); margin: 0">Aparência da Ficha</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body">
                     <div style="margin-bottom: 16px;">
@@ -293,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; width: 100%" onclick="this.closest('dialog').close()">Salvar e Fechar</button>
+                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; width: 100%" onclick="fecharDialogoAnimado(this.closest('dialog'))">Salvar e Fechar</button>
                 </div>
             </div>
         </dialog>
@@ -302,10 +388,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal de Seleção de Classe
     const classSelectModalHtml = `
         <dialog id="modal-class-select" class="modal-overlay">
-            <div class="modal-content" style="max-width: 520px; width: 95%;">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title" style="color: var(--primary-color)">Escolher Classe</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div style="padding: 4px 0 8px 0;">
                     <input type="text" id="modal-class-search"
@@ -314,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                            style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:white;font-size:0.85rem;outline:none;box-sizing:border-box;"
                     />
                 </div>
-                <div class="modal-body" id="modal-class-select-list" style="max-height: 55vh; overflow-y: auto;"></div>
+                <div class="modal-body modal-selection-list" id="modal-class-select-list"></div>
             </div>
         </dialog>
     `;
@@ -325,11 +411,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="modal-calc-ajuda-title" class="modal-title" style="color: var(--primary-color)">Cálculo</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body" id="modal-calc-ajuda-body"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; width: 100%" onclick="this.closest('dialog').close()">Entendido</button>
+                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; width: 100%" onclick="fecharDialogoAnimado(this.closest('dialog'))">Entendido</button>
                 </div>
             </div>
         </dialog>
@@ -338,10 +424,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal de Detalhes de Habilidade/Poder/Magia
     const habModalHtml = `
         <dialog id="modal-hab" class="modal-overlay">
-            <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="modal-hab-title" class="modal-title" style="color: var(--primary-color)">Detalhes</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body" id="modal-hab-body"></div>
                 <div class="modal-footer" style="display: flex; gap: 10px;"></div>
@@ -352,10 +438,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal de Detalhes de Poder
     const podModalHtml = `
         <dialog id="modal-poder" class="modal-overlay">
-            <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="modal-poder-title" class="modal-title" style="color: var(--primary-color)">Detalhes do Poder</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body" id="modal-poder-body"></div>
                 <div class="modal-footer" style="display: flex; gap: 10px;"></div>
@@ -366,10 +452,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal de Detalhes de Magia
     const magModalHtml = `
         <dialog id="modal-magia" class="modal-overlay">
-            <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="modal-magia-title" class="modal-title" style="color: var(--primary-color)">Detalhes da Magia</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body" id="modal-magia-body"></div>
                 <div class="modal-footer" style="display: flex; gap: 10px;"></div>
@@ -380,10 +466,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal de Detalhes de Ataque
     const atkModalHtml = `
         <dialog id="modal-ataque" class="modal-overlay">
-            <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="modal-ataque-title" class="modal-title" style="color: var(--primary-color)">Detalhes do Ataque</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body" id="modal-ataque-body"></div>
                 <div class="modal-footer" style="display: flex; gap: 10px;"></div>
@@ -394,10 +480,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal de Detalhes de Nota (Diário)
     const notaModalHtml = `
         <dialog id="modal-nota" class="modal-overlay">
-            <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="modal-nota-title" class="modal-title" style="color: var(--primary-color)">Diário</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body" id="modal-nota-body"></div>
             </div>
@@ -410,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-content" style="max-width: 800px; width: 95%;">
                 <div class="modal-header">
                     <h3 id="modal-text-editor-title" class="modal-title" style="color: var(--primary-color)">Editor de Texto</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body">
                     <textarea id="modal-text-editor-textarea" class="inv-input diario-escrita" style="min-height: 50vh; width: 100%;" placeholder="Escreva aqui os detalhes..."></textarea>
@@ -476,22 +562,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const racePowersModalHtml = `
         <dialog id="modal-poder-espirito" class="modal-overlay">
-            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Espírito</h3><button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button></div><div class="modal-body"><div class="modal-selection-list">
+            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Espírito</h3><button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button></div><div class="modal-body"><div class="modal-selection-list">
                 ${montarOpcoesPoder(window.PODERES_ESPIRITO, 'escolherPoderEspirito')}
             </div></div></div>
         </dialog>
         <dialog id="modal-poder-morto" class="modal-overlay">
-            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Morto-Vivo</h3><button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button></div><div class="modal-body"><div class="modal-selection-list">
+            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Morto-Vivo</h3><button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button></div><div class="modal-body"><div class="modal-selection-list">
                 ${montarOpcoesPoder(window.PODERES_MORTO, 'escolherPoderMortoVivo')}
             </div></div></div>
         </dialog>
         <dialog id="modal-poder-animalia" class="modal-overlay">
-            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Animalia</h3><button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button></div><div class="modal-body"><div class="modal-selection-list">
+            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Poder de Animalia</h3><button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button></div><div class="modal-body"><div class="modal-selection-list">
                 ${montarOpcoesPoder(window.PODERES_ANIMALIA, 'escolherPoderAnimalia')}
             </div></div></div>
         </dialog>
         <dialog id="modal-familia-fada" class="modal-overlay">
-            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Família das Fadas</h3><button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button></div><div class="modal-body"><div class="modal-selection-list">
+            <div class="modal-content"><div class="modal-header"><h3 class="modal-title">Família das Fadas</h3><button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button></div><div class="modal-body"><div class="modal-selection-list">
                 ${Object.entries(window.FAMILIAS_FADA).map(([key, f]) => `
                 <div class="selection-option" onclick="escolherFamiliaFada('${key}')">
                     <strong style="color:${f.cor}">${f.nome}</strong>
@@ -524,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="modal-pod-buffs-title" class="modal-title" style="color: var(--primary-color)">Configurar Buffs</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body">
                     <div id="pod-buffs-container"></div>
@@ -593,7 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-content" style="max-width: 480px;">
                 <div class="modal-header">
                     <h3 id="modal-ajuste-vital-title" class="modal-title" style="color: var(--primary-color)">Ajustes Personalizados</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body">
                     <div id="ajuste-vital-container"></div>
@@ -612,7 +698,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="modal-ally-buffs-title" class="modal-title" style="color: var(--primary-color)">Buffs de Aliado</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div class="modal-body">
                     <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px; text-align: center;">Defina os bônus que este aliado concede ao personagem principal quando está ativo.</p>

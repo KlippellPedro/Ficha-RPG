@@ -1,92 +1,145 @@
-/* Responsividade para Perícias */
+/* Responsividade da página de Perícias */
+@media (max-width: 1220px) {
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
-  html body .filter-bar {
-    flex-direction: column !important;
-    padding: 15px !important;
-    gap: 10px !important;
+  .container {
+    width: calc(100% - 20px);
+    margin-top: 78px;
+    padding: 14px;
+    gap: 16px;
   }
 
-  html body .search-box,
-  html body #search-pericia,
-  html body .btn-clear-notas {
-    width: 100% !important;
-    box-sizing: border-box !important;
+  .pericias-page-header {
+    align-items: flex-start;
+    padding: 18px;
   }
 
-  html body .skills-grid {
-    grid-template-columns: 1fr !important;
+  .pericias-summary {
+    width: 105px;
+    min-width: 105px;
+    min-height: 72px;
   }
 
-  html body .skill-row {
-    display: grid !important;
-    grid-template-columns: 60px 1fr 1fr 40px !important;
-    grid-template-areas:
-      "total-area name-area name-area fechar-area"
-      "attr-area train-area bonus-area adv-area" !important;
-    height: auto !important;
-    gap: 12px !important;
-    padding: 15px !important;
-    background: #151518 !important;
-    border-radius: 12px !important;
-    border-left: 5px solid var(--primary-color) !important;
+  .pericias-page-header p {
+    font-size: 0.76rem;
   }
 
-  html body .skill-total-box {
-    grid-area: total-area !important;
-    width: 100% !important;
-    height: 60px !important;
+  .filter-bar {
+    padding: 12px;
   }
 
-  html body .skill-name,
-  html body .skill-name-input {
-    grid-area: name-area !important;
-    font-size: 1.1rem !important;
-    margin: 0 !important;
+  .skills-section-heading {
+    padding: 13px 16px;
   }
 
-  /* Atributo */
-  html body .skill-attr-selector {
-    grid-area: attr-area !important;
-    height: 40px !important;
-    width: 100% !important;
+  .skills-grid {
+    padding: 10px;
+    gap: 10px;
   }
 
-  /* Treinamento */
-  html body .skill-training-select {
-    grid-area: train-area !important;
-    height: 40px !important;
-    width: 100% !important;
+  .skill-card-controls {
+    grid-template-columns: 82px minmax(0, 1fr) 68px;
   }
 
-  /* Bônus */
-  html body .skill-bonus {
-    grid-area: bonus-area !important;
-    height: 40px !important;
-    width: 100% !important;
+  .skill-training-field {
+    grid-column: 1 / -1;
   }
 
-  /* Vantagem */
-  html body .skill-adv-container {
-    grid-area: adv-area !important;
-    height: 40px !important;
-    width: 100% !important;
-    padding: 0 !important;
-    justify-content: center !important;
+  .skill-bonus-field {
+    grid-column: 1;
   }
-  html body .adv-label {
+
+  .skill-roll-state {
+    grid-column: 2;
+  }
+
+  .skill-total-box {
+    grid-column: 3;
+  }
+}
+
+@media (max-width: 560px) {
+  .pericias-page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .pericias-summary {
+    width: 100%;
+    min-height: 58px;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .pericias-summary strong {
+    font-size: 1.4rem;
+  }
+
+  .pericias-search-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filter-bar .btn-clear-notas {
+    width: 100%;
+  }
+
+  .attr-filter-bar {
+    justify-content: flex-start;
+  }
+
+  .attr-filter-label {
+    width: 100%;
+  }
+
+  .skills-section-heading {
+    align-items: flex-start;
+  }
+
+  .skills-section-heading p {
     display: none;
-  } /* Esconde o "V" para ganhar espaço */
+  }
 
-  /* Botão Remover */
-  html body .btn-remove-skill {
-    grid-area: fechar-area !important;
-    width: 35px !important;
-    height: 35px !important;
-    background: var(--primary-glow) !important;
-    border: 1px solid var(--primary-color) !important;
-    color: var(--primary-color) !important;
-    border-radius: 6px !important;
-    opacity: 0.7 !important;
-    font-size: 1.2rem !important;
+  .skill-card-head,
+  .dynamic-skill .skill-card-head {
+    grid-template-columns: minmax(0, 1fr) 34px;
+  }
+
+  .skill-identity {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .skill-attribute-field {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .pericia-help-btn {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .btn-remove-skill {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .skill-card-controls {
+    grid-template-columns: 74px minmax(0, 1fr) 64px;
+    gap: 8px;
+  }
+
+  .skill-roll-state-detail {
+    font-size: 0.5rem;
+  }
+
+  .btn-add-skill {
+    width: calc(100% - 20px);
+    margin: 0 10px 10px;
   }
 }

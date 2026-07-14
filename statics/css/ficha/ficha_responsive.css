@@ -1,85 +1,257 @@
-/* Responsividade específica da Página de Ficha Principal */
+/* Responsividade específica da Ficha principal */
 
-@media (max-width: 768px) {
-  /* Cabeçalho da Ficha */
-  html body .char-header {
-    grid-template-columns: 1fr !important;
-  }
-  html body .char-header .flex-2 {
-    grid-column: auto !important;
+@media (max-width: 1180px) {
+  .ficha-page .char-header {
+    grid-template-columns: 145px repeat(3, minmax(0, 1fr));
   }
 
-  /* DLCs e Configuração de Sessão no Topo */
-  html body .container > div:first-child {
-    flex-direction: column !important;
-    gap: 10px !important;
-  }
-  html body .dlc-selector-box {
-    width: 100% !important;
+  .ficha-page .atributos-grid {
+    grid-template-columns: repeat(4, minmax(92px, 1fr));
   }
 
-  /* Atributos: 2 por linha no celular */
-  html body .atributos-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
-    gap: 10px !important;
-  }
-  html body .attribute-card {
-    width: 100% !important;
+  .ficha-page .combat-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* Barras de Vida/Mana */
-  html body .stats-container {
-    flex-direction: column !important;
-    gap: 20px !important;
-  }
-  html body .stat-group {
-    max-width: 100% !important;
-    min-width: 100% !important;
+  .ficha-page .combat-overview-grid .combat-col.flex-grow {
+    grid-column: auto;
   }
 
-  /* Seção de Combate e Status */
-  html body .combat-header-row {
-    grid-template-columns: 1fr !important;
+  .ficha-page .combat-overview-grid .combat-col:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .ficha-page .session-panel-grid {
+    grid-template-columns: 1fr;
   }
 
-  /* Grades de especialidades */
-  html body .grid-span-2 {
-    grid-column: auto !important;
+  .ficha-page .char-header {
+    grid-template-columns: 132px repeat(2, minmax(0, 1fr));
   }
 
-  /* Seção de Ações HUD */
-  html body .actions-container {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important; /* 2 por linha */
-    gap: 10px !important;
-  }
-  html body .action-item:last-child {
-    grid-column: span 2 !important; /* Turnos ocupa a linha toda */
-  }
-  html body .action-item {
-    width: 100% !important;
-    min-width: 0 !important;
+  .ficha-page .char-avatar-container {
+    width: 122px;
+    height: 122px;
   }
 
-  /* Barra de XP e Labels */
-  html body .xp-hud-section {
-    padding: 15px !important;
-    margin: 20px 0 !important;
-  }
-  html body .xp-hud-section .stat-labels {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 5px !important;
-    margin-bottom: 10px !important;
-    text-align: center !important;
+  .ficha-page .char-header .flex-2,
+  .ficha-page .char-header .grid-span-2 {
+    grid-column: span 2;
   }
 
-  /* Seção de Bônus de Evento */
-  html body .event-grid-row {
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
+  .ficha-page .classes-dynamic-list {
+    grid-template-columns: 1fr;
   }
-  html body .event-section-theme p {
-    font-size: 0.75rem !important;
+
+  .ficha-page .atributos-grid {
+    grid-template-columns: repeat(4, minmax(82px, 1fr));
+  }
+
+  .ficha-page .stats-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ficha-page #sanidade-stat-group {
+    grid-column: 1 / -1;
+  }
+
+  .ficha-page .sheet-data-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ficha-page .sheet-data-actions .controles {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 680px) {
+  .ficha-page > .ficha-page-shell {
+    width: calc(100% - 16px);
+    margin-top: 72px;
+    padding: 10px;
+    gap: 13px;
+    border-radius: 12px;
+  }
+
+  .ficha-page .ficha-page-hero {
+    min-height: auto;
+  }
+
+  .ficha-page .ficha-hero-tags {
+    gap: 6px;
+  }
+
+  .ficha-page .sheet-chapter,
+  .ficha-page .session-panel {
+    padding: 16px 13px;
+    border-radius: 10px;
+  }
+
+  .ficha-page .chapter-heading,
+  .ficha-page .chapter-heading--compact {
+    margin-bottom: 17px;
+    padding-bottom: 12px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .ficha-page .chapter-heading > p,
+  .ficha-page .sheet-data-actions header > p {
+    text-align: left;
+  }
+
+  .ficha-page .char-header {
+    grid-template-columns: 1fr;
+  }
+
+  .ficha-page .char-avatar-container {
+    width: 128px;
+    height: 128px;
+    grid-row: auto;
+    justify-self: start;
+  }
+
+  .ficha-page .char-header .flex-2,
+  .ficha-page .char-header .grid-span-2 {
+    grid-column: 1;
+  }
+
+  .ficha-page #anjo-raca-header,
+  .ficha-page #demonio-raca-header,
+  .ficha-page #hibrido-extra > div {
+    flex-wrap: wrap;
+  }
+
+  .ficha-page #anjo-raca-header > *,
+  .ficha-page #demonio-raca-header > *,
+  .ficha-page #hibrido-extra > div > * {
+    min-width: min(100%, 180px) !important;
+    flex: 1 1 180px !important;
+  }
+
+  .ficha-page .atributos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ficha-page .attribute-card:last-child {
+    grid-column: 1 / -1;
+    width: calc(50% - 6px);
+    justify-self: center;
+  }
+
+  .ficha-page .stats-container {
+    grid-template-columns: 1fr;
+  }
+
+  .ficha-page #sanidade-stat-group {
+    grid-column: auto;
+  }
+
+  .ficha-page .stat-group {
+    padding: 13px 10px;
+  }
+
+  .ficha-page .bar-controls {
+    gap: 4px;
+  }
+
+  .ficha-page .btn-qty {
+    width: 24px;
+  }
+
+  .ficha-page .btn-qty-5 {
+    display: none;
+  }
+
+  .ficha-page .combat-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ficha-page .combat-overview-grid .combat-col:last-child {
+    grid-column: auto;
+  }
+
+  .ficha-page .combat-overview-grid .detail-textarea {
+    min-height: 105px;
+  }
+
+  .ficha-page .actions-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ficha-page .action-item:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .ficha-page .action-item {
+    min-width: 0;
+  }
+
+  .ficha-page .xp-hud-section .stat-labels {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ficha-page-shell > .combat-header-row:not(.combat-overview-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .ficha-page .event-grid-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ficha-page .sheet-data-actions {
+    padding: 16px 13px;
+  }
+
+  .ficha-page .sheet-data-actions .controles {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .ficha-page .sheet-data-actions .controles button {
+    width: 100%;
+  }
+
+  .ficha-page dialog.modal-overlay .modal-content,
+  .ficha-page dialog.modal-overlay .modal-content-box {
+    width: calc(100vw - 14px);
+    max-height: calc(100dvh - 14px);
+    padding: 18px 14px;
+    border-radius: 11px;
+  }
+
+  .ficha-page .ajuste-vital-row {
+    grid-template-columns: 72px minmax(0, 1fr) 30px;
+    gap: 7px;
+  }
+}
+
+@media (max-width: 390px) {
+  .ficha-page .atributos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ficha-page .attribute-card:last-child {
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .ficha-page .actions-container {
+    grid-template-columns: 1fr;
+  }
+
+  .ficha-page .action-item:last-child {
+    grid-column: auto;
+  }
+
+  .ficha-page .event-grid-row {
+    grid-template-columns: 1fr;
   }
 }

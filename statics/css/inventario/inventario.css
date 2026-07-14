@@ -158,29 +158,6 @@
   transform: scale(1.002);
 }
 
-.item-row.equipped-row {
-  background: linear-gradient(90deg, var(--primary-glow) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border-left: 4px solid var(--primary-color);
-  box-shadow:
-    inset 5px 0 15px var(--primary-glow),
-    0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.item-row.broken-item {
-  opacity: 0.5;
-  filter: grayscale(1);
-  border-left: 4px solid #555 !important;
-  text-decoration: line-through;
-  pointer-events: auto; /* Permite abrir o modal para consertar */
-}
-
-.item-row.damaged-item {
-  border: 1px dashed #f59e0b !important; /* Borda tracejada âmbar */
-  box-shadow: inset 0 0 10px rgba(245, 158, 11, 0.15);
-  background: linear-gradient(90deg, rgba(245, 158, 11, 0.05) 0%, transparent 100%);
-  position: relative;
-  animation: damage-pulse 2s infinite ease-in-out;
-}
 .item-row.drag-insert-top {
   border-top: 2px solid var(--primary-color) !important;
   box-shadow: 0 -4px 8px var(--primary-glow);
@@ -402,6 +379,42 @@ select.inv-input option {
   background: var(--primary-glow);
 }
 
+/* Integração com o shell visual compartilhado */
+.inventory-hero .inventory-title {
+  margin: 0;
+  padding: 0;
+  color: var(--ui-text, var(--text-main));
+  font-size: clamp(1.65rem, 3.2vw, 2.55rem);
+  border: 0;
+}
+
+.inventory-hero .inventory-title::before {
+  display: none;
+}
+
+.inventory-container {
+  gap: 16px;
+}
+
+.inventory-list.collection-panel > .filter-bar {
+  margin: 14px;
+}
+
+.inventory-list.collection-panel > .inv-cards-grid {
+  padding: 0 14px 14px;
+}
+
+.inventory-footer-actions {
+  padding: 0 14px 14px;
+}
+
+.inventory-footer-actions .btn-add-item,
+.inventory-footer-actions .btn-clear-notas {
+  width: auto;
+  min-height: 42px;
+  margin: 0;
+}
+
 .btn-clear-inventory {
   background: transparent;
   border: 2px dashed var(--primary-color);
@@ -463,11 +476,6 @@ select.inv-input option {
   }
 }
 
-@keyframes damage-pulse {
-  0%, 100% { border-color: rgba(245, 158, 11, 0.5); }
-  50%       { border-color: rgba(245, 158, 11, 1); }
-}
-
 /* Overload shake */
 @keyframes weight-shake {
   0%, 100% { transform: translateX(0); }
@@ -491,20 +499,6 @@ select.inv-input option {
     rgba(0,0,0,0.4),
     linear-gradient(135deg, rgba(239,68,68,0.2), rgba(255,68,68,0.05)) !important;
   box-shadow: 0 0 20px rgba(239,68,68,0.3) !important;
-}
-
-/* Raridade dot na borda esquerda do item-row via :has() */
-.item-row:has(.rarity-incomum)  { border-left: 3px solid #4ade80 !important; }
-.item-row:has(.rarity-raro)     { border-left: 3px solid #3b82f6 !important; }
-.item-row:has(.rarity-epico)    { border-left: 3px solid #a855f7 !important; }
-.item-row:has(.rarity-mitico)   { border-left: 3px solid var(--primary-color) !important; box-shadow: -3px 0 8px var(--primary-glow); }
-.item-row:has(.rarity-especial) { border-left: 3px solid #00d4ff !important; box-shadow: -3px 0 10px rgba(0,212,255,0.4); }
-
-/* Item equipado: glow verde mais destacado */
-.item-row.equipped-row {
-  background: rgba(74, 222, 128, 0.05) !important;
-  border-left: 3px solid #4ade80 !important;
-  box-shadow: -4px 0 12px rgba(74, 222, 128, 0.2), inset 0 0 20px rgba(74, 222, 128, 0.03);
 }
 
 @keyframes fadeIn {

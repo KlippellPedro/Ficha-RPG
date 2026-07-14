@@ -1,90 +1,152 @@
 /**
- * Lógica de Interface das Habilidades (Lista e Filtros)
+ * Interface da coleção de Habilidades.
+ * Mantém os IDs e campos de persistência usados pelo motor global.
  */
 
+function _escapeHabHTML(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function _escapeHabAttr(value) {
+    return _escapeHabHTML(value)
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function getOpcoesClassesHab(valorSelecionado = "") {
-    const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    const classes = getClassesAtivas(dados);
-    let opcoes = `<option value="Geral" ${valorSelecionado === 'Geral' || !valorSelecionado ? 'selected' : ''}>Geral</option>`;
-    opcoes += `<option value="Raça" ${valorSelecionado === 'Raça' ? 'selected' : ''}>Raça</option>`;
-    opcoes += `<option value="Ancião" ${valorSelecionado === 'Ancião' ? 'selected' : ''}>Ancião</option>`;
-    opcoes += `<option value="Outro" ${valorSelecionado === 'Outro' ? 'selected' : ''}>Outro</option>`;
+    let dados = {};
+    try { dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { dados = {}; }
+    const classes = typeof getClassesAtivas === 'function' ? getClassesAtivas(dados) : [];
+    const option = (value, label) => `<option value="${_escapeHabAttr(value)}" ${valorSelecionado === value ? 'selected' : ''}>${_escapeHabHTML(label)}</option>`;
+    let opcoes = option('Geral', 'Geral');
+    opcoes += option('Raça', 'Raça');
+    opcoes += option('Ancião', 'Ancião');
+    opcoes += option('Outro', 'Outro');
 
     classes.forEach(c => {
-        const nomeFormatado = c.name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        const nomeFormatado = String(c.name || '')
+            .split('_')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
         const valor = c.sub ? `${c.name}_${c.sub}` : c.name;
         const label = c.sub ? `${nomeFormatado} (${c.sub})` : nomeFormatado;
-        opcoes += `<option value="${valor}" ${valorSelecionado === valor ? 'selected' : ''}>${label}</option>`;
+        opcoes += option(valor, label);
     });
     return opcoes;
 }
 
 function atualizarFiltroHabilidadesUI() {
     const filterSelect = document.getElementById('filter-habilidade-classe');
-    if (filterSelect) filterSelect.innerHTML = `<option value="todos">Todas as Fontes</option>` + getOpcoesClassesHab(filterSelect.value);
+    if (!filterSelect) return;
+    const valorAtual = filterSelect.value;
+    filterSelect.innerHTML = `<option value="todos">Todas as origens</option>${getOpcoesClassesHab(valorAtual)}`;
+    filterSelect.value = Array.from(filterSelect.options).some(option => option.value === valorAtual) ? valorAtual : 'todos';
 }
 
 function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto = "PM", desc = "", idIndex = null, duracao = "", alcance = "", acao = "", classe = "", mods = "[]", buffAtivo = "false") {
     const container = document.getElementById('habilidades-container');
     if (!container) return;
-    const index = idIndex !== null ? idIndex : Date.now();
-    const isPassiva = tipo === 'Passiva';
-    const isAtivo   = buffAtivo === 'true';
 
-    const row = document.createElement('div');
-    row.className = `item-row hab-row-grid draggable${isAtivo ? ' has-active-buff' : ''}`;
+    const index = idIndex !== null ? idIndex : Date.now();
+    const safeIndex = _escapeHabAttr(index);
+    const isPassiva = tipo === 'Passiva';
+    const isAtivo = buffAtivo === 'true';
+    const resumoAcao = acao || 'Ação não definida';
+    const resumoDuracao = duracao || 'Duração livre';
+    const resumoAlcance = alcance || 'Alcance não definido';
+
+    const row = document.createElement('article');
+    row.className = `item-row hab-row-grid entity-card ui-card draggable${isAtivo ? ' has-active-buff' : ''}`;
     row.draggable = true;
     row.dataset.index = index;
     row.dataset.tipo = tipo;
     row.innerHTML = `
-        <input type="text" id="hab_nome_${index}" class="save-input inv-input" placeholder="Nome" value="${nome}">
-        <select id="hab_classe_${index}" class="save-input inv-input">
-            ${getOpcoesClassesHab(classe)}
-        </select>
-        <div style="display:flex; gap:5px;">
-            <input type="text" id="hab_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
-            <select id="hab_tipo_custo_${index}" class="save-input inv-input" style="width:60px;">
-                <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
-                <option value="PV" ${tipoCusto === 'PV' ? 'selected' : ''}>PV</option>
-                <option value="Outro" ${tipoCusto === 'Outro' ? 'selected' : ''}>Outro</option>
-            </select>
+        <div class="entity-card-head">
+            <span class="entity-card-grip" aria-hidden="true">⠿</span>
+            <span class="entity-card-symbol" aria-hidden="true">✦</span>
+            <div class="entity-card-identity">
+                <input type="text" id="hab_nome_${safeIndex}" class="save-input inv-input entity-card-name" placeholder="Nome da habilidade" value="${_escapeHabAttr(nome)}" aria-label="Nome da habilidade">
+                <div class="entity-card-badges">
+                    <span class="entity-badge entity-badge--type" data-hab-tipo-label>${_escapeHabHTML(tipo)}</span>
+                    <span class="entity-badge entity-badge--state entity-badge--muted" data-hab-buff-label>${isAtivo ? 'Efeito ativo' : (isPassiva ? 'Sempre ativa' : 'Efeito inativo')}</span>
+                </div>
+            </div>
+            <button type="button" class="entity-card-remove" onclick="removerHabilidade(this)" title="Remover habilidade" aria-label="Remover habilidade">×</button>
         </div>
-        <button type="button" class="btn-open-desc" onclick="abrirModalHab('${index}')">🔍</button>
-        <button type="button" id="btn_usar_hab_${index}"
-                class="btn-use-skill${isAtivo ? ' buff-ativo' : ''}${isPassiva ? ' hidden-btn' : ''}"
-                onclick="toggleBuffHabilidade('${index}')"
-                style="${isPassiva ? 'display:none' : ''}">
-            ${isAtivo ? 'Ativo' : 'Usar'}
-        </button>
-        <button type="button" class="btn-duplicate" onclick="duplicarHabilidade('${index}')" title="Duplicar">📋</button>
-        <button type="button" class="btn-remove-class" onclick="removerHabilidade(this)">×</button>
 
-        <div style="display:none">
-            <textarea id="hab_desc_${index}" class="save-input">${desc}</textarea>
-            <input type="hidden" id="hab_tipo_${index}" class="save-input" value="${tipo}">
-            <input type="hidden" id="hab_duracao_${index}" class="save-input" value="${duracao}">
-            <input type="hidden" id="hab_alcance_${index}" class="save-input" value="${alcance}">
-            <input type="hidden" id="hab_acao_${index}" class="save-input" value="${acao}">
-            <input type="hidden" id="hab_mods_${index}" class="save-input" value='${mods}'>
-            <input type="hidden" id="hab_buff_ativo_${index}" class="save-input" value="${buffAtivo}">
+        <div class="entity-card-fields">
+            <label class="entity-card-field">
+                <span>Origem</span>
+                <select id="hab_classe_${safeIndex}" class="save-input inv-input">
+                    ${getOpcoesClassesHab(classe)}
+                </select>
+            </label>
+            <label class="entity-card-field entity-card-field--cost">
+                <span>Custo</span>
+                <span class="cost-container">
+                    <input type="text" id="hab_custo_${safeIndex}" class="save-input inv-input" inputmode="numeric" placeholder="0" value="${_escapeHabAttr(custo)}">
+                    <select id="hab_tipo_custo_${safeIndex}" class="save-input inv-input" aria-label="Recurso do custo">
+                        <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
+                        <option value="PV" ${tipoCusto === 'PV' ? 'selected' : ''}>PV</option>
+                        <option value="Outro" ${tipoCusto === 'Outro' ? 'selected' : ''}>Outro</option>
+                    </select>
+                </span>
+            </label>
+        </div>
+
+        <div class="entity-card-summary">
+            <span data-hab-resumo-acao>${_escapeHabHTML(resumoAcao)}</span>
+            <span data-hab-resumo-duracao>${_escapeHabHTML(resumoDuracao)}</span>
+            <span data-hab-resumo-alcance>${_escapeHabHTML(resumoAlcance)}</span>
+        </div>
+
+        <div class="entity-card-actions">
+            <button type="button" class="entity-details-button" onclick="abrirModalHab(this.closest('.entity-card').dataset.index)">Ver detalhes</button>
+            <button type="button" class="entity-duplicate-button" onclick="duplicarHabilidade(this.closest('.entity-card').dataset.index)" title="Duplicar habilidade" aria-label="Duplicar habilidade">⧉</button>
+            <button type="button" id="btn_usar_hab_${safeIndex}"
+                    class="btn-use-skill${isAtivo ? ' buff-ativo' : ''}"
+                    onclick="toggleBuffHabilidade(this.closest('.entity-card').dataset.index)"
+                    ${isPassiva ? 'hidden' : ''}>
+                ${isAtivo ? 'Ativo' : 'Usar'}
+            </button>
+        </div>
+
+        <div class="entity-card-hidden" hidden>
+            <textarea id="hab_desc_${safeIndex}" class="save-input">${_escapeHabHTML(desc)}</textarea>
+            <input type="hidden" id="hab_tipo_${safeIndex}" class="save-input" value="${_escapeHabAttr(tipo)}">
+            <input type="hidden" id="hab_duracao_${safeIndex}" class="save-input" value="${_escapeHabAttr(duracao)}">
+            <input type="hidden" id="hab_alcance_${safeIndex}" class="save-input" value="${_escapeHabAttr(alcance)}">
+            <input type="hidden" id="hab_acao_${safeIndex}" class="save-input" value="${_escapeHabAttr(acao)}">
+            <input type="hidden" id="hab_mods_${safeIndex}" class="save-input" value="${_escapeHabAttr(mods)}">
+            <input type="hidden" id="hab_buff_ativo_${safeIndex}" class="save-input" value="${isAtivo ? 'true' : 'false'}">
         </div>
     `;
+
     container.appendChild(row);
-    if (idIndex === null) { atualizarTudo(); filtrarHabilidades(); }
+    if (idIndex === null) {
+        atualizarTudo();
+        filtrarHabilidades();
+    }
 }
 
 function duplicarHabilidade(index) {
     const fields = ['nome', 'tipo', 'classe', 'custo', 'tipo_custo', 'desc', 'duracao', 'alcance', 'acao', 'mods'];
-    const vals = fields.map(f => document.getElementById(`hab_${f}_${index}`)?.value || "");
-    // Buff nunca é copiado para duplicata (começa desativado)
-    adicionarHabilidadeUI(vals[0] + " (Cópia)", vals[1], vals[3], vals[4], vals[5], null, vals[6], vals[7], vals[8], vals[2], vals[9], "false");
+    const vals = fields.map(field => document.getElementById(`hab_${field}_${index}`)?.value || "");
+    adicionarHabilidadeUI(`${vals[0]} (Cópia)`, vals[1], vals[3], vals[4], vals[5], null, vals[6], vals[7], vals[8], vals[2], vals[9], 'false');
 }
 
 function removerHabilidade(btn) {
-    const row = btn.closest('.item-row');
+    const row = btn?.closest('.item-row');
+    if (!row) return;
     const index = row.dataset.index;
-    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    Object.keys(dados).forEach(k => { if (k.endsWith(`_${index}`) && k.startsWith('hab_')) delete dados[k]; });
+    let dados = {};
+    try { dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { dados = {}; }
+    Object.keys(dados).forEach(key => {
+        if (key.endsWith(`_${index}`) && key.startsWith('hab_')) delete dados[key];
+    });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     row.remove();
     atualizarTudo();
@@ -92,47 +154,55 @@ function removerHabilidade(btn) {
 }
 
 function filtrarHabilidades() {
-    const termo = document.getElementById('search-habilidade').value.toLowerCase();
-    const fTipo = document.getElementById('filter-habilidade-tipo').value.toLowerCase();
-    const fClasse = document.getElementById('filter-habilidade-classe')?.value.toLowerCase() || "todos";
-
+    const termo = document.getElementById('search-habilidade')?.value.toLocaleLowerCase('pt-BR') || '';
+    const tipo = document.getElementById('filter-habilidade-tipo')?.value.toLocaleLowerCase('pt-BR') || 'todos';
+    const origem = document.getElementById('filter-habilidade-classe')?.value.toLocaleLowerCase('pt-BR') || 'todos';
     let contador = 0;
-    document.querySelectorAll('#habilidades-container .item-row').forEach(row => {
-        const idx = row.dataset.index;
-        const n = document.getElementById(`hab_nome_${idx}`)?.value.toLowerCase() || "";
-        const c = document.getElementById(`hab_classe_${idx}`)?.value.toLowerCase() || "";
-        const t = document.getElementById(`hab_tipo_${idx}`)?.value.toLowerCase() || "";
 
-        const match = n.includes(termo) && (fTipo === 'todos' || t === fTipo) && (fClasse === 'todos' || c === fClasse);
-        row.style.display = match ? 'grid' : 'none';
-        if (match) contador++;
+    document.querySelectorAll('#habilidades-container .item-row').forEach(row => {
+        const index = row.dataset.index;
+        const nome = document.getElementById(`hab_nome_${index}`)?.value.toLocaleLowerCase('pt-BR') || '';
+        const classe = document.getElementById(`hab_classe_${index}`)?.value.toLocaleLowerCase('pt-BR') || '';
+        const tipoItem = document.getElementById(`hab_tipo_${index}`)?.value.toLocaleLowerCase('pt-BR') || '';
+        const visivel = nome.includes(termo) && (tipo === 'todos' || tipoItem === tipo) && (origem === 'todos' || classe === origem);
+        row.style.display = visivel ? 'flex' : 'none';
+        if (visivel) contador++;
     });
-    const countEl = document.getElementById('habilidades-counter');
-    if (countEl) countEl.innerText = `Habilidades visíveis: ${contador}`;
+
+    const label = `${contador} ${contador === 1 ? 'habilidade visível' : 'habilidades visíveis'}`;
+    const counter = document.getElementById('habilidades-counter');
+    const summary = document.getElementById('habilidades-summary-count');
+    if (counter) counter.textContent = label;
+    if (summary) summary.textContent = contador;
 }
 
 function limparHabilidades() {
-    showConfirm("Apagar todas as habilidades?", () => {
-        document.getElementById('habilidades-container').innerHTML = '';
-        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        Object.keys(dados).forEach(k => { if (k.startsWith('hab_')) delete dados[k]; });
+    const limpar = () => {
+        const container = document.getElementById('habilidades-container');
+        if (container) container.innerHTML = '';
+        let dados = {};
+        try { dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { dados = {}; }
+        Object.keys(dados).forEach(key => { if (key.startsWith('hab_')) delete dados[key]; });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         atualizarTudo();
-        showNotification("Todas as habilidades foram removidas.", "success");
-    }, () => {
-        showNotification("Limpeza de habilidades cancelada.", "info");
-    }, "Limpar Habilidades?");
+        filtrarHabilidades();
+        if (typeof showNotification === 'function') showNotification('Todas as habilidades foram removidas.', 'success');
+    };
+
+    if (typeof showConfirm === 'function') {
+        showConfirm('Apagar todas as habilidades?', limpar, null, 'Limpar habilidades?');
+    } else if (window.confirm('Apagar todas as habilidades?')) {
+        limpar();
+    }
 }
 
 function resetarFiltrosHabilidades() {
     const search = document.getElementById('search-habilidade');
     const type = document.getElementById('filter-habilidade-tipo');
     const source = document.getElementById('filter-habilidade-classe');
-
     if (search) search.value = '';
     if (type) type.value = 'todos';
     if (source) source.value = 'todos';
-
     filtrarHabilidades();
-    showNotification("Filtros de habilidades limpos", "info", 2000);
+    if (typeof showNotification === 'function') showNotification('Filtros de habilidades limpos.', 'info', 2000);
 }

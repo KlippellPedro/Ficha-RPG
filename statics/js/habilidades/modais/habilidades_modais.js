@@ -23,75 +23,86 @@ function abrirModalHab(index) {
 
     if (!titleEl || !body || !modal) return;
 
-    titleEl.innerText = `Detalhes: ${nome || "Habilidade"}`;
+    modal.dataset.habilidadeIndex = index;
+    titleEl.innerText = nome || "Nova habilidade";
     body.innerHTML = `
-        <div class="grid-2-cols">
-            <div class="input-group">
-                <label>Origem</label>
-                <select id="modal_hab_classe" class="inv-input">
-                    ${typeof getOpcoesClassesHab === 'function' ? getOpcoesClassesHab(classe) : ''}
-                </select>
-            </div>
-            <div class="input-group"><label>Tipo de Efeito</label>
-                <select id="modal_hab_tipo" class="inv-input">
-                    <option value="Ativa" ${tipo === 'Ativa' ? 'selected' : ''}>Ativa</option>
-                    <option value="Passiva" ${tipo === 'Passiva' ? 'selected' : ''}>Passiva</option>
-                    <option value="Reação" ${tipo === 'Reação' ? 'selected' : ''}>Reação</option>
-                    <option value="Outro" ${tipo === 'Outro' ? 'selected' : ''}>Outro</option>
-                </select>
-            </div>
-            <div class="input-group"><label>Custo</label>
-                <div style="display:flex; gap:5px;">
-                    <input type="text" id="modal_hab_custo" class="inv-input" value="${custo}" style="flex:1;">
-                    <select id="modal_hab_tipo_custo" class="inv-input" style="width:80px;">
-                        <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
-                        <option value="PV" ${tipoCusto === 'PV' ? 'selected' : ''}>PV</option>
-                        <option value="Outro" ${tipoCusto === 'Outro' ? 'selected' : ''}>Outro</option>
-                    </select>
+        <div class="entity-modal-grid">
+            <section class="entity-modal-panel">
+                <h4 class="entity-modal-section-title">Configuração</h4>
+                <div class="entity-form-grid">
+                    <div class="input-group">
+                        <label for="modal_hab_classe">Origem</label>
+                        <select id="modal_hab_classe" class="inv-input">
+                            ${typeof getOpcoesClassesHab === 'function' ? getOpcoesClassesHab(classe) : ''}
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="modal_hab_tipo">Tipo de efeito</label>
+                        <select id="modal_hab_tipo" class="inv-input">
+                            <option value="Ativa" ${tipo === 'Ativa' ? 'selected' : ''}>Ativa</option>
+                            <option value="Passiva" ${tipo === 'Passiva' ? 'selected' : ''}>Passiva</option>
+                            <option value="Reação" ${tipo === 'Reação' ? 'selected' : ''}>Reação</option>
+                            <option value="Outro" ${tipo === 'Outro' ? 'selected' : ''}>Outro</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="grid-2-cols">
-            <div class="input-group">
-                <label>Duração</label>
-                <input type="text" id="modal_hab_duracao" class="inv-input" value="${duracao}">
-            </div>
-            <div class="input-group">
-                <label>Alcance</label>
-                <input type="text" id="modal_hab_alcance" class="inv-input" value="${alcance}">
-            </div>
-        </div>
-        <div class="input-group">
-            <label>Ação</label>
-            <input type="text" id="modal_hab_acao" class="inv-input" value="${acao}">
-        </div>
-        <div class="input-group" id="hab-buff-btn-container">
-            <label style="display:flex;justify-content:space-between;align-items:center;">
-                <span>Buffs / Modificadores</span>
-                <small style="color:var(--text-muted);font-weight:normal;">
-                    ${tipo === 'Passiva' ? '🔒 Passiva: sempre ativo' : '⚡ Ativa: ativo ao usar'}
-                </small>
-            </label>
-            <button type="button" class="btn-save-modal" style="width:100%; background: #16a34a; color: #fff; border: 1px solid #166534;" onclick="abrirModalBuffsHab('${index}')">Configurar Buffs</button>
-        </div>
-        <div class="input-group">
-            <label>Descrição e Efeito</label>
-            <textarea id="modal_hab_desc" class="inv-input" style="min-height: 200px">${desc}</textarea>
+                <div class="entity-form-grid">
+                    <div class="input-group">
+                        <label for="modal_hab_custo">Custo</label>
+                        <div class="entity-modal-cost">
+                            <input type="text" id="modal_hab_custo" class="inv-input" inputmode="numeric" value="${_escapeHabAttr(custo)}" placeholder="0">
+                            <select id="modal_hab_tipo_custo" class="inv-input" aria-label="Recurso do custo">
+                                <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
+                                <option value="PV" ${tipoCusto === 'PV' ? 'selected' : ''}>PV</option>
+                                <option value="Outro" ${tipoCusto === 'Outro' ? 'selected' : ''}>Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="modal_hab_acao">Ação</label>
+                        <input type="text" id="modal_hab_acao" class="inv-input" value="${_escapeHabAttr(acao)}" placeholder="Ex: Ação padrão">
+                    </div>
+                </div>
+                <div class="entity-form-grid">
+                    <div class="input-group">
+                        <label for="modal_hab_duracao">Duração</label>
+                        <input type="text" id="modal_hab_duracao" class="inv-input" value="${_escapeHabAttr(duracao)}" placeholder="Ex: 1 rodada">
+                    </div>
+                    <div class="input-group">
+                        <label for="modal_hab_alcance">Alcance</label>
+                        <input type="text" id="modal_hab_alcance" class="inv-input" value="${_escapeHabAttr(alcance)}" placeholder="Ex: Pessoal">
+                    </div>
+                </div>
+
+                <h4 class="entity-modal-section-title">Efeitos na ficha</h4>
+                <div class="input-group" id="hab-buff-btn-container">
+                    <label>
+                        <span>Buffs e modificadores</span>
+                        <small>${tipo === 'Passiva' ? 'Sempre aplicados' : 'Aplicados ao usar'}</small>
+                    </label>
+                    <button type="button" class="entity-buff-launcher" onclick="abrirModalBuffsHab(document.getElementById('modal-hab').dataset.habilidadeIndex)">Configurar modificadores</button>
+                </div>
+            </section>
+
+            <section class="entity-modal-panel">
+                <h4 class="entity-modal-section-title">Descrição e efeito</h4>
+                <textarea id="modal_hab_desc" class="inv-input entity-modal-description" placeholder="Descreva efeito, condições, limites e aparência...">${_escapeHabHTML(desc)}</textarea>
+            </section>
         </div>
     `;
 
     const footer = modal ? modal.querySelector('.modal-footer') : null;
     if (footer) {
-        footer.style.justifyContent = 'flex-end';
         footer.innerHTML = `
-            <button type="button" class="btn-save-modal" onclick="salvarDetalhesHab()">Salvar e Fechar</button>
+            <button type="button" class="btn-modal-secondary" onclick="fecharModalHab()">Cancelar</button>
+            <button type="button" class="btn-save-modal" onclick="salvarDetalhesHab()">Salvar alterações</button>
         `;
     }
     modal.showModal();
 }
 
 function fecharModalHab() {
-    document.getElementById('modal-hab').close();
+    fecharDialogoAnimado(document.getElementById('modal-hab'));
     habSendoEditadaIdx = null;
 }
 
@@ -107,7 +118,13 @@ function salvarDetalhesHab() {
 
         // Atualiza visibilidade do botão Usar baseado no novo tipo
         const btnUsar = document.getElementById(`btn_usar_hab_${idx}`);
-        if (btnUsar) btnUsar.style.display = novoTipo === 'Passiva' ? 'none' : '';
+        if (btnUsar) btnUsar.hidden = novoTipo === 'Passiva';
+
+        const card = document.getElementById(`hab_tipo_${idx}`)?.closest('.entity-card');
+        const tipoLabel = card?.querySelector('[data-hab-tipo-label]');
+        const buffLabel = card?.querySelector('[data-hab-buff-label]');
+        if (tipoLabel) tipoLabel.textContent = novoTipo;
+        if (buffLabel && novoTipo === 'Passiva') buffLabel.textContent = 'Sempre ativa';
 
         // Se mudou para Passiva, desativa buff ativo automaticamente
         if (novoTipo === 'Passiva') {
@@ -127,6 +144,14 @@ function salvarDetalhesHab() {
     document.getElementById(`hab_duracao_${idx}`).value = document.getElementById('modal_hab_duracao').value;
     document.getElementById(`hab_alcance_${idx}`).value = document.getElementById('modal_hab_alcance').value;
     document.getElementById(`hab_acao_${idx}`).value = document.getElementById('modal_hab_acao').value;
+
+    const card = document.getElementById(`hab_tipo_${idx}`)?.closest('.entity-card');
+    const resumoAcao = card?.querySelector('[data-hab-resumo-acao]');
+    const resumoDuracao = card?.querySelector('[data-hab-resumo-duracao]');
+    const resumoAlcance = card?.querySelector('[data-hab-resumo-alcance]');
+    if (resumoAcao) resumoAcao.textContent = document.getElementById('modal_hab_acao').value || 'Ação não definida';
+    if (resumoDuracao) resumoDuracao.textContent = document.getElementById('modal_hab_duracao').value || 'Duração livre';
+    if (resumoAlcance) resumoAlcance.textContent = document.getElementById('modal_hab_alcance').value || 'Alcance não definido';
 
     fecharModalHab();
     atualizarTudo();
@@ -159,7 +184,7 @@ function abrirModalBuffsHab(index) {
 }
 
 function fecharModalBuffHab() {
-    document.getElementById('modal-pod-buffs').close();
+    fecharDialogoAnimado(document.getElementById('modal-pod-buffs'));
     currentHabModEditIdx = null;
 }
 
@@ -167,21 +192,24 @@ function adicionarLinhaBuffHab(attr = 'nenhum', mod = 0, isAdv = false) {
     const container = document.getElementById('pod-buffs-container');
     if (!container) return;
     const optionsCat = window.OPTIONS_CATEGORIZADAS || {};
+    let categoria = isAdv ? 'vantagem' : 'ficha';
+    if (!isAdv && attr !== 'nenhum') {
+        if (optionsCat.pericia?.some(option => option.v === attr)) categoria = 'pericia';
+        else if (optionsCat.arma?.some(option => option.v === attr)) categoria = 'arma';
+    }
 
     const row = document.createElement('div');
     row.className = 'material-attr-row';
-    row.style = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
-
     row.innerHTML = `
-        <select class="inv-input pod-cat-select" style="flex: 1; border-color: #555;">
-            <option value="ficha">Ficha</option>
-            <option value="pericia">Perícia</option>
-            <option value="arma">Arma</option>
-            <option value="vantagem" ${isAdv ? 'selected' : ''}>Vantagem</option>
+        <select class="inv-input pod-cat-select" aria-label="Categoria do modificador">
+            <option value="ficha" ${categoria === 'ficha' ? 'selected' : ''}>Ficha</option>
+            <option value="pericia" ${categoria === 'pericia' ? 'selected' : ''}>Perícia</option>
+            <option value="arma" ${categoria === 'arma' ? 'selected' : ''}>Arma</option>
+            <option value="vantagem" ${categoria === 'vantagem' ? 'selected' : ''}>Vantagem</option>
         </select>
-        <select class="inv-input pod-buff-attr" style="flex: 1.5;"></select>
-        <input type="text" class="inv-input pod-buff-val" style="flex: 0.8;" value="${mod}" placeholder="Val">
-        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+        <select class="inv-input pod-buff-attr" aria-label="Atributo modificado"></select>
+        <input type="text" class="inv-input pod-buff-val" value="${_escapeHabAttr(mod)}" placeholder="Valor" aria-label="Valor do modificador">
+        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()" aria-label="Remover modificador">×</button>
     `;
 
     container.appendChild(row);

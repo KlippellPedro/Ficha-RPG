@@ -53,6 +53,46 @@ dialog.modal-overlay {
   position: relative;
 }
 
+/* Animação de abertura/fechamento — dialog[open] anima entrada; .modal-closing anima saída
+   antes do close() de fato (dialog nativo fecha instantaneamente sem essa classe). */
+dialog.modal-overlay[open] .modal-content,
+dialog.modal-overlay[open] .modal-content-box {
+  animation: modal-pop-in var(--dur-base, 0.25s) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+
+dialog.modal-overlay.modal-closing .modal-content,
+dialog.modal-overlay.modal-closing .modal-content-box {
+  animation: modal-pop-out var(--dur-fast, 0.15s) var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1)) both;
+}
+
+dialog.modal-overlay[open] {
+  animation: modal-backdrop-in var(--dur-base, 0.25s) var(--ease-out, ease-out) both;
+}
+
+dialog.modal-overlay.modal-closing {
+  animation: modal-backdrop-out var(--dur-fast, 0.15s) var(--ease-out, ease-out) both;
+}
+
+@keyframes modal-pop-in {
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes modal-pop-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(4px); }
+}
+
+@keyframes modal-backdrop-in {
+  from { background-color: rgba(0, 0, 0, 0); backdrop-filter: blur(0px); }
+  to   { background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); }
+}
+
+@keyframes modal-backdrop-out {
+  from { background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); }
+  to   { background-color: rgba(0, 0, 0, 0); backdrop-filter: blur(0px); }
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;

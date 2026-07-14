@@ -409,7 +409,7 @@ function confirmarSelecionarClasse(index, className) {
         btn.classList.remove('empty');
     }
 
-    document.getElementById('modal-class-select')?.close();
+    fecharDialogoAnimado(document.getElementById('modal-class-select'));
     if (typeof atualizarEstiloClasse === 'function') atualizarEstiloClasse(select);
     if (typeof atualizarTudo === 'function') atualizarTudo();
 }

@@ -12,7 +12,14 @@ function _syncBotaoHab(index) {
     const isAtivo = buffInput.value === 'true';
     btn.textContent = isAtivo ? 'Ativo' : 'Usar';
     btn.classList.toggle('buff-ativo', isAtivo);
-    btn.closest('.item-row')?.classList.toggle('has-active-buff', isAtivo);
+    const card = btn.closest('.item-row');
+    card?.classList.toggle('has-active-buff', isAtivo);
+    const stateLabel = card?.querySelector('[data-hab-buff-label]');
+    if (stateLabel) {
+        stateLabel.textContent = card.dataset.tipo === 'Passiva'
+            ? 'Sempre ativa'
+            : (isAtivo ? 'Efeito ativo' : 'Efeito inativo');
+    }
 }
 
 /**

@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="../statics/css/ficha/ficha.css" />
     <link rel="stylesheet" href="../statics/css/ficha/modais/ficha_modais.css" />
     <link rel="stylesheet" href="../statics/css/ficha/ficha_especiais.css" />
+    <link rel="stylesheet" href="../statics/css/ficha/ficha_responsive.css" />
     <link rel="stylesheet" href="../statics/css/responsive.css" />
+    <link rel="stylesheet" href="../statics/css/design_system.css" />
     <script src="../statics/js/global.js"></script>
     <script src="../statics/js/global_calculations.js"></script>
     <script src="../statics/js/global_ui.js"></script>
@@ -29,8 +31,9 @@
     <script src="../statics/js/ficha/racas/ficha_racas.js"></script>
     <script src="../statics/js/ficha/ficha_status.js"></script>
     <script src="../statics/js/ficha/ficha.js"></script>
+    <script src="../statics/js/design_system.js"></script>
   </head>
-  <body>
+  <body class="ficha-page">
     <div class="critical-vignette"></div>
     <!-- Menu Superior -->
     <nav class="top-menu">
@@ -45,9 +48,24 @@
       <span class="message"></span>
     </div>
 
-    <div class="container">
+    <main class="container ficha-page-shell">
+      <section class="page-hero ficha-page-hero" aria-labelledby="ficha-page-title">
+        <div class="page-hero-copy">
+          <span class="page-eyebrow">Painel de personagem</span>
+          <h1 id="ficha-page-title">Ficha de Supremacia</h1>
+        </div>
+      </section>
+
       <!-- Seletor de DLCs -->
-      <div style="display: flex; gap: 20px; flex-wrap: wrap">
+      <section class="session-panel" aria-labelledby="session-panel-title">
+        <header class="chapter-heading chapter-heading--compact">
+          <div>
+            <span class="page-section-eyebrow">Preparação</span>
+            <h2 id="session-panel-title" class="section-title">Conteúdo e sessão</h2>
+          </div>
+          <p>Ative os conjuntos de regras e recursos especiais usados nesta campanha.</p>
+        </header>
+        <div class="session-panel-grid">
         <div id="dlc-selector-container" class="dlc-selector-box" style="flex: 1; margin-bottom: 0"></div>
         <div class="dlc-selector-box" style="min-width: 200px; margin-bottom: 0">
           <label class="dlc-label">Configuração de Sessão</label>
@@ -56,12 +74,20 @@
             <span>⚠️ Modo de Evento</span>
           </label>
         </div>
-      </div>
+        </div>
+      </section>
 
       <!-- Identidade do Personagem -->
       <header class="ficha-header-main ficha-section">
-        <div class="section-title">Identidade do Personagem</div>
-        <div class="char-header">
+        <section class="sheet-chapter sheet-chapter--identity" aria-labelledby="identity-title">
+          <header class="chapter-heading">
+            <div>
+              <span class="page-section-eyebrow">Capítulo 01</span>
+              <h2 id="identity-title" class="section-title">Identidade do personagem</h2>
+            </div>
+            <p>O retrato, a origem e as escolhas que definem quem ocupa o centro desta história.</p>
+          </header>
+          <div class="char-header">
           <div class="char-avatar-container" onclick="triggerCharImageInput(this)">
             <img
               id="char-avatar-img"
@@ -153,18 +179,33 @@
             <label>Nível</label>
             <input type="number" id="nivel" class="save-input header-input" value="1" />
           </div>
-        </div>
+          </div>
+        </section>
 
         <!-- Container Dinâmico de Classes -->
-        <div class="section-title" style="margin-top:16px;">Classes</div>
-        <div id="classes-container" class="classes-dynamic-list">
-          <!-- Gerado via JavaScript -->
-        </div>
-        <button type="button" class="btn-add-class" onclick="adicionarClasseUI()">+ Adicionar Classe</button>
+        <section class="sheet-chapter sheet-chapter--classes" aria-labelledby="classes-title">
+          <header class="chapter-heading">
+            <div>
+              <span class="page-section-eyebrow">Progressão</span>
+              <h2 id="classes-title" class="section-title">Classes</h2>
+            </div>
+            <p>Organize as classes e os níveis que formam a trajetória do personagem.</p>
+          </header>
+          <div id="classes-container" class="classes-dynamic-list">
+            <!-- Gerado via JavaScript -->
+          </div>
+          <button type="button" class="btn-add-class" onclick="adicionarClasseUI()">+ Adicionar Classe</button>
+        </section>
 
         <!-- Atributos HUD movidos para cá -->
-        <section class="attributes-section-header">
-          <div class="section-title">Atributos</div>
+        <section class="attributes-section-header sheet-chapter sheet-chapter--attributes" aria-labelledby="attributes-title">
+          <header class="chapter-heading">
+            <div>
+              <span class="page-section-eyebrow">Capítulo 02</span>
+              <h2 id="attributes-title" class="section-title">Atributos</h2>
+            </div>
+            <p>Edite os valores-base e consulte a composição de cada modificador pelo botão de ajuda.</p>
+          </header>
           <div class="atributos-grid">
             <div class="attribute-card">
               <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('forca')">?</button>
@@ -236,8 +277,14 @@
         </section>
 
         <!-- Vida e Mana movidos para baixo dos atributos -->
-        <section class="stats-section-header">
-          <div class="section-title" style="width:100%;max-width:800px;">Status Vital</div>
+        <section class="stats-section-header sheet-chapter sheet-chapter--resources" aria-labelledby="resources-title">
+          <header class="chapter-heading">
+            <div>
+              <span class="page-section-eyebrow">Capítulo 03</span>
+              <h2 id="resources-title" class="section-title">Recursos vitais</h2>
+            </div>
+            <p>Vida, Mana e Sanidade ficam lado a lado, com ajustes rápidos e detalhes do cálculo.</p>
+          </header>
           <div class="stats-container">
             <!-- Barra de Vida -->
             <div id="pv-stat-group" class="stat-group">
@@ -372,8 +419,15 @@
         </div>
 
         <!-- Linha de Combate e Status movida para baixo da Vida/Mana -->
-        <div class="section-title" style="margin-top:20px;">Combate</div>
-        <section class="combat-header-row">
+        <section class="sheet-chapter sheet-chapter--combat" aria-labelledby="combat-title">
+          <header class="chapter-heading">
+            <div>
+              <span class="page-section-eyebrow">Capítulo 04</span>
+              <h2 id="combat-title" class="section-title">Combate e estado</h2>
+            </div>
+            <p>Resultados defensivos, movimento, resistências e condições reunidos em um único painel tático.</p>
+          </header>
+          <div class="combat-header-row combat-overview-grid">
           <!-- Coluna 1: Sistema de Defesa -->
           <div class="combat-col">
             <div class="input-group" style="position: relative">
@@ -467,12 +521,19 @@
               <textarea id="condicao" class="save-input detail-textarea" style="flex: 1" placeholder="Ex: Envenenado (3 turnos), Caído..."></textarea>
             </div>
           </div>
+          </div>
         </section>
       </header>
 
       <!-- Seção de Ações de Combate -->
-      <div class="actions-hud-section ficha-section">
-        <div class="section-title">Ações de Combate</div>
+      <section class="actions-hud-section ficha-section sheet-chapter" aria-labelledby="actions-title">
+        <header class="chapter-heading chapter-heading--compact">
+          <div>
+            <span class="page-section-eyebrow">Economia de turno</span>
+            <h2 id="actions-title" class="section-title">Ações de combate</h2>
+          </div>
+          <p>Acompanhe as ações disponíveis e o avanço dos turnos durante a cena.</p>
+        </header>
         <div class="actions-container">
           <div class="action-item">
             <label>Ação Movimento</label>
@@ -501,11 +562,17 @@
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Seção de Experiência (XP) -->
-      <div class="xp-hud-section ficha-section">
-        <div class="section-title">Experiência</div>
+      <section class="xp-hud-section ficha-section sheet-chapter" aria-labelledby="experience-title">
+        <header class="chapter-heading chapter-heading--compact">
+          <div>
+            <span class="page-section-eyebrow">Progressão</span>
+            <h2 id="experience-title" class="section-title">Experiência</h2>
+          </div>
+          <p>Visualize o avanço até o próximo nível e ajuste o XP em passos rápidos.</p>
+        </header>
         <div class="stat-group" style="max-width: 600px; margin: 0 auto; width: 100%">
           <div class="stat-labels">
             <label>EXPERIÊNCIA (XP)</label>
@@ -524,7 +591,7 @@
             <button type="button" class="btn-qty" onclick="alterarXP(100)">+</button>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Seções Específicas de Classes -->
       <div id="section-lutador" class="combat-header-row" style="display: none">
@@ -843,12 +910,21 @@ Toda fada tem asas, as quais são uma parte importante da mesma. As Asas são co
       </div>
 
       <!-- Controles da Ficha -->
-      <div class="controles">
-        <button type="button" onclick="exportarFicha()">Exportar JSON</button>
-        <input type="file" id="import-file" style="display: none" onchange="importarFicha(event)" />
-        <button type="button" onclick="document.getElementById('import-file').click()">Importar JSON</button>
-        <button type="button" onclick="limparTodaFicha()">Limpar Ficha</button>
-      </div>
-    </div>
+      <section class="sheet-data-actions" aria-labelledby="data-actions-title">
+        <header>
+          <div>
+            <span class="page-section-eyebrow">Dados da ficha</span>
+            <h2 id="data-actions-title">Importar, exportar ou limpar</h2>
+          </div>
+          <p>Use estas ações para transportar os dados da ficha ou começar novamente.</p>
+        </header>
+        <div class="controles">
+          <button type="button" onclick="exportarFicha()">Exportar JSON</button>
+          <input type="file" id="import-file" style="display: none" onchange="importarFicha(event)" />
+          <button type="button" onclick="document.getElementById('import-file').click()">Importar JSON</button>
+          <button type="button" onclick="limparTodaFicha()">Limpar Ficha</button>
+        </div>
+      </section>
+    </main>
   </body>
 </html>

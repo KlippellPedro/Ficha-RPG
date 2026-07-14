@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-content" style="max-width:680px;width:95%;">
                 <div class="modal-header">
                     <h3 class="modal-title" style="color:var(--primary-color)">Escolher Raça</h3>
-                    <button type="button" class="btn-remove-class" onclick="this.closest('dialog').close()">×</button>
+                    <button type="button" class="btn-remove-class" onclick="fecharDialogoAnimado(this.closest('dialog'))">×</button>
                 </div>
                 <div style="padding: 4px 0 8px 0;">
                     <input type="text" id="modal-raca-search"
@@ -130,7 +130,7 @@ window.confirmarSelecionarRaca = function (key) {
         btn.style.borderColor = cor;
         btn.style.color = cor;
     }
-    document.getElementById('modal-raca-select')?.close();
+    fecharDialogoAnimado(document.getElementById('modal-raca-select'));
 };
 
 function initRaces() {

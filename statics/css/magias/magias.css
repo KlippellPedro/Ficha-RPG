@@ -1,56 +1,84 @@
-/* Definição das colunas para Magias */
-.mag-header-grid,
-.mag-row-grid {
-  display: grid; /* Removido !important */
-  grid-template-columns: 2fr 130px 90px 160px 50px 60px 50px 40px; /* Removido !important */
+/* Identidade arcana e controles específicos de Magias. */
+
+.page-magias {
+  --ui-page-accent: #5b8cff;
+  --ui-page-accent-soft: rgba(91, 140, 255, 0.2);
+  --ui-page-accent-2: #a78bfa;
+  --ui-page-accent-2-soft: rgba(167, 139, 250, 0.15);
 }
 
-/* Chips de filtro de círculo */
-.circle-chips {
+.page-magias .circle-chips {
   display: flex;
-  gap: 6px;
   align-items: center;
+  gap: 5px;
   flex-wrap: wrap;
 }
 
-.circle-chip {
-  background: var(--bg-input);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 5px 14px;
-  font-family: var(--font-heading, serif);
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
+.page-magias .circle-chip {
+  min-width: 38px;
+  min-height: 34px;
+  padding: 6px 11px;
+  color: var(--ui-text-dim);
+  font-family: var(--ui-font-display);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--ui-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: none;
 }
 
-.circle-chip:hover           { transform: translateY(-1px); filter: brightness(1.3); }
-.circle-chip.active          { color: var(--primary-color); background: var(--primary-glow); border-color: var(--primary-color); }
-.circle-chip.chip-2.active   { color: #4ade80; background: rgba(74,222,128,0.12); border-color: #4ade80; }
-.circle-chip.chip-3.active   { color: #3b82f6; background: rgba(59,130,246,0.12); border-color: #3b82f6; }
-.circle-chip.chip-4.active   { color: #f59e0b; background: rgba(245,158,11,0.12); border-color: #f59e0b; }
-.circle-chip.chip-extra.active { color: #ff4444; background: rgba(255,68,68,0.12); border-color: #ff4444; }
+.page-magias .circle-chip:hover {
+  color: var(--ui-text);
+  border-color: var(--ui-line-strong);
+  background: rgba(255, 255, 255, 0.05);
+}
 
-/* Cores por Círculo/Nível com glow mais forte */
-.mag-nivel-1 { color: #ffffff !important; }
-.mag-nivel-2 { color: #4ade80 !important; text-shadow: 0 0 10px rgba(74,222,128,0.6); font-weight: bold; }
-.mag-nivel-3 { color: #3b82f6 !important; text-shadow: 0 0 10px rgba(59,130,246,0.6); font-weight: bold; }
-.mag-nivel-4 { color: #f59e0b !important; text-shadow: 0 0 12px rgba(245,158,11,0.7); font-weight: bold; }
-.mag-nivel-extra { color: #ff4444 !important; text-shadow: 0 0 12px rgba(255,68,68,0.7); font-weight: bold; }
+.page-magias .circle-chip.active {
+  color: #fff;
+  border-color: var(--ui-page-accent);
+  background: var(--ui-page-accent-soft);
+  box-shadow: 0 0 14px var(--ui-page-accent-soft);
+}
 
-/* Estilização das opções dentro do seletor */
-select.inv-input option[value="1"] {
-  color: #ffffff;
+.page-magias .circle-chip.chip-2.active { color: #79e6ab; border-color: #53dfa2; background: rgba(83, 223, 162, 0.12); }
+.page-magias .circle-chip.chip-3.active { color: #8eb2ff; border-color: #5b8cff; background: rgba(91, 140, 255, 0.14); }
+.page-magias .circle-chip.chip-4.active { color: #ffd47b; border-color: #f7c65c; background: rgba(247, 198, 92, 0.13); }
+.page-magias .circle-chip.chip-extra.active { color: #ff91a4; border-color: #ff6f87; background: rgba(255, 111, 135, 0.13); }
+
+.page-magias .entity-card-fields {
+  grid-template-columns: minmax(120px, 1.1fr) minmax(82px, 0.58fr) minmax(140px, 0.82fr);
 }
-select.inv-input option[value="2"] {
-  color: #4ade80;
+
+.page-magias .entity-card-symbol {
+  color: var(--ui-page-accent-2);
 }
-select.inv-input option[value="3"] {
-  color: #3b82f6;
+
+.page-magias .level-control,
+.page-magias .level-control > :is(input, select) {
+  width: 100%;
 }
-select.inv-input option[value="4"] {
-  color: #f59e0b;
+
+.page-magias .mag-nivel-1 { color: var(--ui-text) !important; }
+.page-magias .mag-nivel-2 { color: #53dfa2 !important; text-shadow: 0 0 10px rgba(83, 223, 162, 0.42); font-weight: 800; }
+.page-magias .mag-nivel-3 { color: #76a2ff !important; text-shadow: 0 0 10px rgba(91, 140, 255, 0.5); font-weight: 800; }
+.page-magias .mag-nivel-4 { color: #f7c65c !important; text-shadow: 0 0 11px rgba(247, 198, 92, 0.48); font-weight: 800; }
+.page-magias .mag-nivel-extra { color: #ff7e95 !important; text-shadow: 0 0 11px rgba(255, 111, 135, 0.48); font-weight: 800; }
+
+.page-magias .entity-badge--level[data-level="2"] { color: #53dfa2; }
+.page-magias .entity-badge--level[data-level="3"] { color: #76a2ff; }
+.page-magias .entity-badge--level[data-level="4"] { color: #f7c65c; }
+.page-magias .entity-badge--level[data-level="extra"] { color: #ff7e95; }
+
+.page-magias #modal-magia .entity-modal-panel:last-child {
+  background:
+    radial-gradient(circle at 100% 0, var(--ui-page-accent-soft), transparent 48%),
+    rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 980px) {
+  .page-magias .circle-chips {
+    order: 5;
+    width: 100%;
+  }
 }

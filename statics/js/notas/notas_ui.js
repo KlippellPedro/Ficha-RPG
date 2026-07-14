@@ -1,135 +1,191 @@
-/**
- * Lógica de Interface das Notas (Lista, Filtros e Favoritos)
- */
+/** Interface das notas: cards, favoritos, filtros e resumos. */
+
+function configurarCampoNota(control, id, value = "") {
+    control.id = id;
+    control.value = value ?? "";
+    return control;
+}
+
+function atualizarResumoNota(index) {
+    const row = document.querySelector(`#notas-container .item-row[data-index="${CSS.escape(String(index))}"]`);
+    if (!row) return;
+
+    const desc = document.getElementById(`nota_desc_${index}`)?.value.trim() || "";
+    const preview = row.querySelector('.nota-card-preview');
+    if (preview) preview.textContent = desc || "Esta nota ainda não possui conteúdo. Abra para começar a escrever.";
+
+    let topics = [];
+    try {
+        topics = JSON.parse(document.getElementById(`nota_campos_${index}`)?.value || "[]");
+    } catch {
+        topics = [];
+    }
+    const topicsCount = row.querySelector('.nota-topics-count');
+    if (topicsCount) {
+        const count = Array.isArray(topics) ? topics.length : 0;
+        topicsCount.textContent = `${count} ${count === 1 ? 'tópico' : 'tópicos'}`;
+    }
+
+    const category = document.getElementById(`nota_tipo_${index}`)?.value.trim() || "Sem categoria";
+    row.dataset.category = category.toLowerCase();
+}
 
 function adicionarNotaUI(titulo = "", tipo = "", desc = "", idIndex = null, camposCustom = "[]", favorito = false, data = "") {
     const container = document.getElementById('notas-container');
     if (!container) return;
 
-    const index = idIndex !== null ? idIndex : Date.now();
-    // Gera a data atual se for uma nota nova
+    const index = String(idIndex !== null ? idIndex : Date.now());
     const dataFormatada = data || new Date().toLocaleDateString('pt-BR');
-
-    const row = document.createElement('div');
-    row.className = 'item-row nota-row-grid draggable';
+    const row = document.createElement('article');
+    row.className = 'item-row nota-row-grid nota-card draggable ui-enter';
     row.draggable = true;
     row.dataset.index = index;
 
     row.innerHTML = `
-        <button type="button" id="btn_fav_${index}" class="btn-fav ${favorito ? 'active' : ''}" onclick="toggleFavorito('${index}')" title="Favoritar">
-            ${favorito ? '★' : '☆'}
-        </button>
-        <div class="nota-header-info">
-            <input type="text" id="nota_titulo_${index}" class="save-input inv-input nota-titulo-lista" placeholder="Título da Nota" value="${titulo}">
-            <small class="nota-data-lista">${dataFormatada}</small>
-        </div>
-        <div class="nota-tag-container">
-            <input type="text" id="nota_tipo_${index}" class="save-input inv-input nota-tag" placeholder="Tipo" value="${tipo}">
-        </div>
-        
-        <button type="button" class="btn-open-desc" onclick="abrirModalNota('${index}')">🔍</button>
-        <button type="button" class="btn-open-desc" onclick="duplicarNota('${index}')" title="Duplicar">📋</button>
-        <button type="button" class="btn-remove-class" onclick="removerNota(this)">×</button>
+        <header class="nota-card-header">
+            <button type="button" class="btn-fav" title="Favoritar nota" aria-label="Favoritar nota"></button>
+            <div class="nota-header-info">
+                <span class="nota-card-kicker">Entrada do diário</span>
+                <input type="text" class="save-input inv-input nota-titulo-lista" placeholder="Título da nota" aria-label="Título da nota">
+                <small class="nota-data-lista"></small>
+            </div>
+            <button type="button" class="btn-remove-class nota-remove-button" title="Apagar nota" aria-label="Apagar nota">×</button>
+        </header>
 
-        <div style="display:none">
-            <textarea id="nota_desc_${index}" class="save-input">${desc}</textarea>
-            <textarea id="nota_campos_${index}" class="save-input">${camposCustom}</textarea>
-            <input type="checkbox" id="nota_fav_${index}" class="save-input" ${favorito ? 'checked' : ''}>
-            <input type="hidden" id="nota_data_${index}" class="save-input" value="${dataFormatada}">
+        <div class="nota-card-body">
+            <div class="nota-tag-container">
+                <label>
+                    <span class="sr-only">Categoria da nota</span>
+                    <input type="text" class="save-input inv-input nota-tag" placeholder="Categoria">
+                </label>
+                <span class="nota-topics-count">0 tópicos</span>
+            </div>
+            <p class="nota-card-preview"></p>
+        </div>
+
+        <footer class="nota-card-footer">
+            <button type="button" class="btn-open-desc nota-open-button">Abrir nota</button>
+            <button type="button" class="btn-duplicate nota-duplicate-button" title="Duplicar nota">Duplicar</button>
+        </footer>
+
+        <div class="nota-hidden-data" hidden>
+            <textarea class="save-input nota-desc-input"></textarea>
+            <textarea class="save-input nota-fields-input"></textarea>
+            <input type="checkbox" class="save-input nota-favorite-input">
+            <input type="hidden" class="save-input nota-date-input">
         </div>
     `;
 
-    // Marca como recente se foi criada hoje
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    if (dataFormatada === hoje) row.classList.add('nota-recente');
+    const titleInput = configurarCampoNota(row.querySelector('.nota-titulo-lista'), `nota_titulo_${index}`, titulo);
+    const typeInput = configurarCampoNota(row.querySelector('.nota-tag'), `nota_tipo_${index}`, tipo);
+    configurarCampoNota(row.querySelector('.nota-desc-input'), `nota_desc_${index}`, desc);
+    configurarCampoNota(row.querySelector('.nota-fields-input'), `nota_campos_${index}`, camposCustom || "[]");
+    const favoriteInput = row.querySelector('.nota-favorite-input');
+    favoriteInput.id = `nota_fav_${index}`;
+    favoriteInput.checked = Boolean(favorito);
+    configurarCampoNota(row.querySelector('.nota-date-input'), `nota_data_${index}`, dataFormatada);
 
+    const favoriteButton = row.querySelector('.btn-fav');
+    favoriteButton.id = `btn_fav_${index}`;
+    favoriteButton.classList.toggle('active', Boolean(favorito));
+    favoriteButton.textContent = favorito ? '★' : '☆';
+    favoriteButton.setAttribute('aria-pressed', favorito ? 'true' : 'false');
+    favoriteButton.addEventListener('click', () => toggleFavorito(index));
+
+    row.querySelector('.nota-data-lista').textContent = dataFormatada;
+    row.querySelector('.nota-open-button').addEventListener('click', () => abrirModalNota(index));
+    row.querySelector('.nota-duplicate-button').addEventListener('click', () => duplicarNota(index));
+    row.querySelector('.nota-remove-button').addEventListener('click', event => removerNota(event.currentTarget));
+
+    titleInput.addEventListener('input', filtrarNotas);
+    typeInput.addEventListener('input', () => {
+        atualizarResumoNota(index);
+        filtrarNotas();
+    });
+
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    row.classList.toggle('nota-recente', dataFormatada === hoje);
     container.appendChild(row);
+    atualizarResumoNota(index);
+
     if (idIndex === null) {
         atualizarTudo();
         ordenarNotas();
         filtrarNotas();
+        titleInput.focus();
     }
 }
 
-/**
- * Alterna o estado de favorito de uma nota
- */
 function toggleFavorito(index) {
-    const btn = document.getElementById(`btn_fav_${index}`);
+    const button = document.getElementById(`btn_fav_${index}`);
     const checkbox = document.getElementById(`nota_fav_${index}`);
-    if (!btn || !checkbox) return;
+    if (!button || !checkbox) return;
 
-    const novoEstado = !checkbox.checked;
-    checkbox.checked = novoEstado;
-
-    btn.classList.toggle('active', novoEstado);
-    btn.innerText = novoEstado ? '★' : '☆';
-
+    checkbox.checked = !checkbox.checked;
+    button.classList.toggle('active', checkbox.checked);
+    button.textContent = checkbox.checked ? '★' : '☆';
+    button.setAttribute('aria-pressed', checkbox.checked ? 'true' : 'false');
     atualizarTudo();
     ordenarNotas();
+    filtrarNotas();
 }
 
-/**
- * Ordena as notas: Favoritos primeiro, depois por Título
- */
 function ordenarNotas() {
     const container = document.getElementById('notas-container');
     if (!container) return;
 
-    const rows = Array.from(container.querySelectorAll('.item-row'));
+    const rows = [...container.querySelectorAll('.item-row')];
     rows.sort((a, b) => {
-        const isFavA = document.getElementById(`nota_fav_${a.dataset.index}`)?.checked ? 1 : 0;
-        const isFavB = document.getElementById(`nota_fav_${b.dataset.index}`)?.checked ? 1 : 0;
-        if (isFavA !== isFavB) return isFavB - isFavA;
-        const tituloA = document.getElementById(`nota_titulo_${a.dataset.index}`)?.value.toLowerCase() || "";
-        const tituloB = document.getElementById(`nota_titulo_${b.dataset.index}`)?.value.toLowerCase() || "";
-        return tituloA.localeCompare(tituloB);
+        const favA = document.getElementById(`nota_fav_${a.dataset.index}`)?.checked ? 1 : 0;
+        const favB = document.getElementById(`nota_fav_${b.dataset.index}`)?.checked ? 1 : 0;
+        if (favA !== favB) return favB - favA;
+        const titleA = document.getElementById(`nota_titulo_${a.dataset.index}`)?.value.toLowerCase() || "";
+        const titleB = document.getElementById(`nota_titulo_${b.dataset.index}`)?.value.toLowerCase() || "";
+        return titleA.localeCompare(titleB, 'pt-BR');
     });
     rows.forEach(row => container.appendChild(row));
 }
 
 function filtrarNotas() {
-    const termo = document.getElementById('search-nota')?.value.toLowerCase() || "";
-    const termoDesc = document.getElementById('search-nota-desc')?.value.toLowerCase() || "";
+    const termo = document.getElementById('search-nota')?.value.trim().toLowerCase() || "";
+    const termoDesc = document.getElementById('search-nota-desc')?.value.trim().toLowerCase() || "";
+    const rows = [...document.querySelectorAll('#notas-container .item-row')];
     let contador = 0;
 
-    document.querySelectorAll('#notas-container .item-row').forEach(row => {
+    rows.forEach(row => {
         const index = row.dataset.index;
         const titulo = document.getElementById(`nota_titulo_${index}`)?.value.toLowerCase() || "";
         const tipo = document.getElementById(`nota_tipo_${index}`)?.value.toLowerCase() || "";
         const desc = document.getElementById(`nota_desc_${index}`)?.value.toLowerCase() || "";
-
-        const matchesTitulo = titulo.includes(termo) || tipo.includes(termo);
-        const matchesDesc = desc.includes(termoDesc);
-
-        if (matchesTitulo && matchesDesc) {
-            // Remove a propriedade inline para deixar o CSS (grid) assumir o controle
-            row.style.removeProperty('display');
-            contador++;
-        } else {
-            // Usa setProperty com 'important' para garantir que sobreponha o CSS de responsividade
-            row.style.setProperty('display', 'none', 'important');
-        }
+        const match = (titulo.includes(termo) || tipo.includes(termo)) && desc.includes(termoDesc);
+        row.hidden = !match;
+        if (match) contador += 1;
     });
 
-    const counterEl = document.getElementById('notas-counter');
-    if (counterEl) counterEl.innerText = `Notas visíveis: ${contador}`;
+    const counter = document.getElementById('notas-counter');
+    if (counter) counter.textContent = `${contador} ${contador === 1 ? 'visível' : 'visíveis'}`;
+    const summary = document.getElementById('notas-summary-count');
+    if (summary) summary.textContent = String(rows.length);
+    const emptyState = document.getElementById('notas-empty-state');
+    if (emptyState) emptyState.hidden = contador !== 0;
 }
 
 function duplicarNota(index) {
-    const campos = ['titulo', 'tipo', 'desc', 'campos'];
-    const vals = campos.map(f => document.getElementById(`nota_${f}_${index}`)?.value || "");
-    const isFav = document.getElementById(`nota_fav_${index}`)?.checked || false;
-
-    adicionarNotaUI(vals[0] + " (Cópia)", vals[1], vals[2], null, vals[3], isFav);
+    const fields = ['titulo', 'tipo', 'desc', 'campos'];
+    const values = fields.map(field => document.getElementById(`nota_${field}_${index}`)?.value || "");
+    const isFavorite = document.getElementById(`nota_fav_${index}`)?.checked || false;
+    adicionarNotaUI(`${values[0] || 'Nota'} (Cópia)`, values[1], values[2], null, values[3], isFavorite);
 }
 
 function removerNota(btn) {
     const row = btn.closest('.item-row');
+    if (!row) return;
     const index = row.dataset.index;
     showConfirm("Deseja apagar esta nota?", () => {
-        let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        Object.keys(dados).forEach(k => { if (k.startsWith('nota_') && k.endsWith(`_${index}`)) delete dados[k]; });
+        const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        Object.keys(dados).forEach(key => {
+            if (key.startsWith('nota_') && key.endsWith(`_${index}`)) delete dados[key];
+        });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         row.remove();
         atualizarTudo();
@@ -137,7 +193,7 @@ function removerNota(btn) {
         showNotification("Nota removida com sucesso.", "success");
     }, () => {
         showNotification("Remoção de nota cancelada.", "info");
-    }, "Apagar Nota?");
+    }, "Apagar nota?");
 }
 
 function resetarFiltrosNota() {

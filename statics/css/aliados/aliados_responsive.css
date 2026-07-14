@@ -1,0 +1,174 @@
+@media (max-width: 1120px) {
+  .aliados-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ally-card {
+    max-width: none;
+  }
+}
+
+@media (max-width: 780px) {
+  .aliados-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .ally-overview-card {
+    min-height: 86px;
+  }
+
+  .aliados-actions > *,
+  .aliados-actions .btn-add-card,
+  .aliados-actions .btn-history,
+  .aliados-actions .import-export-group {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .aliados-collection .collection-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .aliados-grid {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .ally-collection-dialog .ally-modal-list {
+    grid-template-columns: 1fr;
+  }
+
+  .ally-modal-empty {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .ally-card {
+    padding: 14px;
+  }
+
+  .ally-header {
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+
+  .ally-avatar-container {
+    width: 54px;
+    height: 54px;
+    border-radius: 11px;
+  }
+
+  .ally-card-tools {
+    flex-direction: column;
+  }
+
+  .ally-color-input,
+  .btn-remove-ally {
+    width: 29px;
+    height: 29px;
+  }
+
+  .ally-stats-container {
+    grid-template-columns: 1fr;
+  }
+
+  .ally-quick-stats {
+    grid-column: auto;
+  }
+
+  .ally-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .ally-secondary-actions {
+    justify-content: center;
+  }
+
+  .btn-open-sheet {
+    width: 100%;
+  }
+
+  .atk-header-row,
+  .spell-header-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .atk-actions,
+  .spell-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .ally-log-entry {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .ally-log-entry .log-action,
+  .ally-log-entry small {
+    grid-column: 1 / -1;
+  }
+
+  .buff-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .buff-row .buff-mod {
+    width: 100%;
+  }
+
+  .buff-row > .btn-remove-class {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 430px) {
+  .aliados-grid {
+    padding: 8px;
+  }
+
+  .ally-card {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .ally-header {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .ally-avatar-container {
+    width: 48px;
+    height: 48px;
+  }
+
+  .ally-card-tools {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .ally-quick-stats,
+  .ally-card-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .ally-card-meta > span {
+    text-align: left;
+  }
+
+  .atk-stats-row,
+  .spell-stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .buff-row {
+    grid-template-columns: 1fr;
+  }
+
+  .buff-row > .btn-remove-class {
+    width: 100%;
+    justify-self: stretch;
+  }
+}

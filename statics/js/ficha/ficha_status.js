@@ -179,7 +179,7 @@ function verificarStatusInicial(mods) {
     if (modCar >= 3 && !jaEscolheu) {
         if (modal && !modal.open) modal.showModal();
     } else {
-        if (modal && modal.open) modal.close();
+        if (modal && modal.open) fecharDialogoAnimado(modal);
         if (modCar < 3 && jaEscolheu) {
             inputDef.value = "false";
             if (inputStatus) inputStatus.value = "";

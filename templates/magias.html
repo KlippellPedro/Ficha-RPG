@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../statics/css/magias/magias.css" />
     <link rel="stylesheet" href="../statics/css/magias/magias_responsive.css" />
     <link rel="stylesheet" href="../statics/css/responsive.css" />
+    <link rel="stylesheet" href="../statics/css/design_system.css" />
     <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/global.js"></script>
     <script src="../statics/js/global_calculations.js"></script>
@@ -20,13 +21,14 @@
     <script src="../statics/js/global_images.js"></script>
     <script src="../statics/js/global_modals.js"></script>
     <script src="../statics/js/menu.js"></script>
-    <script src="../statics/js/inventario/inventario.js"></script>
+    <script src="../statics/js/global_dragdrop.js"></script>
     <script src="../statics/js/magias/magias_data.js"></script>
     <script src="../statics/js/magias/magias_ui.js"></script>
     <script src="../statics/js/magias/modais/magias_modais.js"></script>
     <script src="../statics/js/magias/magias.js"></script>
+    <script src="../statics/js/design_system.js"></script>
   </head>
-  <body>
+  <body class="page-magias">
     <nav class="top-menu">
       <div class="menu-links"></div>
     </nav>
@@ -36,16 +38,24 @@
       <span class="message"></span>
     </div>
 
-    <div class="container">
-      <header>
-        <h1>MAGIAS</h1>
+    <main class="container">
+      <header class="page-hero ui-reveal">
+        <div class="page-hero-copy">
+          <span class="page-eyebrow">Grimório arcano</span>
+          <h1>Magias</h1>
+          <p>Catalogue círculos, custos e efeitos persistentes em um grimório rápido de consultar durante o jogo.</p>
+        </div>
+        <div class="page-hero-summary" aria-live="polite">
+          <strong id="magias-summary-count">0</strong>
+          <span>magias visíveis</span>
+        </div>
       </header>
 
-      <div class="filter-bar">
+      <div class="filter-bar page-toolbar ui-reveal" role="search" aria-label="Filtros de magias">
         <div class="search-group">
-          <input type="text" id="search-magia" class="inv-input" placeholder="🔍 Pesquisar magia pelo nome..." oninput="filtrarMagias()" />
+          <input type="text" id="search-magia" class="inv-input" placeholder="Buscar magia pelo nome..." aria-label="Buscar magia" oninput="filtrarMagias()" />
         </div>
-        <select id="filter-magia-tipo" class="inv-input" style="max-width: 150px" onchange="filtrarMagias()">
+        <select id="filter-magia-tipo" class="inv-input toolbar-select" aria-label="Filtrar por tradição" onchange="filtrarMagias()">
           <option value="todos">Todos os Tipos</option>
           <option value="Comum">Comum</option>
           <option value="Elemental">Elemental</option>
@@ -64,7 +74,7 @@
           <button type="button" class="circle-chip chip-extra" data-nivel="extra" onclick="setCircleFilter(this, 'extra')">+</button>
         </div>
         <!-- select oculto para manter compatibilidade com filtrarMagias() -->
-        <select id="filter-magia-nivel" style="display:none" onchange="filtrarMagias()">
+        <select id="filter-magia-nivel" hidden onchange="filtrarMagias()">
           <option value="todos">Todos Níveis</option>
           <option value="1">Círculo I</option>
           <option value="2">Círculo II</option>
@@ -72,34 +82,27 @@
           <option value="4">Círculo IV</option>
           <option value="extra">Outros / %</option>
         </select>
-        <button type="button" class="btn-open-desc" onclick="resetarFiltrosMagia()" title="Limpar Filtros">🔄</button>
+        <button type="button" class="btn-open-desc toolbar-reset" onclick="resetarFiltrosMagia()" title="Limpar filtros">Limpar</button>
       </div>
 
-      <div
-        id="magias-counter"
-        style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; padding-left: 5px"
-      >
-        Magias visíveis: 0
-      </div>
+      <section class="collection-panel ui-reveal" aria-labelledby="magias-list-title">
+        <div class="collection-heading">
+          <div>
+            <span class="page-section-eyebrow">Repertório conhecido</span>
+            <h2 id="magias-list-title">Todas as magias</h2>
+            <p>Arraste os cards para definir a ordem do grimório.</p>
+          </div>
+          <strong id="magias-counter" class="page-counter">0 magias visíveis</strong>
+        </div>
 
-      <div class="inv-header mag-header-grid">
-        <span>Nome</span>
-        <span>Tipo de Magia</span>
-        <span>Nível</span>
-        <span>Custo</span>
-        <span>Info</span>
-        <span>Usar</span>
-        <span>Dup</span>
-        <span>X</span>
-      </div>
+        <section id="magias-container" class="inventory-list entity-card-grid" aria-live="polite"></section>
 
-      <section id="magias-container" class="inventory-list">
-        <!-- Injetado via JS -->
+        <div class="collection-footer page-actions">
+          <button type="button" class="btn-history" onclick="abrirModalHistorico()">Histórico de conjuração</button>
+          <button type="button" class="btn-clear-inventory" onclick="limparMagias()">Limpar grimório</button>
+          <button type="button" class="btn-add-card" onclick="adicionarMagiaUI()">+ Aprender magia</button>
+        </div>
       </section>
-
-      <button type="button" class="btn-add-card" onclick="adicionarMagiaUI()">+ Aprender Nova Magia</button>
-      <button type="button" class="btn-clear-inventory" onclick="limparMagias()">Esquecer Todas as Magias</button>
-      <button type="button" class="btn-history" onclick="abrirModalHistorico()">📜 Histórico de Conjuração</button>
-    </div>
+    </main>
   </body>
 </html>

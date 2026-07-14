@@ -80,7 +80,7 @@ function abrirModalCientistaSubclasse(index) {
 
 function fecharModalCientistaSubclasse() {
     const modal = document.getElementById('modal-cientista-subclasse');
-    if (modal) modal.close();
+    if (modal) fecharDialogoAnimado(modal);
     currentCientistaIndex = null;
 }
 
@@ -124,7 +124,7 @@ function confirmarClasseUnica() {
         if (typeof atualizarEstiloClasse === 'function') atualizarEstiloClasse(pendingUniqueSelect);
 
         const modalUnique = document.getElementById('modal-unique-class');
-        if (modalUnique) modalUnique.close();
+        if (modalUnique) fecharDialogoAnimado(modalUnique);
 
         pendingUniqueSelect = null;
         atualizarTudo();
@@ -133,7 +133,7 @@ function confirmarClasseUnica() {
         if (pendingUniqueSelect) pendingUniqueSelect.value = ""; // Reseta a seleção da classe
 
         const modalUnique = document.getElementById('modal-unique-class');
-        if (modalUnique) modalUnique.close();
+        if (modalUnique) fecharDialogoAnimado(modalUnique);
 
         pendingUniqueSelect = null;
         atualizarTudo();
@@ -143,7 +143,7 @@ function confirmarClasseUnica() {
 
 function cancelarClasseUnica() {
     if (pendingUniqueSelect) pendingUniqueSelect.value = "";
-    document.getElementById('modal-unique-class').close();
+    fecharDialogoAnimado(document.getElementById('modal-unique-class'));
     pendingUniqueSelect = null;
     atualizarTudo();
 }
@@ -221,7 +221,7 @@ function salvarAjustePersonalizado() {
     if (destino) destino.value = lista.length ? JSON.stringify(lista) : '';
 
     const modal = document.getElementById('modal-ajuste-vital');
-    if (modal) modal.close();
+    if (modal) fecharDialogoAnimado(modal);
 
     const tipoSalvo = ajusteVitalAtual;
     ajusteVitalAtual = null;
@@ -264,7 +264,7 @@ function escolherPoderEspirito(poder) {
     const inputPoder = document.getElementById("espirito_poder");
     if (inputPoder) {
         inputPoder.value = poder;
-        document.getElementById('modal-poder-espirito').close();
+        fecharDialogoAnimado(document.getElementById('modal-poder-espirito'));
         atualizarTudo();
     }
 }
@@ -273,7 +273,7 @@ function escolherPoderMortoVivo(poder) {
     const inputPoder = document.getElementById("morto_vivo_poder");
     if (inputPoder) {
         inputPoder.value = poder;
-        document.getElementById('modal-poder-morto').close();
+        fecharDialogoAnimado(document.getElementById('modal-poder-morto'));
         atualizarTudo();
     }
 }
@@ -282,7 +282,7 @@ function escolherPoderAnimalia(poder) {
     const inputPoder = document.getElementById("animalia_poder");
     if (inputPoder) {
         inputPoder.value = poder;
-        document.getElementById('modal-poder-animalia').close();
+        fecharDialogoAnimado(document.getElementById('modal-poder-animalia'));
         atualizarTudo();
     }
 }
@@ -291,7 +291,7 @@ function escolherFamiliaFada(familia) {
     const input = document.getElementById("fada_familia");
     if (input) {
         input.value = familia;
-        document.getElementById('modal-familia-fada').close();
+        fecharDialogoAnimado(document.getElementById('modal-familia-fada'));
         atualizarTudo();
     }
 }
@@ -302,6 +302,6 @@ function escolherStatus(valor) {
     const inputDef = document.getElementById('status_inicial_definido');
     if (inputDef) inputDef.value = "true";
     const modal = document.getElementById('modal-status');
-    if (modal) modal.close();
+    if (modal) fecharDialogoAnimado(modal);
     atualizarTudo();
 }
