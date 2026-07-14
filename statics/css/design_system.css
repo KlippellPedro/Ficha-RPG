@@ -870,6 +870,18 @@ body .modal-header > .btn-remove-class:active {
   animation: ui-card-enter 360ms var(--ui-ease) both;
 }
 
+/* Garante que selecionar texto (clicar e arrastar o mouse) dentro de campos de um
+   card arrastável sempre selecione o texto em vez de iniciar o arraste do card. */
+.item-row input,
+.item-row textarea,
+.item-row select,
+.inv-card input,
+.inv-card textarea,
+.inv-card select {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
 .is-dragging,
 .dragging {
   opacity: 0.62;

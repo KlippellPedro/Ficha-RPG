@@ -56,6 +56,7 @@ function adicionarNovoAliado() {
     // Inicializa a ficha do aliado com valores padrão
     const dadosIniciais = {
         nome: "Novo Aliado",
+        tipo_aliado: "complexo",
         pv_atual: 20, pv_max: 20,
         pm_atual: 10, pm_max: 10,
         sanidade_atual: 100, sanidade_max: 100,
@@ -66,7 +67,8 @@ function adicionarNovoAliado() {
         foto: "",
         nivel: 1,
         xp_atual: 0,
-        xp_max: 1000
+        xp_max: 1000,
+        pericias_personalizadas: []
     };
     localStorage.setItem(id, JSON.stringify(dadosIniciais));
 
@@ -126,6 +128,13 @@ function renderizarAliados() {
                 localStorage.setItem(id, JSON.stringify(dados));
             }
         }
+
+        const tipoSelect = card.querySelector('.ally-tipo-select');
+        if (tipoSelect) {
+            tipoSelect.value = dados.tipo_aliado === 'simples' ? 'simples' : 'complexo';
+            card.classList.toggle('ally-card--simples', tipoSelect.value === 'simples');
+        }
+        renderizarPericiasPersonalizadasAliado(card, dados);
 
         card.querySelector('.ally-pv-atual').value = dados.pv_atual || 0;
         card.querySelector('.ally-pv-max').value = dados.pv_max || 0;
@@ -239,6 +248,97 @@ function salvarStatusAliado(input) {
     atualizarBarrasCard(card);
     localStorage.setItem(id, JSON.stringify(dados));
     atualizarResumoAliados();
+}
+
+/**
+ * Alterna entre um aliado "Complexo" (com ficha completa própria, ideal para
+ * NPCs/aliados detalhados) e "Simples" (só stats rápidos + perícias
+ * personalizadas, ideal para animais/invocações que só precisam de um teste
+ * ou outro, tipo um cão que só ataca).
+ */
+function alternarTipoAliado(select) {
+    const card = select.closest('.ally-card');
+    const id = card.dataset.id;
+    const dados = JSON.parse(localStorage.getItem(id)) || {};
+    dados.tipo_aliado = select.value === 'simples' ? 'simples' : 'complexo';
+    localStorage.setItem(id, JSON.stringify(dados));
+    card.classList.toggle('ally-card--simples', dados.tipo_aliado === 'simples');
+}
+
+/** Renderiza os chips de perícias personalizadas de um aliado "Simples" */
+function renderizarPericiasPersonalizadasAliado(card, dados) {
+    const lista = card.querySelector('.ally-custom-skills-list');
+    if (!lista) return;
+    lista.replaceChildren();
+
+    const pericias = Array.isArray(dados.pericias_personalizadas) ? dados.pericias_personalizadas : [];
+    if (pericias.length === 0) {
+        const vazio = document.createElement('span');
+        vazio.className = 'ally-custom-skills-empty';
+        vazio.textContent = 'Nenhuma perícia adicionada ainda.';
+        lista.appendChild(vazio);
+        return;
+    }
+
+    pericias.forEach((pericia, index) => {
+        const chip = document.createElement('span');
+        chip.className = 'ally-skill-chip';
+
+        const nome = document.createElement('span');
+        nome.className = 'ally-skill-chip-nome';
+        nome.textContent = pericia.nome || 'Perícia';
+
+        const valor = document.createElement('strong');
+        const numero = Number.parseInt(pericia.valor, 10) || 0;
+        valor.textContent = `${numero >= 0 ? '+' : ''}${numero}`;
+
+        const remover = document.createElement('button');
+        remover.type = 'button';
+        remover.className = 'btn-remove-ally-skill';
+        remover.setAttribute('aria-label', `Remover perícia ${pericia.nome || ''}`);
+        remover.textContent = '×';
+        remover.onclick = () => removerPericiaAliado(remover, index);
+
+        chip.append(nome, valor, remover);
+        lista.appendChild(chip);
+    });
+}
+
+/** Adiciona uma perícia personalizada ao aliado "Simples" */
+function adicionarPericiaAliado(btn) {
+    const card = btn.closest('.ally-card');
+    const id = card.dataset.id;
+    const nomeInput = card.querySelector('.ally-skill-name-input');
+    const valorInput = card.querySelector('.ally-skill-value-input');
+    const nome = nomeInput.value.trim();
+    if (!nome) {
+        nomeInput.focus();
+        return;
+    }
+    const valor = Number.parseInt(valorInput.value, 10) || 0;
+
+    const dados = JSON.parse(localStorage.getItem(id)) || {};
+    const pericias = Array.isArray(dados.pericias_personalizadas) ? dados.pericias_personalizadas : [];
+    pericias.push({ nome, valor });
+    dados.pericias_personalizadas = pericias;
+    localStorage.setItem(id, JSON.stringify(dados));
+
+    nomeInput.value = '';
+    valorInput.value = '';
+    nomeInput.focus();
+    renderizarPericiasPersonalizadasAliado(card, dados);
+}
+
+/** Remove uma perícia personalizada do aliado "Simples" pelo índice */
+function removerPericiaAliado(btn, index) {
+    const card = btn.closest('.ally-card');
+    const id = card.dataset.id;
+    const dados = JSON.parse(localStorage.getItem(id)) || {};
+    const pericias = Array.isArray(dados.pericias_personalizadas) ? dados.pericias_personalizadas : [];
+    pericias.splice(index, 1);
+    dados.pericias_personalizadas = pericias;
+    localStorage.setItem(id, JSON.stringify(dados));
+    renderizarPericiasPersonalizadasAliado(card, dados);
 }
 
 function criarModalColecaoAliado({ modalId, titleId, containerId, title }) {

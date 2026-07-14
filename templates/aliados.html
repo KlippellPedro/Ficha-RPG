@@ -125,6 +125,10 @@
             </div>
           </div>
           <div class="ally-card-tools">
+            <select class="ally-tipo-select" onchange="alternarTipoAliado(this)" aria-label="Tipo de aliado" title="Complexo: tem uma ficha completa própria. Simples: só stats rápidos e perícias personalizadas.">
+              <option value="complexo">Complexo</option>
+              <option value="simples">Simples</option>
+            </select>
             <input type="color" class="ally-color-input" oninput="salvarStatusAliado(this)" title="Cor do tema do aliado" aria-label="Cor do tema do aliado" />
             <button type="button" class="btn-remove-ally" onclick="removerAliado(this)" title="Remover aliado" aria-label="Remover aliado">×</button>
           </div>
@@ -182,6 +186,18 @@
               <label>Movimento</label>
               <input type="number" class="ally-movimentacao-input" oninput="salvarStatusAliado(this)" />
             </div>
+          </div>
+        </div>
+
+        <div class="ally-custom-skills">
+          <div class="ally-custom-skills-header">
+            <span>Perícias personalizadas</span>
+          </div>
+          <div class="ally-custom-skills-list"><!-- Perícias renderizadas via JS --></div>
+          <div class="ally-custom-skill-add">
+            <input type="text" class="ally-skill-name-input" placeholder="Nome (ex: Luta)" aria-label="Nome da perícia personalizada" maxlength="24" />
+            <input type="number" class="ally-skill-value-input" placeholder="+0" aria-label="Valor da perícia personalizada" />
+            <button type="button" class="btn-add-ally-skill" onclick="adicionarPericiaAliado(this)" aria-label="Adicionar perícia personalizada">+</button>
           </div>
         </div>
 

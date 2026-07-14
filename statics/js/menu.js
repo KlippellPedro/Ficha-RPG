@@ -29,12 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const allyId = params.get("allyId");
     let itens = [
         { nome: "Ficha", href: "ficha.html" },
-        { nome: "Aliados", href: "aliados.html" },
         { nome: "Perícias", href: "pericias.html" },
         { nome: "Inventário", href: "inventario.html" },
         { nome: "Habilidades", href: "habilidade.html" },
         { nome: "Poderes", href: "poderes.html" },
         { nome: "Magias", href: "magias.html" },
+        { nome: "Aliados", href: "aliados.html" },
         { nome: "Ataques", href: "ataques.html" },
         { nome: "Notas", href: "notas.html" }
     ];

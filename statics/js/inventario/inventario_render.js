@@ -309,6 +309,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('items-container');
     if (!container) return;
 
+    // Garante que a seleção de texto funcione desativando o drag ao clicar em inputs
+    // (precisa ser feito no mousedown, antes do gesto de arraste começar — só travar
+    // no dragstart é tarde demais e o navegador já trocou a seleção de texto por um arraste)
+    container.addEventListener('mousedown', (e) => {
+        const card = e.target.closest('.inv-card');
+        if (!card) return;
+        if (_ordemAtual !== 'padrao' || e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
+            card.draggable = false;
+        } else {
+            card.draggable = true;
+        }
+    });
+
     container.addEventListener('dragstart', (e) => {
         const card = e.target.closest('.inv-card');
         if (!card || !card.draggable) { e.preventDefault(); return; }

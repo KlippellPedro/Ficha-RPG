@@ -382,6 +382,26 @@
   border-radius: 3px;
 }
 
+.ally-tipo-select {
+  height: 32px;
+  padding: 0 6px;
+  color: var(--ui-text-dim);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ally-tipo-select:hover,
+.ally-tipo-select:focus {
+  color: var(--ally-accent);
+  border-color: color-mix(in srgb, var(--ally-accent) 50%, var(--ui-line));
+}
+
 .btn-remove-ally {
   width: 32px;
   height: 32px;
@@ -547,6 +567,121 @@
   font-size: 0.76rem;
   font-weight: 800;
   text-align: center;
+}
+
+/* Perícias personalizadas — só aparecem em aliados "Simples" */
+.ally-custom-skills {
+  display: none;
+  padding: 10px 11px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-sm);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.ally-card--simples .ally-custom-skills {
+  display: block;
+}
+
+.ally-card--simples .btn-open-sheet {
+  display: none;
+}
+
+.ally-custom-skills-header {
+  margin-bottom: 8px;
+  color: var(--ui-text-dim);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ally-custom-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 9px;
+}
+
+.ally-custom-skills-empty {
+  color: var(--ui-text-dim);
+  font-size: 0.68rem;
+  font-style: italic;
+}
+
+.ally-skill-chip {
+  min-height: 26px;
+  padding: 4px 4px 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid color-mix(in srgb, var(--ally-accent) 40%, var(--ui-line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ally-accent) 10%, transparent);
+}
+
+.ally-skill-chip-nome {
+  color: var(--ui-text-soft);
+  font-size: 0.68rem;
+}
+
+.ally-skill-chip strong {
+  color: var(--ally-accent);
+  font-family: var(--ui-font-mono);
+  font-size: 0.72rem;
+}
+
+.btn-remove-ally-skill {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ui-text-dim);
+  font-size: 0.85rem;
+  line-height: 1;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+}
+
+.btn-remove-ally-skill:hover {
+  color: var(--ally-danger);
+  background: rgba(255, 100, 124, 0.14);
+}
+
+.ally-custom-skill-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px 32px;
+  gap: 6px;
+}
+
+.ally-skill-name-input,
+.ally-skill-value-input {
+  min-height: 30px;
+  padding: 0 8px !important;
+  color: var(--ui-text) !important;
+  font-size: 0.72rem;
+}
+
+.ally-skill-value-input {
+  text-align: center;
+  font-family: var(--ui-font-mono);
+}
+
+.btn-add-ally-skill {
+  width: 32px;
+  min-height: 30px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ally-accent-on);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  border: none;
+  background: var(--ally-accent);
+  box-shadow: none;
 }
 
 .ally-card-meta {
