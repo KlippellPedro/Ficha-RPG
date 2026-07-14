@@ -80,11 +80,22 @@ function saveNotasOrder() {
 
 function loadNotasOrder() {
     const container = document.getElementById('notas-container');
-    const saved = JSON.parse(localStorage.getItem(window.STORAGE_KEY_NOTAS_ORDER));
-    if (!container || !saved) return;
+    if (!container) return;
+    let saved = [];
+    try { saved = JSON.parse(localStorage.getItem(window.STORAGE_KEY_NOTAS_ORDER)) || []; }
+    catch (e) { saved = []; }
+    if (!Array.isArray(saved) || saved.length === 0) return;
     const items = new Map();
     Array.from(container.children).forEach(row => { if (row.dataset.index) items.set(row.dataset.index, row); });
     const fragment = document.createDocumentFragment();
-    saved.forEach(id => { const item = items.get(id); if (item) fragment.appendChild(item); });
+    saved.forEach(id => {
+        const item = items.get(String(id));
+        if (item) {
+            fragment.appendChild(item);
+            items.delete(String(id));
+        }
+    });
+    items.forEach(item => fragment.appendChild(item));
     container.appendChild(fragment);
+    saveNotasOrder();
 }

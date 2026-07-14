@@ -96,9 +96,13 @@ function saveMagiasOrder() {
 }
 
 function loadMagiasOrder() {
-    const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_MAGIAS_ORDER));
     const container = document.getElementById('magias-container');
-    if (!savedOrder || !container) return;
+    if (!container) return;
+
+    let savedOrder = [];
+    try { savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_MAGIAS_ORDER)) || []; }
+    catch (e) { savedOrder = []; }
+    if (!Array.isArray(savedOrder) || savedOrder.length === 0) return;
 
     const items = new Map();
     Array.from(container.children).forEach(row => {
@@ -107,10 +111,15 @@ function loadMagiasOrder() {
 
     const fragment = document.createDocumentFragment();
     savedOrder.forEach(id => {
-        const item = items.get(id);
-        if (item) fragment.appendChild(item);
+        const item = items.get(String(id));
+        if (item) {
+            fragment.appendChild(item);
+            items.delete(String(id));
+        }
     });
+    items.forEach(item => fragment.appendChild(item));
     container.appendChild(fragment);
+    saveMagiasOrder();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

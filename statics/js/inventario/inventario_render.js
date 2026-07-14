@@ -24,12 +24,6 @@ function _rarityOrder() {
     return (typeof OPTIONS_RARIDADE !== 'undefined' ? OPTIONS_RARIDADE : []).map(o => o.v);
 }
 
-function _compararPadrao(a, b) {
-    if (a.equipado !== b.equipado) return a.equipado ? -1 : 1;
-    if (a.favorito !== b.favorito) return a.favorito ? -1 : 1;
-    return a.nome.localeCompare(b.nome, 'pt-BR');
-}
-
 /**
  * Filtros e busca (chamados pelos controles da barra de filtro)
  */
@@ -96,7 +90,9 @@ function renderizarInventario() {
             break;
         }
         default:
-            itens.sort(_compararPadrao);
+            // A ordem do array é a ordem personalizada persistida pelo usuário.
+            // filter() já preserva essa sequência mesmo com busca e filtros.
+            break;
     }
 
     container.innerHTML = '';

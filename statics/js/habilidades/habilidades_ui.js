@@ -126,6 +126,7 @@ function adicionarHabilidadeUI(nome = "", tipo = "Ativa", custo = "", tipoCusto 
     `;
 
     container.appendChild(row);
+    if (idIndex === null && typeof saveHabilidadesOrder === 'function') saveHabilidadesOrder();
     if (idIndex === null) {
         atualizarTudo();
         filtrarHabilidades();
@@ -149,6 +150,7 @@ function removerHabilidade(btn) {
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     row.remove();
+    if (typeof saveHabilidadesOrder === 'function') saveHabilidadesOrder();
     atualizarTudo();
     filtrarHabilidades();
 }
@@ -180,6 +182,7 @@ function limparHabilidades() {
     const limpar = () => {
         const container = document.getElementById('habilidades-container');
         if (container) container.innerHTML = '';
+        localStorage.removeItem(STORAGE_KEY_HABILIDADES_ORDER);
         let dados = {};
         try { dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { dados = {}; }
         Object.keys(dados).forEach(key => { if (key.startsWith('hab_')) delete dados[key]; });
