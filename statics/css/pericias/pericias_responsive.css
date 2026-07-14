@@ -18,10 +18,20 @@
     padding: 18px;
   }
 
+  .pericias-summary-group {
+    gap: 6px;
+  }
+
   .pericias-summary {
-    width: 105px;
-    min-width: 105px;
-    min-height: 72px;
+    width: 88px;
+    min-width: 88px;
+    min-height: 68px;
+  }
+
+  .pericias-summary-mini {
+    width: 54px;
+    min-width: 54px;
+    min-height: 68px;
   }
 
   .pericias-page-header p {
@@ -68,15 +78,25 @@
     gap: 16px;
   }
 
-  .pericias-summary {
+  .pericias-summary-group {
     width: 100%;
-    min-height: 58px;
-    flex-direction: row;
-    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  .pericias-summary {
+    min-height: 56px;
   }
 
   .pericias-summary strong {
     font-size: 1.4rem;
+  }
+
+  .pericias-summary-mini {
+    min-height: 56px;
+  }
+
+  .pericias-summary-mini strong {
+    font-size: 1rem;
   }
 
   .pericias-search-row {

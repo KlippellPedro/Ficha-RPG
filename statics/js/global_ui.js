@@ -2,6 +2,11 @@
  * UI Engine - Atualização de Barras e Tooltips
  */
 
+// Campos que já têm sua própria função de cálculo (atualizarDefesa, atualizarMovimento,
+// engineCalcularAtributos) definindo um tooltip detalhado com todas as fontes de bônus.
+// Esta função NUNCA deve sobrescrever o title deles, só aplicar a cor.
+const CAMPOS_COM_TOOLTIP_PROPRIO = new Set(['movimentacao', 'defesa', 'status_info']);
+
 window.aplicarBonusVisuais = function (bonusItens, dadosObj, breakdown = null) {
     // Campos que ficam coloridos quando têm bônus de item ativos
     ['movimentacao', 'defesa', 'status_info', 'sanidade_max', 'invocacoes_max'].forEach(id => {
@@ -9,9 +14,27 @@ window.aplicarBonusVisuais = function (bonusItens, dadosObj, breakdown = null) {
         if (!el) return;
         const bonus = bonusItens[id] || 0;
         el.style.color = bonus > 0 ? '#4ade80' : (bonus < 0 ? '#ef4444' : 'var(--text-main)');
-        if (bonus !== 0) {
-            el.title = `Base: ${parseInt(el.value || 0) - bonus} | Bônus de Item: ${bonus > 0 ? '+' : ''}${bonus} | Total: ${el.value}`;
+
+        // Defesa, Movimentação e Status já recebem um title completo (com todas as fontes
+        // de bônus) das suas próprias funções de cálculo — sobrescrever aqui apagaria os detalhes.
+        if (CAMPOS_COM_TOOLTIP_PROPRIO.has(id)) return;
+
+        const details = [];
+        if (breakdown) {
+            const sources = [
+                ...(breakdown.itens[id] || []),
+                ...(breakdown.poderes[id] || []),
+                ...(breakdown.habilidades[id] || []),
+                ...(breakdown.aliados[id] || []),
+                ...(breakdown.event[id] || [])
+            ];
+            sources.forEach(s => details.push(s));
         }
+        if (bonus !== 0 && !details.length) {
+            details.push(`Bônus: ${bonus > 0 ? '+' : ''}${bonus}`);
+        }
+        if (!details.length) details.push(`Base: ${el.value}`);
+        el.title = `Total: ${el.value} (${details.join(' | ')})`;
     });
 }
 

@@ -213,16 +213,17 @@ function calcularEstadoRolagemPericia(vantagens, desvantagens, bonus = 0) {
             rotulo: `V +${saldo}`,
             detalhe: `${totalV}V − ${totalD}D`,
             titulo: `Vantagem +${saldo}`,
-            instrucao: `Role 2d20, use o maior resultado e some ${bonusTexto}.`
+            instrucao: `Role ${saldo}d20, use o maior resultado e some ${bonusTexto}.`
         };
     }
     if (saldo < 0) {
+        const dados = Math.abs(saldo);
         return {
             tipo: "desvantagem",
-            rotulo: `D +${Math.abs(saldo)}`,
+            rotulo: `D +${dados}`,
             detalhe: `${totalV}V − ${totalD}D`,
-            titulo: `Desvantagem +${Math.abs(saldo)}`,
-            instrucao: `Role 2d20, use o menor resultado e some ${bonusTexto}.`
+            titulo: `Desvantagem +${dados}`,
+            instrucao: `Role ${dados}d20, use o menor resultado e some ${bonusTexto}.`
         };
     }
     if (totalV > 0 || totalD > 0) {
@@ -246,6 +247,7 @@ function calcularEstadoRolagemPericia(vantagens, desvantagens, bonus = 0) {
 function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}, breakdown = null) {
     const nivelAtual = Math.max(0, numeroPericia(nivel));
     let treinadas = 0;
+    const contagemPorTreino = { treinado: 0, profissional: 0, mestre: 0, anciao: 0 };
 
     document.querySelectorAll(".skill-row").forEach(row => {
         const skillSlug = row.dataset.skillSlug || row.querySelector(".skill-bonus")?.id.replace("skill_bonus_", "");
@@ -288,6 +290,7 @@ function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}, breakdow
         if (training !== "nenhum") {
             row.classList.add(training);
             treinadas += 1;
+            if (contagemPorTreino[training] !== undefined) contagemPorTreino[training] += 1;
         }
         row.dataset.bonusState = itemSkillBonus > 0 ? "positive" : itemSkillBonus < 0 ? "negative" : "neutral";
 
@@ -342,6 +345,11 @@ function atualizarPericias(nivel, mods, bonusItens = {}, dadosObj = {}, breakdow
 
     const trainedCounter = document.getElementById("skills-trained-count");
     if (trainedCounter) trainedCounter.textContent = treinadas;
+
+    Object.keys(contagemPorTreino).forEach(nivelTreino => {
+        const contador = document.getElementById(`skills-count-${nivelTreino}`);
+        if (contador) contador.textContent = contagemPorTreino[nivelTreino];
+    });
 }
 
 document.addEventListener("DOMContentLoaded", () => {

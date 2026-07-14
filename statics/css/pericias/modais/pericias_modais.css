@@ -345,7 +345,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  color: #fff;
+  color: var(--on-primary);
   border-radius: 7px;
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color, var(--primary-color)));
   box-shadow: 0 8px 25px var(--primary-glow);

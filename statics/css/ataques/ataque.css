@@ -214,7 +214,7 @@
 }
 
 .atk-details-button {
-  color: #fff;
+  color: var(--ui-page-accent-on-soft);
   border: 1px solid color-mix(in srgb, var(--ui-page-accent) 60%, var(--ui-line));
   background: var(--ui-page-accent-soft);
 }

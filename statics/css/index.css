@@ -150,6 +150,7 @@
 }
 
 .landing-button--primary {
+  color: var(--on-primary);
   border-color: color-mix(in srgb, var(--primary-color) 76%, #fff 12%);
   background: linear-gradient(135deg, var(--primary-color), color-mix(in srgb, var(--primary-color) 58%, #3299bf));
   box-shadow: 0 12px 34px var(--primary-glow);

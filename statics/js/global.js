@@ -9,6 +9,9 @@ window.HISTORY_KEY = window.allyId ? `ally_hist_${window.allyId}` : "ficha_rpg_h
 window.BACKUP_KEY = "ficha_rpg_backup";
 window.THEME_KEY = "ficha_rpg_tema";
 window.THEME_KEY_SECONDARY = "ficha_rpg_tema_secundaria";
+window.THEME_KEY_TEXT_OVERRIDE = "ficha_rpg_tema_texto_manual";
+window.THEME_KEY_TEXT_PRIMARY = "ficha_rpg_tema_texto_primaria";
+window.THEME_KEY_TEXT_SECONDARY = "ficha_rpg_tema_texto_secundaria";
 window.DLCS_KEY = "ficha_rpg_dlcs";
 window.ALIADOS_KEY = "ficha_rpg_aliados";
 window.STORAGE_KEY_INVENTORY_ORDER = window.allyId ? `ally_inv_order_${window.allyId}` : "ficha_rpg_inventario_order";
@@ -588,26 +591,158 @@ function showNotification(message, type = 'info', duration = 5000) {
 }
 
 /**
+ * Motor de contraste de cores — matemática pura (sem estado) usada para
+ * decidir automaticamente se um texto/ícone deve ficar claro ou escuro
+ * sobre uma cor escolhida pelo usuário, e para garantir que a própria cor
+ * não fique ilegível sobre o fundo quase preto da ficha.
+ */
+const COR_FUNDO_PAGINA = '#09090b'; // = --bg-main
+const COR_FUNDO_CARD = '#18181b'; // = --bg-card, usado para simular o blend do "glow"
+const ALPHA_GLOW = 0.3; // mesmo alpha já usado para --primary-glow/--secondary-glow
+const CONTRASTE_ALVO_PADRAO = 4.5; // WCAG AA para texto normal
+const TEXTO_CLARO = '#ffffff';
+const TEXTO_ESCURO = '#09090b'; // mesmo tom do fundo da página, não #000 puro
+
+function hexParaRgb(hex) {
+    let h = String(hex || '').replace('#', '');
+    if (h.length === 3) h = h.split('').map(c => c + c).join('');
+    const num = parseInt(h, 16) || 0;
+    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+}
+
+function rgbParaHex({ r, g, b }) {
+    const canal = v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0');
+    return `#${canal(r)}${canal(g)}${canal(b)}`;
+}
+
+function rgbParaHsl({ r, g, b }) {
+    const rn = r / 255, gn = g / 255, bn = b / 255;
+    const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+    const delta = max - min;
+    let h = 0;
+    if (delta !== 0) {
+        if (max === rn) h = ((gn - bn) / delta) % 6;
+        else if (max === gn) h = (bn - rn) / delta + 2;
+        else h = (rn - gn) / delta + 4;
+        h *= 60;
+        if (h < 0) h += 360;
+    }
+    const l = (max + min) / 2;
+    const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+    return { h, s: s * 100, l: l * 100 };
+}
+
+function hslParaRgb({ h, s, l }) {
+    const sn = s / 100, ln = l / 100;
+    const c = (1 - Math.abs(2 * ln - 1)) * sn;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = ln - c / 2;
+    let rp = 0, gp = 0, bp = 0;
+    if (h < 60) { rp = c; gp = x; }
+    else if (h < 120) { rp = x; gp = c; }
+    else if (h < 180) { gp = c; bp = x; }
+    else if (h < 240) { gp = x; bp = c; }
+    else if (h < 300) { rp = x; bp = c; }
+    else { rp = c; bp = x; }
+    return { r: (rp + m) * 255, g: (gp + m) * 255, b: (bp + m) * 255 };
+}
+
+function luminanciaRelativa({ r, g, b }) {
+    const canal = v => {
+        const c = v / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+}
+
+function taxaContraste(rgbA, rgbB) {
+    const lA = luminanciaRelativa(rgbA);
+    const lB = luminanciaRelativa(rgbB);
+    const clara = Math.max(lA, lB), escura = Math.min(lA, lB);
+    return (clara + 0.05) / (escura + 0.05);
+}
+
+function misturarAlfaSobreFundo(rgbFrente, alpha, rgbFundo) {
+    return {
+        r: rgbFrente.r * alpha + rgbFundo.r * (1 - alpha),
+        g: rgbFrente.g * alpha + rgbFundo.g * (1 - alpha),
+        b: rgbFrente.b * alpha + rgbFundo.b * (1 - alpha)
+    };
+}
+
+// Escolhe, por contraste WCAG, se texto claro ou escuro lê melhor sobre um fundo OPACO
+function corTextoLegivel(hex) {
+    const rgbFundo = hexParaRgb(hex);
+    const contrasteClaro = taxaContraste(rgbFundo, hexParaRgb(TEXTO_CLARO));
+    const contrasteEscuro = taxaContraste(rgbFundo, hexParaRgb(TEXTO_ESCURO));
+    return contrasteClaro >= contrasteEscuro ? TEXTO_CLARO : TEXTO_ESCURO;
+}
+
+// Mesma decisão, mas simulando o fundo translúcido ("glow") sobre o card antes de decidir
+function corTextoLegivelSobreGlow(hex, alpha = ALPHA_GLOW) {
+    const misturado = misturarAlfaSobreFundo(hexParaRgb(hex), alpha, hexParaRgb(COR_FUNDO_CARD));
+    return corTextoLegivel(rgbParaHex(misturado));
+}
+
+// Sobe a Luminosidade (HSL) preservando matiz/saturação até a cor contrastar o
+// suficiente com o fundo da página — garante que a cor escolhida continue legível
+// quando usada como texto/ícone/borda direto (não como fundo de um botão).
+function garantirClarezaMinima(hex, contrasteAlvo = CONTRASTE_ALVO_PADRAO) {
+    const rgbFundo = hexParaRgb(COR_FUNDO_PAGINA);
+    const rgbAtual = hexParaRgb(hex);
+    if (taxaContraste(rgbAtual, rgbFundo) >= contrasteAlvo) return rgbParaHex(rgbAtual);
+
+    const hsl = rgbParaHsl(rgbAtual);
+    for (let l = Math.ceil(hsl.l); l <= 100; l++) {
+        const candidato = hslParaRgb({ h: hsl.h, s: hsl.s, l });
+        if (taxaContraste(candidato, rgbFundo) >= contrasteAlvo) return rgbParaHex(candidato);
+    }
+    return TEXTO_CLARO;
+}
+
+// Orquestra as funções acima: cor final (já clareada se necessário), seu glow,
+// e as cores de texto legível pra usar em cima dela (fundo opaco e fundo "soft"/glow).
+function prepararCorTema(hex, contrasteAlvo = CONTRASTE_ALVO_PADRAO) {
+    const cor = garantirClarezaMinima(hex, contrasteAlvo);
+    const rgb = hexParaRgb(cor);
+    return {
+        cor,
+        glow: `rgba(${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)}, ${ALPHA_GLOW})`,
+        corOn: corTextoLegivel(cor),
+        corOnSoft: corTextoLegivelSobreGlow(cor)
+    };
+}
+
+/**
  * Aplica uma cor customizada ao tema da ficha
  */
 function aplicarCorTema(cor) {
     if (!cor) return;
-    document.documentElement.style.setProperty('--primary-color', cor);
+    const tema = prepararCorTema(cor);
 
-    // Gera uma versão com transparência para o brilho (glow)
-    const r = parseInt(cor.slice(1, 3), 16);
-    const g = parseInt(cor.slice(3, 5), 16);
-    const b = parseInt(cor.slice(5, 7), 16);
-    document.documentElement.style.setProperty('--primary-glow', `rgba(${r}, ${g}, ${b}, 0.3)`);
+    document.documentElement.style.setProperty('--primary-color', tema.cor);
+    document.documentElement.style.setProperty('--primary-glow', tema.glow);
+
+    // A cor de texto só é recalculada automaticamente se o usuário não tiver
+    // personalizado manualmente (ver alternarPersonalizacaoTexto/aplicarCorTextoManual).
+    if (localStorage.getItem(THEME_KEY_TEXT_OVERRIDE) !== '1') {
+        document.documentElement.style.setProperty('--on-primary', tema.corOn);
+        document.documentElement.style.setProperty('--on-primary-soft', tema.corOnSoft);
+    }
+
+    // Sincroniza o seletor de cor com o valor efetivamente aplicado (pode ter sido
+    // clareado por garantirClarezaMinima se o usuário escolheu uma cor escura demais).
+    const inputCor = document.getElementById('input-theme-color');
+    if (inputCor) inputCor.value = tema.cor;
 
     // Se estivermos editando um aliado, salvamos a cor nos dados dele.
     // Caso contrário, salvamos no tema global da ficha.
     if (allyId) {
         let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        dados.cor_tema = cor;
+        dados.cor_tema = tema.cor;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     } else {
-        localStorage.setItem(THEME_KEY, cor);
+        localStorage.setItem(THEME_KEY, tema.cor);
     }
 }
 
@@ -616,14 +751,60 @@ function aplicarCorTema(cor) {
  */
 function aplicarCorSecundaria(cor) {
     if (!cor) return;
-    document.documentElement.style.setProperty('--secondary-color', cor);
+    const tema = prepararCorTema(cor);
 
-    const r = parseInt(cor.slice(1, 3), 16);
-    const g = parseInt(cor.slice(3, 5), 16);
-    const b = parseInt(cor.slice(5, 7), 16);
-    document.documentElement.style.setProperty('--secondary-glow', `rgba(${r}, ${g}, ${b}, 0.3)`);
+    document.documentElement.style.setProperty('--secondary-color', tema.cor);
+    document.documentElement.style.setProperty('--secondary-glow', tema.glow);
 
-    localStorage.setItem(THEME_KEY_SECONDARY, cor);
+    if (localStorage.getItem(THEME_KEY_TEXT_OVERRIDE) !== '1') {
+        document.documentElement.style.setProperty('--on-secondary', tema.corOn);
+        document.documentElement.style.setProperty('--on-secondary-soft', tema.corOnSoft);
+    }
+
+    const inputCor = document.getElementById('input-theme-color-secondary');
+    if (inputCor) inputCor.value = tema.cor;
+
+    localStorage.setItem(THEME_KEY_SECONDARY, tema.cor);
+}
+
+/**
+ * Liga/desliga a personalização manual da cor de texto sobre a primária/secundária.
+ * Desligar recalcula o automático reaplicando as cores atuais.
+ */
+function alternarPersonalizacaoTexto(checkbox) {
+    const ativo = !!checkbox.checked;
+    localStorage.setItem(THEME_KEY_TEXT_OVERRIDE, ativo ? '1' : '0');
+
+    const campos = document.getElementById('theme-text-override-fields');
+    if (campos) campos.style.display = ativo ? 'block' : 'none';
+
+    const corPrimariaAtual = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#ff4444';
+    const corSecundariaAtual = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim() || '#457b9d';
+
+    if (ativo) {
+        const inputPri = document.getElementById('input-theme-text-primary');
+        const inputSec = document.getElementById('input-theme-text-secondary');
+        aplicarCorTextoManual('primaria', (inputPri && inputPri.value) || corTextoLegivel(corPrimariaAtual));
+        aplicarCorTextoManual('secundaria', (inputSec && inputSec.value) || corTextoLegivel(corSecundariaAtual));
+    } else {
+        // A flag já está '0' no localStorage, então isso recalcula e restaura o automático
+        aplicarCorTema(corPrimariaAtual);
+        aplicarCorSecundaria(corSecundariaAtual);
+    }
+}
+
+/**
+ * Define manualmente a cor de texto usada sobre a primária ou a secundária,
+ * sem nenhum cálculo de contraste — o usuário assume o controle total.
+ */
+function aplicarCorTextoManual(tipo, cor) {
+    if (!cor) return;
+    const nomeOn = tipo === 'secundaria' ? '--on-secondary' : '--on-primary';
+    const key = tipo === 'secundaria' ? THEME_KEY_TEXT_SECONDARY : THEME_KEY_TEXT_PRIMARY;
+
+    document.documentElement.style.setProperty(nomeOn, cor);
+    document.documentElement.style.setProperty(`${nomeOn}-soft`, cor);
+    localStorage.setItem(key, cor);
 }
 
 /**
@@ -751,6 +932,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Carrega cor secundária
         const temaSecundario = localStorage.getItem(THEME_KEY_SECONDARY);
         if (temaSecundario) aplicarCorSecundaria(temaSecundario);
+
+        // Restaura a personalização manual de cor de texto (se ativa), sobrepondo
+        // o cálculo automático que acabou de rodar acima
+        if (localStorage.getItem(THEME_KEY_TEXT_OVERRIDE) === '1') {
+            const corTextoPrimaria = localStorage.getItem(THEME_KEY_TEXT_PRIMARY);
+            const corTextoSecundaria = localStorage.getItem(THEME_KEY_TEXT_SECONDARY);
+            if (corTextoPrimaria) aplicarCorTextoManual('primaria', corTextoPrimaria);
+            if (corTextoSecundaria) aplicarCorTextoManual('secundaria', corTextoSecundaria);
+        }
 
     } catch (e) {
         console.warn("Nenhum dado prévio encontrado ou erro no JSON.");

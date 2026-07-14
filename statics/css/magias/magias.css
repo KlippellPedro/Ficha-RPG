@@ -3,8 +3,12 @@
 .page-magias {
   --ui-page-accent: #5b8cff;
   --ui-page-accent-soft: rgba(91, 140, 255, 0.2);
+  --ui-page-accent-on: #09090b;
+  --ui-page-accent-on-soft: #ffffff;
   --ui-page-accent-2: #a78bfa;
   --ui-page-accent-2-soft: rgba(167, 139, 250, 0.15);
+  --ui-page-accent-2-on: #09090b;
+  --ui-page-accent-2-on-soft: #ffffff;
 }
 
 .page-magias .circle-chips {

@@ -9,6 +9,14 @@
   --primary-glow: rgba(255, 68, 68, 0.3);
   --secondary-color: #457b9d;
   --secondary-glow: rgba(69, 123, 157, 0.3);
+  /* Cor de texto/ícone legível sobre --primary-color/--secondary-color, calculada em
+     tempo real por aplicarCorTema/aplicarCorSecundaria (global.js). Os valores abaixo
+     só valem para o instante antes do JS rodar. "-soft" é a variante para fundos
+     translúcidos (--primary-glow/--secondary-glow). */
+  --on-primary: #ffffff;
+  --on-primary-soft: #ffffff;
+  --on-secondary: #ffffff;
+  --on-secondary-soft: #ffffff;
   --primary: var(--primary-color);
   --primary-hover: var(--primary-color);
   --text-main: #f4f4f5; /* Branco acinzentado */

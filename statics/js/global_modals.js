@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="modal-body" id="historico-lista"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn-save-modal" style="background: transparent; border: 1px dashed var(--primary-color); color: var(--primary-color); flex: 1;" onclick="limparHistorico()">Limpar</button>
-                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; flex: 2;" onclick="fecharDialogoAnimado(this.closest('dialog'))">Fechar</button>
+                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: var(--on-primary); flex: 2;" onclick="fecharDialogoAnimado(this.closest('dialog'))">Fechar</button>
                 </div>
             </div>
         </dialog>
@@ -377,9 +377,34 @@ document.addEventListener('DOMContentLoaded', () => {
                                onchange="aplicarCorSecundaria(this.value)">
                         <p style="font-size: 0.75rem; color: #666; margin-top: 6px;">Acentos complementares e elementos de combate.</p>
                     </div>
+                    <div style="margin-bottom: 16px; padding-top: 12px; border-top: 1px solid #333;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #ccc; font-size: 0.85rem; font-weight: bold;">
+                            <input type="checkbox" id="input-theme-text-override"
+                                   ${localStorage.getItem(THEME_KEY_TEXT_OVERRIDE) === '1' ? 'checked' : ''}
+                                   onchange="alternarPersonalizacaoTexto(this)">
+                            Personalizar cor do texto manualmente
+                        </label>
+                        <p style="font-size: 0.75rem; color: #666; margin-top: 6px;">Por padrão, o sistema escolhe automaticamente entre texto claro ou escuro para manter a legibilidade sobre as cores acima.</p>
+                    </div>
+                    <div id="theme-text-override-fields" style="display: ${localStorage.getItem(THEME_KEY_TEXT_OVERRIDE) === '1' ? 'block' : 'none'}; margin-bottom: 16px;">
+                        <div style="margin-bottom: 12px;">
+                            <label style="display: block; margin-bottom: 8px; color: #ccc; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Texto sobre a Cor Primária</label>
+                            <input type="color" id="input-theme-text-primary"
+                                   value="${localStorage.getItem(THEME_KEY_TEXT_PRIMARY) || corTextoLegivel(localStorage.getItem(THEME_KEY) || '#ff4444')}"
+                                   style="width: 100%; height: 50px; cursor: pointer; background: none; border: 1px solid #333; border-radius: 8px;"
+                                   onchange="aplicarCorTextoManual('primaria', this.value)">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; color: #ccc; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Texto sobre a Cor Secundária</label>
+                            <input type="color" id="input-theme-text-secondary"
+                                   value="${localStorage.getItem(THEME_KEY_TEXT_SECONDARY) || corTextoLegivel(localStorage.getItem(THEME_KEY_SECONDARY) || '#457b9d')}"
+                                   style="width: 100%; height: 50px; cursor: pointer; background: none; border: 1px solid #333; border-radius: 8px;"
+                                   onchange="aplicarCorTextoManual('secundaria', this.value)">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; width: 100%" onclick="fecharDialogoAnimado(this.closest('dialog'))">Salvar e Fechar</button>
+                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: var(--on-primary); width: 100%" onclick="fecharDialogoAnimado(this.closest('dialog'))">Salvar e Fechar</button>
                 </div>
             </div>
         </dialog>
@@ -415,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="modal-body" id="modal-calc-ajuda-body"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: white; width: 100%" onclick="fecharDialogoAnimado(this.closest('dialog'))">Entendido</button>
+                    <button type="button" class="btn-save-modal" style="background: var(--primary-color); color: var(--on-primary); width: 100%" onclick="fecharDialogoAnimado(this.closest('dialog'))">Entendido</button>
                 </div>
             </div>
         </dialog>

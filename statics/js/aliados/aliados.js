@@ -115,8 +115,16 @@ function renderizarAliados() {
 
         const colorInput = card.querySelector('.ally-color-input');
         if (colorInput) {
-            colorInput.value = dados.cor_tema || "#ff4444";
-            card.style.setProperty('--ally-accent', colorInput.value);
+            const corOriginal = dados.cor_tema || "#ff4444";
+            const tema = prepararCorTema(corOriginal);
+            colorInput.value = tema.cor;
+            card.style.setProperty('--ally-accent', tema.cor);
+            card.style.setProperty('--ally-accent-on', tema.corOn);
+            card.style.setProperty('--ally-accent-on-soft', tema.corOnSoft);
+            if (dados.cor_tema !== tema.cor) {
+                dados.cor_tema = tema.cor;
+                localStorage.setItem(id, JSON.stringify(dados));
+            }
         }
 
         card.querySelector('.ally-pv-atual').value = dados.pv_atual || 0;
@@ -210,7 +218,12 @@ function salvarStatusAliado(input) {
 
     dados.nome = card.querySelector('.ally-name-input').value;
     dados.char_nome = dados.nome; // Mantém compatibilidade com o campo da ficha
-    dados.cor_tema = card.querySelector('.ally-color-input').value;
+
+    const colorInput = card.querySelector('.ally-color-input');
+    const tema = prepararCorTema(colorInput.value);
+    colorInput.value = tema.cor; // sincroniza o swatch caso a cor tenha sido clareada
+    dados.cor_tema = tema.cor;
+
     dados.pv_atual = parseInt(card.querySelector('.ally-pv-atual').value) || 0;
     dados.pv_max = parseInt(card.querySelector('.ally-pv-max').value) || 0;
     dados.pm_atual = parseInt(card.querySelector('.ally-pm-atual').value) || 0;
@@ -220,7 +233,9 @@ function salvarStatusAliado(input) {
     dados.defesa = parseInt(card.querySelector('.ally-defesa-input').value) || 0;
     dados.movimentacao = parseInt(card.querySelector('.ally-movimentacao-input').value) || 0;
 
-    card.style.setProperty('--ally-accent', dados.cor_tema);
+    card.style.setProperty('--ally-accent', tema.cor);
+    card.style.setProperty('--ally-accent-on', tema.corOn);
+    card.style.setProperty('--ally-accent-on-soft', tema.corOnSoft);
     atualizarBarrasCard(card);
     localStorage.setItem(id, JSON.stringify(dados));
     atualizarResumoAliados();

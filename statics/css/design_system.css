@@ -16,8 +16,12 @@
   --ui-text-dim: #898491;
   --ui-page-accent: var(--primary-color);
   --ui-page-accent-soft: var(--primary-glow);
+  --ui-page-accent-on: var(--on-primary);
+  --ui-page-accent-on-soft: var(--on-primary-soft);
   --ui-page-accent-2: var(--secondary-color, #22d3ee);
   --ui-page-accent-2-soft: var(--secondary-glow, rgba(34, 211, 238, 0.18));
+  --ui-page-accent-2-on: var(--on-secondary);
+  --ui-page-accent-2-on-soft: var(--on-secondary-soft);
   --ui-success: #53dfa2;
   --ui-warning: #f7c65c;
   --ui-danger: #ff6f87;
@@ -94,7 +98,7 @@ body.modal-open {
 }
 
 ::selection {
-  color: #fff;
+  color: var(--ui-page-accent-on);
   background: var(--ui-page-accent);
 }
 
@@ -395,7 +399,7 @@ body :where(button, .ui-button) {
 .btn-add-skill,
 .btn-large,
 .btn-save-modal {
-  color: #fff;
+  color: var(--ui-page-accent-on);
   border: 1px solid color-mix(in srgb, var(--ui-page-accent) 72%, #fff 8%);
   background: linear-gradient(135deg, var(--ui-page-accent), color-mix(in srgb, var(--ui-page-accent) 65%, var(--ui-page-accent-2)));
   box-shadow: 0 7px 22px var(--ui-page-accent-soft);

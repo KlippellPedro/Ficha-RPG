@@ -255,7 +255,7 @@
 
 .btn-open-desc:hover {
   background: var(--primary-color);
-  color: #000;
+  color: var(--on-primary);
 }
 
 /* Estilo para o novo botão de edição de material */
@@ -273,7 +273,7 @@
 }
 .btn-material-edit:hover {
   background: var(--primary-color);
-  color: #000;
+  color: var(--on-primary);
 }
 
 /* Utilitários e Classes de Layout */

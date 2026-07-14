@@ -304,7 +304,7 @@
 
 .entity-details-button:hover,
 .entity-duplicate-button:hover {
-  color: #fff;
+  color: var(--ui-page-accent-on-soft);
   border-color: var(--ui-page-accent);
   background: var(--ui-page-accent-soft);
 }

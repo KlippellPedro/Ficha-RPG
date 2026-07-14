@@ -269,7 +269,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.poder-details-button:hover { color: #fff; background: var(--ui-page-accent-soft); border-color: var(--ui-page-accent); }
+.poder-details-button:hover { color: var(--ui-page-accent-on-soft); background: var(--ui-page-accent-soft); border-color: var(--ui-page-accent); }
 
 .poder-duplicate-button {
   width: 40px;
@@ -280,7 +280,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.poder-duplicate-button:hover { color: #fff; border-color: var(--ui-page-accent); background: var(--ui-page-accent-soft); }
+.poder-duplicate-button:hover { color: var(--ui-page-accent-on-soft); border-color: var(--ui-page-accent); background: var(--ui-page-accent-soft); }
 
 .poder-card .btn-use-skill { min-width: 76px; }
 

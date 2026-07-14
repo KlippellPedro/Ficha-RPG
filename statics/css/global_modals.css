@@ -203,7 +203,7 @@ dialog.modal-overlay.modal-closing {
 
 .btn-save-modal {
   background: var(--primary-color);
-  color: #fff;
+  color: var(--on-primary);
   border: none;
   padding: 12px 25px;
   border-radius: 6px;
@@ -251,7 +251,7 @@ dialog.modal-overlay.modal-closing {
 }
 #modal-confirm .btn-confirm-yes {
   background: var(--primary-color);
-  color: white;
+  color: var(--on-primary);
   padding: 10px 20px;
   border-radius: 6px;
   font-weight: bold;

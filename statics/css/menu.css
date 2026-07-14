@@ -27,7 +27,7 @@
   height: 32px;
   display: grid;
   place-items: center;
-  color: #fff;
+  color: var(--on-primary-soft);
   font-family: var(--font-heading);
   font-size: 0.9rem;
   font-weight: 800;
@@ -120,7 +120,7 @@
 }
 
 .top-menu .menu-config-button:hover {
-  color: #fff;
+  color: var(--on-primary);
   border-color: var(--primary-color);
   background: color-mix(in srgb, var(--primary-color) 22%, transparent);
   transform: rotate(18deg);
