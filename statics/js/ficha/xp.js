@@ -160,7 +160,7 @@ function selecionarNovaClasseLevelUp() {
 function concluirNovaClasseLevelUp(className) {
     if (typeof adicionarClasseUI === 'function') {
         adicionarClasseUI(className, 1);
-        document.getElementById('modal-level-up').close();
+        fecharDialogoAnimado(document.getElementById('modal-level-up'));
 
         const xpAtualEl = document.getElementById('xp_atual');
         const nivelEl = document.getElementById('nivel');
@@ -199,7 +199,7 @@ function processarLevelUp(idx) {
             atualizarEstiloClasse(selectName);
         }
 
-        document.getElementById('modal-level-up').close();
+        fecharDialogoAnimado(document.getElementById('modal-level-up'));
 
         // Desconta exatamente o XP necessário para o nível que o personagem estava
         xpAtualEl.value = Math.max(0, atualXP - xpMaxGasto);

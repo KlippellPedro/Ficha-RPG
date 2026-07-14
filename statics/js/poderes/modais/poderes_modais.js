@@ -19,40 +19,51 @@ function abrirModalPod(index) {
     const modal   = document.getElementById('modal-poder');
 
     if (!titleEl || !body || !modal) return;
+    modal.dataset.poderIndex = index;
 
     titleEl.innerText = `Detalhes: ${nome || "Poder"}`;
     body.innerHTML = `
-        <div class="grid-2-cols">
-            <div class="input-group">
-                <label>Tipo de Efeito</label>
-                <select id="modal_pod_modo" class="inv-input">
-                    <option value="Ativa"   ${modo === 'Ativa'   ? 'selected' : ''}>Ativa</option>
-                    <option value="Passiva" ${modo === 'Passiva' ? 'selected' : ''}>Passiva</option>
-                </select>
-            </div>
-            <div class="input-group"><label>Ação</label><input type="text" id="modal_pod_acao" class="inv-input" value="${acao}"></div>
-        </div>
-        <div class="grid-2-cols">
-            <div class="input-group"><label>Duração</label><input type="text" id="modal_pod_duracao" class="inv-input" value="${duracao}"></div>
-            <div class="input-group"><label>Alcance</label><input type="text" id="modal_pod_alcance" class="inv-input" value="${alcance}"></div>
-        </div>
-        <div class="input-group">
-            <label style="display:flex;justify-content:space-between;align-items:center;">
-                <span>Buffs / Modificadores</span>
-                <small style="color:var(--text-muted);font-weight:normal;font-size:0.7rem;">
-                    ${modo === 'Passiva' ? '🔒 Sempre ativo' : 'Ativo ao usar'}
-                </small>
-            </label>
-            <button type="button" class="btn-save-modal" style="width:100%; background: #1e40af; color: #fff; border: 1px solid #2563eb;" onclick="abrirModalBuffPod('${index}')">Configurar Buffs do Poder</button>
-        </div>
-        <div class="input-group"><label>Descrição do Poder</label>
-            <textarea id="modal_pod_desc" class="inv-input" style="min-height: 130px">${desc}</textarea>
+        <div class="poder-modal-grid">
+            <section class="poder-modal-panel">
+                <div class="section-divider">Funcionamento</div>
+                <div class="grid-2-cols">
+                    <div class="input-group">
+                        <label for="modal_pod_modo">Tipo de Efeito</label>
+                        <select id="modal_pod_modo" class="inv-input">
+                            <option value="Ativa"   ${modo === 'Ativa'   ? 'selected' : ''}>Ativa</option>
+                            <option value="Passiva" ${modo === 'Passiva' ? 'selected' : ''}>Passiva</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label for="modal_pod_acao">Ação</label><input type="text" id="modal_pod_acao" class="inv-input" value="${_escapePoderAttr(acao)}" placeholder="Ex: Ação padrão"></div>
+                </div>
+                <div class="grid-2-cols">
+                    <div class="input-group"><label for="modal_pod_duracao">Duração</label><input type="text" id="modal_pod_duracao" class="inv-input" value="${_escapePoderAttr(duracao)}" placeholder="Ex: 1 rodada"></div>
+                    <div class="input-group"><label for="modal_pod_alcance">Alcance</label><input type="text" id="modal_pod_alcance" class="inv-input" value="${_escapePoderAttr(alcance)}" placeholder="Ex: Pessoal"></div>
+                </div>
+
+                <div class="section-divider">Efeitos na Ficha</div>
+                <div class="input-group">
+                    <label>
+                        Buffs / Modificadores
+                        <small>${modo === 'Passiva' ? 'Sempre ativos' : 'Ativados ao usar'}</small>
+                    </label>
+                    <button type="button" class="btn-material-edit" onclick="abrirModalBuffPod(document.getElementById('modal-poder').dataset.poderIndex)">Configurar buffs</button>
+                </div>
+            </section>
+
+            <section class="poder-modal-panel">
+                <div class="section-divider">Descrição do Poder</div>
+                <textarea id="modal_pod_desc" class="inv-input" placeholder="Descreva efeito, condições, limitações e aparência...">${_escapePoderHTML(desc)}</textarea>
+            </section>
         </div>
     `;
 
     const footer = modal.querySelector('.modal-footer');
     if (footer) {
-        footer.innerHTML = `<button type="button" class="btn-save-modal" style="width:100%" onclick="salvarDetalhesPod()">Salvar e Fechar</button>`;
+        footer.innerHTML = `
+            <button type="button" class="btn-modal-secondary" onclick="fecharModalPod()">Cancelar</button>
+            <button type="button" class="btn-save-modal" onclick="salvarDetalhesPod()">Salvar alterações</button>
+        `;
     }
 
     modal.showModal();
@@ -60,7 +71,7 @@ function abrirModalPod(index) {
 
 function fecharModalPod() {
     const modal = document.getElementById('modal-poder');
-    if (modal) modal.close();
+    if (modal) fecharDialogoAnimado(modal);
     podSendoEditadoIdx = null;
 }
 
@@ -88,6 +99,19 @@ function salvarDetalhesPod() {
     // Atualiza visibilidade do botão Usar
     const btnUsar = document.getElementById(`btn_usar_poder_${idx}`);
     if (btnUsar) btnUsar.style.display = novoModo === 'Passiva' ? 'none' : '';
+
+    const card = btnUsar?.closest('.poder-card');
+    if (card) {
+        card.dataset.tipo = novoModo;
+        const modoLabel = card.querySelector('[data-poder-modo-label]');
+        const resumoAcao = card.querySelector('[data-poder-resumo-acao]');
+        const resumoDuracao = card.querySelector('[data-poder-resumo-duracao]');
+        const resumoAlcance = card.querySelector('[data-poder-resumo-alcance]');
+        if (modoLabel) modoLabel.textContent = novoModo;
+        if (resumoAcao) resumoAcao.textContent = document.getElementById('modal_pod_acao').value || 'Ação não definida';
+        if (resumoDuracao) resumoDuracao.textContent = document.getElementById('modal_pod_duracao').value || 'Duração livre';
+        if (resumoAlcance) resumoAlcance.textContent = document.getElementById('modal_pod_alcance').value || 'Alcance não definido';
+    }
 
     // Se mudou para Passiva, desativa buff ativo
     if (novoModo === 'Passiva') {
@@ -132,7 +156,7 @@ function abrirModalBuffPod(index) {
 }
 
 function fecharModalBuffPod() {
-    document.getElementById('modal-pod-buffs').close();
+    fecharDialogoAnimado(document.getElementById('modal-pod-buffs'));
     currentPodModEditIdx = null;
 }
 
@@ -149,18 +173,16 @@ function adicionarLinhaBuffPod(attr = 'nenhum', mod = 0, isAdv = false) {
 
     const row = document.createElement('div');
     row.className = 'material-attr-row';
-    row.style = "display: flex; gap: 10px; margin-bottom: 10px;";
-
     row.innerHTML = `
-        <select class="inv-input pod-cat-select" style="flex: 1;">
+        <select class="inv-input pod-cat-select" aria-label="Categoria do modificador">
             <option value="ficha" ${cat === 'ficha' ? 'selected' : ''}>Ficha</option>
             <option value="pericia" ${cat === 'pericia' ? 'selected' : ''}>Perícia</option>
             <option value="arma" ${cat === 'arma' ? 'selected' : ''}>Arma</option>
             <option value="vantagem" ${cat === 'vantagem' ? 'selected' : ''}>Vantagem</option>
         </select>
-        <select class="inv-input pod-buff-attr" style="flex: 1.5;"></select>
-        <input type="text" class="inv-input pod-buff-val" style="flex: 0.8;" value="${mod}" placeholder="Val">
-        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()">×</button>
+        <select class="inv-input pod-buff-attr" aria-label="Atributo modificado"></select>
+        <input type="text" class="inv-input pod-buff-val" value="${_escapePoderAttr(mod)}" placeholder="Valor" aria-label="Valor do modificador">
+        <button type="button" class="btn-remove-class" onclick="this.parentElement.remove()" aria-label="Remover modificador">×</button>
     `;
     container.appendChild(row);
 

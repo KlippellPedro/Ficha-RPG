@@ -9,7 +9,10 @@ function _syncBotaoPoder(index) {
     const isAtivo = buffInput.value === 'true';
     btn.textContent = isAtivo ? 'Ativo' : 'Usar';
     btn.classList.toggle('buff-ativo', isAtivo);
-    btn.closest('.item-row')?.classList.toggle('has-active-buff', isAtivo);
+    const card = btn.closest('.item-row');
+    card?.classList.toggle('has-active-buff', isAtivo);
+    const buffLabel = card?.querySelector('[data-poder-buff-label]');
+    if (buffLabel) buffLabel.textContent = isAtivo ? 'Buff ativo' : 'Sem buff ativo';
 }
 
 function _ativarBuffPoder(index) {

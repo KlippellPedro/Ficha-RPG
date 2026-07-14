@@ -7,9 +7,12 @@ function _syncBotaoMagia(index) {
     const btn       = document.getElementById(`btn_usar_mag_${index}`);
     if (!buffInput || !btn) return;
     const isAtivo = buffInput.value === 'true';
-    btn.textContent = isAtivo ? 'Ativo' : 'Usar';
+    btn.textContent = isAtivo ? 'Ativo' : 'Conjurar';
     btn.classList.toggle('buff-ativo', isAtivo);
-    btn.closest('.item-row')?.classList.toggle('has-active-buff', isAtivo);
+    const card = btn.closest('.item-row');
+    card?.classList.toggle('has-active-buff', isAtivo);
+    const stateLabel = card?.querySelector('[data-mag-buff-label]');
+    if (stateLabel) stateLabel.textContent = isAtivo ? 'Efeito ativo' : 'Efeito inativo';
 }
 
 function _ativarBuffMagia(index) {
@@ -74,116 +77,12 @@ function usarMagia(index) {
     }
 }
 
-function duplicarMagia(index) {
-    const tipo = document.getElementById(`mag_tipo_${index}`).value;
-    let nivel = document.getElementById(`mag_nivel_${index}`).value;
-
-    // Remove o % para passar o valor limpo para a função de criação
-    if (tipo === "Elemental" && nivel.endsWith('%')) nivel = nivel.slice(0, -1);
-
-    adicionarMagiaUI(
-        document.getElementById(`mag_nome_${index}`).value + " (Cópia)",
-        tipo,
-        nivel,
-        document.getElementById(`mag_custo_${index}`).value,
-        document.getElementById(`mag_tipo_custo_${index}`).value,
-        document.getElementById(`mag_desc_${index}`).value,
-        null,
-        document.getElementById(`mag_duracao_${index}`).value,
-        document.getElementById(`mag_alcance_${index}`).value,
-        document.getElementById(`mag_acao_${index}`).value,
-        document.getElementById(`mag_teste_${index}`).value
-    );
-}
-
-function removerMagia(btn) {
-    const row = btn.closest('.item-row');
-    const index = row.dataset.index;
-    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    Object.keys(dados).forEach(k => { if (k.includes(`mag_`) && k.endsWith(`_${index}`)) delete dados[k]; });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-    row.remove();
-    atualizarTudo();
-    filtrarMagias();
-}
-
-function limparMagias() {
-    if (!confirm("Apagar grimório inteiro?")) return;
-    document.getElementById('magias-container').innerHTML = '';
-    let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    Object.keys(dados).forEach(k => { if (k.startsWith('mag_')) delete dados[k]; });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-    atualizarTudo();
-    filtrarMagias();
-}
-
-/**
- * Reseta todos os campos de busca e filtros para o estado inicial
- */
-function resetarFiltrosMagia() {
-    const search = document.getElementById('search-magia');
-    const tipo = document.getElementById('filter-magia-tipo');
-    const nivel = document.getElementById('filter-magia-nivel');
-
-    if (search) search.value = '';
-    if (tipo) tipo.value = 'todos';
-    if (nivel) nivel.value = 'todos';
-
-    // Reseta chips
-    document.querySelectorAll('.circle-chip').forEach(c => c.classList.remove('active'));
-    const allChip = document.querySelector('.circle-chip[data-nivel="todos"]');
-    if (allChip) allChip.classList.add('active');
-
-    filtrarMagias();
-    showNotification("Filtros limpos", "info", 2000);
-}
-
 function setCircleFilter(btn, nivel) {
     document.querySelectorAll('.circle-chip').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
     const sel = document.getElementById('filter-magia-nivel');
     if (sel) sel.value = nivel;
     filtrarMagias();
-}
-
-function filtrarMagias() {
-    const termo = document.getElementById('search-magia').value.toLowerCase();
-    const filtroTipo = document.getElementById('filter-magia-tipo').value;
-    const filtroNivel = document.getElementById('filter-magia-nivel').value;
-    let contador = 0;
-
-    document.querySelectorAll('#magias-container .item-row').forEach(row => {
-        const index = row.dataset.index;
-        const nome = document.getElementById(`mag_nome_${index}`)?.value.toLowerCase() || "";
-        const tipo = document.getElementById(`mag_tipo_${index}`)?.value || "";
-        const nivelInput = document.getElementById(`mag_nivel_${index}`);
-        const nivel = nivelInput?.value || "";
-
-        const matchesNome = nome.includes(termo);
-        const matchesTipo = filtroTipo === 'todos' || tipo === filtroTipo;
-
-        let matchesNivel = filtroNivel === 'todos';
-        if (!matchesNivel && nivelInput) {
-            if (filtroNivel === 'extra') {
-                // Considera 'extra' se for um input de texto (Elemental/Outro) ou se o valor não for 1-4
-                matchesNivel = nivelInput.tagName === 'INPUT' || !['1', '2', '3', '4'].includes(nivel);
-            } else {
-                matchesNivel = nivel === filtroNivel;
-            }
-        } else if (!matchesNivel && !nivelInput) {
-            // Se o input de nível não existe por erro, oculta por segurança se houver filtro ativo
-            matchesNivel = false;
-        }
-
-        const visible = (matchesNome && matchesTipo && matchesNivel);
-        row.style.display = visible ? 'grid' : 'none';
-        if (visible) contador++;
-    });
-
-    const counterEl = document.getElementById('magias-counter');
-    if (counterEl) {
-        counterEl.innerText = `Magias visíveis: ${contador}`;
-    }
 }
 
 // Funções para Salvar e Carregar a Ordem Personalizada das Magias

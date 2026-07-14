@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="../statics/css/global_modals.css" />
     <link rel="stylesheet" href="../statics/css/menu.css" />
     <link rel="stylesheet" href="../statics/css/pericias/pericias.css" />
+    <link rel="stylesheet" href="../statics/css/pericias/modais/pericias_modais.css" />
     <link rel="stylesheet" href="../statics/css/responsive.css" />
     <link rel="stylesheet" href="../statics/css/pericias/pericias_responsive.css" />
+    <link rel="stylesheet" href="../statics/css/design_system.css" />
     <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/ficha/classes/classes_data.js"></script>
     <script src="../statics/js/ficha/classes/class_loader.js"></script>
@@ -24,8 +26,9 @@
     <script src="../statics/js/pericias/pericias_data.js"></script>
     <script src="../statics/js/pericias/pericias.js"></script>
     <script src="../statics/js/pericias/modais/pericias_modais.js"></script>
+    <script src="../statics/js/design_system.js"></script>
   </head>
-  <body>
+  <body data-page="pericias">
     <!-- Menu Superior Dinâmico -->
     <nav class="top-menu">
       <div class="menu-links">
@@ -40,16 +43,24 @@
     </div>
 
     <div class="container">
-      <header>
-        <h1>PERÍCIAS</h1>
+      <header class="pericias-page-header">
+        <div>
+          <span class="pericias-eyebrow">Supremacia do Protesto</span>
+          <h1>PERÍCIAS</h1>
+          <p>Consulte seus resultados, ajuste o grau de treino e defina vantagem ou desvantagem para cada teste.</p>
+        </div>
+        <div class="pericias-summary" aria-live="polite">
+          <strong id="skills-trained-count">0</strong>
+          <span>perícias treinadas</span>
+        </div>
       </header>
 
-      <div class="filter-bar" style="flex-direction:column;gap:10px;">
-        <div style="display:flex;gap:10px;align-items:center;width:100%;">
+      <div class="filter-bar">
+        <div class="pericias-search-row">
           <div class="search-box">
             <input type="text" id="search-pericia" class="inv-input" placeholder="🔍 Pesquisar perícia pelo nome..." oninput="filtrarPericias()" />
           </div>
-          <button type="button" class="btn-clear-notas" style="margin:0;flex-shrink:0;" onclick="resetarFiltrosPericias()">Limpar</button>
+          <button type="button" class="btn-clear-notas" onclick="resetarFiltrosPericias()">Limpar</button>
         </div>
         <div class="attr-filter-bar">
           <span class="attr-filter-label">Atributo:</span>
@@ -65,11 +76,71 @@
       </div>
 
       <section class="skills-section">
+        <div class="skills-section-heading">
+          <div>
+            <span>Todas as perícias</span>
+            <p>O resultado soma atributo, treino, bônus manual e efeitos ativos.</p>
+          </div>
+          <strong id="skills-visible-count" aria-live="polite">0 de 0</strong>
+        </div>
         <div class="skills-grid" id="skills-container">
           <!-- As perícias serão geradas dinamicamente pelo pericia.js -->
         </div>
         <button type="button" class="btn-add-skill" onclick="adicionarOficioUI()">+ Adicionar Ofício / Perícia Customizada</button>
       </section>
     </div>
+
+    <dialog id="modal-pericia-rolagem" class="modal-overlay pericia-roll-dialog" aria-labelledby="modal-pericia-rolagem-title">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <span class="modal-kicker">Condição da rolagem</span>
+            <h3 id="modal-pericia-rolagem-title" class="modal-title">Vantagens e desvantagens</h3>
+          </div>
+          <button type="button" class="btn-remove-class" onclick="fecharModalRolagemPericia()" aria-label="Fechar">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="roll-modal-intro">As fontes se anulam uma a uma. O saldo define se o teste tem vantagem, desvantagem ou fica neutro.</p>
+
+          <div id="pericia-roll-auto-sources" class="roll-auto-sources" hidden></div>
+
+          <div class="roll-counter-grid">
+            <section class="roll-counter roll-counter--advantage" aria-labelledby="pericia-adv-title">
+              <div>
+                <span class="roll-counter-kicker">Dados favoráveis</span>
+                <h4 id="pericia-adv-title">Vantagens</h4>
+              </div>
+              <div class="roll-stepper">
+                <button type="button" onclick="ajustarRolagemPericia('vantagem', -1)" aria-label="Diminuir vantagens">−</button>
+                <output id="pericia-adv-value">0</output>
+                <button type="button" onclick="ajustarRolagemPericia('vantagem', 1)" aria-label="Aumentar vantagens">+</button>
+              </div>
+            </section>
+
+            <section class="roll-counter roll-counter--disadvantage" aria-labelledby="pericia-disadv-title">
+              <div>
+                <span class="roll-counter-kicker">Dados desfavoráveis</span>
+                <h4 id="pericia-disadv-title">Desvantagens</h4>
+              </div>
+              <div class="roll-stepper">
+                <button type="button" onclick="ajustarRolagemPericia('desvantagem', -1)" aria-label="Diminuir desvantagens">−</button>
+                <output id="pericia-disadv-value">0</output>
+                <button type="button" onclick="ajustarRolagemPericia('desvantagem', 1)" aria-label="Aumentar desvantagens">+</button>
+              </div>
+            </section>
+          </div>
+
+          <div id="pericia-roll-summary" class="roll-balance-summary" data-state="normal">
+            <strong id="pericia-roll-summary-title">Rolagem normal</strong>
+            <p id="pericia-roll-summary-text">Role 1d20.</p>
+          </div>
+        </div>
+        <div class="modal-footer pericia-roll-actions">
+          <button type="button" class="btn-modal-secondary" onclick="zerarRolagemPericia()">Zerar</button>
+          <button type="button" class="btn-modal-secondary" onclick="fecharModalRolagemPericia()">Cancelar</button>
+          <button type="button" class="btn-save-modal" onclick="aplicarRolagemPericia()">Aplicar saldo</button>
+        </div>
+      </div>
+    </dialog>
   </body>
 </html>

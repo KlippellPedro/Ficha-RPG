@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="../statics/css/menu.css" />
     <link rel="stylesheet" href="../statics/css/aliados/aliados.css" />
     <link rel="stylesheet" href="../statics/css/responsive.css" />
+    <link rel="stylesheet" href="../statics/css/aliados/aliados_responsive.css" />
+    <link rel="stylesheet" href="../statics/css/design_system.css" />
     <script src="../statics/js/global.js"></script>
     <script src="../statics/js/global_calculations.js"></script>
     <script src="../statics/js/global_ui.js"></script>
@@ -28,34 +30,80 @@
       <span class="message"></span>
     </div>
 
-    <div class="container">
-      <header>
-        <h1>ALIADOS E INVOCAÇÕES</h1>
-        <p>Gerencie seus servos, pets e invocações.</p>
+    <main class="container aliados-page">
+      <header class="page-hero ui-reveal">
+        <div class="page-hero-copy">
+          <span class="page-eyebrow">Companheiros de jornada</span>
+          <h1>ALIADOS E INVOCAÇÕES</h1>
+          <p>Acompanhe recursos, condições, ataques, magias e efeitos de todos que lutam ao seu lado.</p>
+        </div>
+        <div class="page-hero-summary" aria-label="Resumo de aliados">
+          <strong id="aliados-summary-count">0</strong>
+          <span>aliados vinculados</span>
+        </div>
       </header>
 
-      <div class="aliados-actions">
-        <button class="btn-add-card" onclick="adicionarNovoAliado()">+ Criar Novo Aliado</button>
-        <button class="btn-history" onclick="window.mostrarLogAliados()">📜 Log de Combate</button>
+      <section class="aliados-overview ui-reveal" aria-label="Situação do grupo">
+        <article class="ally-overview-card">
+          <span>Em combate</span>
+          <strong id="aliados-active-count">0</strong>
+          <small>com pontos de vida</small>
+        </article>
+        <article class="ally-overview-card ally-overview-card--warning">
+          <span>Em risco</span>
+          <strong id="aliados-critical-count">0</strong>
+          <small>feridos ou críticos</small>
+        </article>
+        <article class="ally-overview-card ally-overview-card--arcane">
+          <span>Recursos</span>
+          <strong id="aliados-ability-count">0</strong>
+          <small>ataques e magias</small>
+        </article>
+      </section>
+
+      <div class="aliados-actions page-toolbar ui-reveal" aria-label="Ações de aliados">
+        <button type="button" class="btn-add-card" onclick="adicionarNovoAliado()">+ Criar novo aliado</button>
+        <button type="button" class="btn-history" onclick="window.mostrarLogAliados()">Log de combate</button>
         <div class="import-export-group">
-          <label for="import-ally-json" class="btn-history">+ Importar Aliado </label>
+          <label for="import-ally-json" class="btn-history" role="button" tabindex="0">Importar ficha</label>
           <input type="file" id="import-ally-json" style="display: none" onchange="importarFichaComoAliado(event)" />
         </div>
       </div>
 
-      <div id="aliados-container" class="aliados-grid">
-        <!-- Cards dos aliados serão injetados aqui -->
-      </div>
+      <section class="collection-panel aliados-collection ui-reveal" aria-labelledby="aliados-section-title">
+        <div class="collection-heading">
+          <div>
+            <span class="page-section-eyebrow">Grupo atual</span>
+            <h2 id="aliados-section-title">Companheiros vinculados</h2>
+            <p>Os recursos podem ser ajustados diretamente; abra a ficha para alterações completas.</p>
+          </div>
+          <strong id="aliados-counter" class="page-counter" aria-live="polite">0 aliados</strong>
+        </div>
 
-      <div id="empty-state" style="display: none; text-align: center; padding: 50px; color: #888">
-        <p>Você ainda não possui aliados. Clique em "Criar Novo Aliado" para começar!</p>
-      </div>
-    </div>
+        <div id="aliados-container" class="aliados-grid" aria-live="polite">
+          <!-- Cards dos aliados serão injetados aqui -->
+        </div>
+
+        <div id="empty-state" class="collection-empty-state" hidden>
+          <span aria-hidden="true">◇</span>
+          <strong>Seu grupo ainda está vazio</strong>
+          <p>Crie um aliado do zero ou importe uma ficha existente para começar.</p>
+          <button type="button" class="btn-add-card" onclick="adicionarNovoAliado()">Criar primeiro aliado</button>
+        </div>
+      </section>
+    </main>
 
     <template id="ally-card-template">
-      <div class="ally-card" data-id="">
+      <article class="ally-card ui-card ui-enter" data-id="">
         <div class="ally-header">
-          <div class="ally-avatar-container" onclick="triggerAllyImageInput(this)">
+          <div
+            class="ally-avatar-container"
+            role="button"
+            tabindex="0"
+            aria-label="Alterar imagem do aliado"
+            onclick="triggerAllyImageInput(this)"
+            onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); triggerAllyImageInput(this); }"
+          >
             <img
               class="ally-avatar-img"
               src="https://ui-avatars.com/api/?name=?&background=0d0d0f&color=ff4444"
@@ -67,13 +115,19 @@
             />
             <input type="file" class="ally-image-input" style="display: none" onchange="salvarImagemAliado(this)" accept="image/*" />
           </div>
-          <div class="ally-level-box">
-            <span>LVL</span>
-            <input type="number" class="ally-nivel-input" readonly />
+          <div class="ally-identity">
+            <input type="text" class="ally-name-input" aria-label="Nome do aliado" placeholder="Nome do Aliado" oninput="salvarStatusAliado(this)" />
+            <div class="ally-identity-meta">
+              <div class="ally-level-box">
+                <span>Nível</span>
+                <input type="number" class="ally-nivel-input" aria-label="Nível do aliado" readonly />
+              </div>
+            </div>
           </div>
-          <input type="text" class="ally-name-input" placeholder="Nome do Aliado" oninput="salvarStatusAliado(this)" />
-          <input type="color" class="ally-color-input" oninput="salvarStatusAliado(this)" title="Cor do Tema do Aliado" />
-          <button class="btn-remove-ally" onclick="removerAliado(this)">×</button>
+          <div class="ally-card-tools">
+            <input type="color" class="ally-color-input" oninput="salvarStatusAliado(this)" title="Cor do tema do aliado" aria-label="Cor do tema do aliado" />
+            <button type="button" class="btn-remove-ally" onclick="removerAliado(this)" title="Remover aliado" aria-label="Remover aliado">×</button>
+          </div>
         </div>
 
         <div class="ally-stats-container">
@@ -131,14 +185,25 @@
           </div>
         </div>
 
-        <div class="ally-footer">
-          <button class="btn-open-sheet" onclick="abrirFichaAliado(this)">Abrir Ficha Completa</button>
-          <button class="btn-export-ally" onclick="abrirModalBuffsAliado(this)" title="Buffs de Aliado">✨</button>
-          <button class="btn-export-ally" onclick="exportarFichaAliado(this)" title="Exportar JSON">💾</button>
+        <div class="ally-card-meta" aria-label="Conteúdo da ficha do aliado">
+          <span><strong class="ally-attack-count">0</strong> ataques</span>
+          <span><strong class="ally-spell-count">0</strong> magias</span>
+          <span><strong class="ally-buff-count">0</strong> efeitos</span>
         </div>
-      </div>
+
+        <div class="ally-footer">
+          <div class="ally-secondary-actions">
+            <button type="button" class="btn-export-ally" onclick="window.abrirModalAtaquesAliado(this)" title="Ver Ataques" aria-label="Ver ataques">⚔</button>
+            <button type="button" class="btn-export-ally" onclick="window.abrirModalMagiasAliado(this)" title="Ver Magias" aria-label="Ver magias">✦</button>
+            <button type="button" class="btn-export-ally" onclick="abrirModalBuffsAliado(this)" title="Buffs de Aliado" aria-label="Configurar efeitos">✨</button>
+            <button type="button" class="btn-export-ally" onclick="exportarFichaAliado(this)" title="Exportar JSON" aria-label="Exportar ficha">⇩</button>
+          </div>
+          <button type="button" class="btn-open-sheet" onclick="abrirFichaAliado(this)">Abrir ficha completa</button>
+        </div>
+      </article>
     </template>
 
     <script src="../statics/js/responsive.js"></script>
+    <script src="../statics/js/design_system.js"></script>
   </body>
 </html>

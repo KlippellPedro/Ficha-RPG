@@ -35,7 +35,7 @@ window.abrirModalGerenciarImagem = function (targetId) {
 
 window.fecharModalGerenciarImagem = function () {
     const modal = document.getElementById('modal-image-manager');
-    if (modal) modal.close();
+    if (modal) fecharDialogoAnimado(modal);
 };
 
 window.atualizarPreviewAjuste = function () {
@@ -85,6 +85,18 @@ window.removerImagem = function () {
     });
 };
 
+window.trocarImagemDesdeModal = function () {
+    window.fecharModalGerenciarImagem();
+    // Se window.currentImgTargetId for nulo, estamos na ficha principal
+    if (!window.currentImgTargetId) {
+        document.getElementById('char-image-input').click();
+    } else {
+        // Se for aliado, precisamos achar o card e clicar no input dele
+        const card = document.querySelector(`.ally-card[data-id="${window.currentImgTargetId}"]`);
+        if (card) card.querySelector('.ally-image-input').click();
+    }
+};
+
 window.aplicarEstilosAvatar = function (imgEl, dados) {
     if (!imgEl || !dados) return;
     const zoom = dados.foto_zoom || 1;
@@ -99,16 +111,30 @@ window.aplicarEstilosAvatar = function (imgEl, dados) {
 window.salvarImagemPersonagem = function (input) {
     const file = input.files[0];
     if (!file) return;
+
     if (file.size > 1024 * 1024) {
-        showNotification("Imagem muito pesada! Máximo 1MB.", "warning");
+        showNotification("A imagem é muito pesada! Tente uma menor que 1MB.", "warning");
         return;
     }
+
     const reader = new FileReader();
     reader.onload = (e) => {
+        const base64 = e.target.result;
         let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        dados.foto = e.target.result;
+        dados.foto = base64;
+        // Reseta ajustes ao trocar de foto
+        dados.foto_zoom = 1;
+        dados.foto_x = 50;
+        dados.foto_y = 50;
+
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-        location.reload();
+
+        const img = document.getElementById('char-avatar-img');
+        if (img) {
+            img.src = base64;
+            window.aplicarEstilosAvatar(img, dados);
+        }
+        showNotification("Avatar atualizado!", "success");
     };
     reader.readAsDataURL(file);
 };

@@ -16,11 +16,12 @@ function sincronizarAtaqueComInventario(atkId) {
     const novaDesc = document.getElementById(`atk_desc_${atkId}`).value;
     const novoTipoDano = document.getElementById(`atk_tipo_dano_${atkId}`)?.value || "";
 
-    // Atualiza apenas se houver mudança e o item existir no inventário
-    if (dados[`inv_nome_${originId}`] !== undefined) {
-        dados[`inv_nome_${originId}`] = novoNome;
-        dados[`inv_desc_${originId}`] = novaDesc;
-        dados[`inv_tipo_dano_${originId}`] = novoTipoDano;
+    // Atualiza apenas se o item ainda existir no inventário
+    const item = (dados.inventario || []).find(i => i.id === originId);
+    if (item) {
+        item.nome = novoNome;
+        item.descricao = novaDesc;
+        item.tipoDano = novoTipoDano;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     }
 }
@@ -61,6 +62,8 @@ function adicionarAtaqueAutomatico(itemData) {
         document.getElementById(`atk_alcance_${id}`).value = itemData.alcance;
         document.getElementById(`atk_tipo_${id}`).value = attackType;
         document.getElementById(`atk_desc_${id}`).value = itemData.desc;
+        if (typeof atualizarBadgeDano === 'function') atualizarBadgeDano(id);
+        if (typeof atualizarResumoCardAtaque === 'function') atualizarResumoCardAtaque(id);
     } else {
         // Adiciona um novo ataque
         adicionarAtaqueUI(
@@ -117,15 +120,11 @@ function atualizarAtaques(nivel, mods, bonusItens) {
     const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
     // Coleta nomes de todas as armas equipadas no inventário
-    const equippedWeapons = new Set();
-    Object.keys(dados).forEach(key => {
-        if (key.startsWith('inv_nome_')) {
-            const id = key.replace('inv_nome_', '');
-            if (dados[`inv_cat_${id}`] === 'armas' && dados[`inv_eqp_${id}`] === true) {
-                equippedWeapons.add(dados[key].trim().toLowerCase());
-            }
-        }
-    });
+    const equippedWeapons = new Set(
+        (dados.inventario || [])
+            .filter(item => item.tipo === 'armas' && item.equipado)
+            .map(item => item.nome.trim().toLowerCase())
+    );
 
     document.querySelectorAll('#ataques-container .item-row').forEach(row => {
         const id = row.dataset.index;
@@ -142,7 +141,9 @@ function atualizarAtaques(nivel, mods, bonusItens) {
             const notEquipped = isPhysical && atkName !== "" && !equippedWeapons.has(atkName);
 
             row.classList.toggle('weapon-not-equipped', notEquipped);
-            if (notEquipped) row.title = "Aviso: Esta arma não está equipada no inventário.";
+            row.dataset.equipmentState = notEquipped ? 'unequipped' : 'ready';
+            if (notEquipped) row.title = "Aviso: esta arma não está equipada no inventário.";
+            else row.removeAttribute('title');
         }
 
         if (!testeInput || !danoInput) return;

@@ -2,6 +2,17 @@
  * Lógica de Interface dos Poderes (Lista e Filtros)
  */
 
+function _escapePoderHTML(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function _escapePoderAttr(value) {
+    return _escapePoderHTML(value).replace(/"/g, '&quot;');
+}
+
 function getOpcoesClassesPod(valorSelecionado = "") {
     const dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
     const classes = typeof getClassesAtivas === 'function' ? getClassesAtivas(dados) : [];
@@ -14,7 +25,7 @@ function getOpcoesClassesPod(valorSelecionado = "") {
         const nomeFormatado = c.name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         const valor = c.sub ? `${c.name}_${c.sub}` : c.name;
         const label = c.sub ? `${nomeFormatado} (${c.sub})` : nomeFormatado;
-        opcoes += `<option value="${valor}" ${valorSelecionado === valor ? 'selected' : ''}>${label}</option>`;
+        opcoes += `<option value="${_escapePoderAttr(valor)}" ${valorSelecionado === valor ? 'selected' : ''}>${_escapePoderHTML(label)}</option>`;
     });
     return opcoes;
 }
@@ -31,45 +42,77 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
     const isPassiva = modoAtivoPas === 'Passiva';
     const isAtivo = buffAtivo === 'true';
     const hasLegacyBuff = buffAtivo === undefined;
+    const safeIndex = _escapePoderAttr(index);
+    const resumoAcao = acao || 'Ação não definida';
+    const resumoDuracao = duracao || 'Duração livre';
+    const resumoAlcance = alcance || 'Alcance não definido';
 
     const row = document.createElement('div');
-    row.className = `item-row pod-row-grid draggable${isAtivo ? ' has-active-buff' : ''}`;
+    row.className = `item-row pod-row-grid poder-card ui-card draggable${isAtivo ? ' has-active-buff' : ''}`;
     row.draggable = true;
     row.dataset.index = index;
+    row.dataset.tipo = modoAtivoPas;
     row.innerHTML = `
-        <input type="text" id="poder_nome_${index}" class="save-input inv-input" placeholder="Nome do Poder" value="${nome}">
-        <select id="poder_classe_${index}" class="save-input inv-input" onchange="atualizarTudo()">
-            ${getOpcoesClassesPod(classe || tipo)}
-        </select>
-        <div class="cost-container" style="display:flex; gap:5px;">
-            <input type="text" id="poder_custo_${index}" class="save-input inv-input" placeholder="Custo" value="${custo}" style="flex:1;">
-            <select id="poder_tipo_custo_${index}" class="save-input inv-input" style="width:60px;">
-                <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
-                <option value="PV" ${tipoCusto === 'PV' ? 'selected' : ''}>PV</option>
-                <option value="Outro" ${tipoCusto === 'Outro' ? 'selected' : ''}>Outro</option>
-            </select>
+        <div class="poder-card-head">
+            <span class="poder-card-icon" aria-hidden="true">✦</span>
+            <div class="poder-card-identity">
+                <input type="text" id="poder_nome_${safeIndex}" class="save-input poder-card-name" placeholder="Nome do poder" value="${_escapePoderAttr(nome)}" aria-label="Nome do poder">
+                <div class="poder-card-badges">
+                    <span class="poder-mode-badge" data-poder-modo-label>${_escapePoderHTML(modoAtivoPas)}</span>
+                    <span class="poder-buff-badge" data-poder-buff-label>${isAtivo ? 'Buff ativo' : 'Sem buff ativo'}</span>
+                </div>
+            </div>
+            <button type="button" class="poder-card-remove" onclick="removerPoder(this)" aria-label="Remover poder" title="Remover poder">×</button>
         </div>
-        <button type="button" class="btn-open-desc" onclick="abrirModalPod('${index}')">🔍</button>
-        <button type="button" id="btn_usar_poder_${index}"
-                class="btn-use-skill${isAtivo ? ' buff-ativo' : ''}"
-                onclick="toggleBuffPoder('${index}')"
-                style="${isPassiva ? 'display:none' : ''}">
-            ${isAtivo ? 'Ativo' : 'Usar'}
-        </button>
-        <button type="button" class="btn-duplicate" onclick="duplicarPoder('${index}')" title="Duplicar">📋</button>
-        <button type="button" class="btn-remove-class" onclick="removerPoder(this)">×</button>
 
-        <div style="display:none">
-            <input type="hidden" id="poder_tipo_${index}" class="save-input" value="${tipo}">
-            <textarea id="poder_desc_${index}" class="save-input">${desc}</textarea>
-            <input type="hidden" id="poder_duracao_${index}" class="save-input" value="${duracao}">
-            <input type="hidden" id="poder_alcance_${index}" class="save-input" value="${alcance}">
-            <input type="hidden" id="poder_acao_${index}" class="save-input" value="${acao}">
-            <input type="hidden" id="poder_pv_bonus_${index}" class="save-input" value="${pv_bonus}">
-            <input type="hidden" id="poder_pm_bonus_${index}" class="save-input" value="${pm_bonus}">
-            <input type="hidden" id="poder_mods_${index}" class="save-input" value='${mods}'>
-            <input type="hidden" id="poder_buff_ativo_${index}" class="save-input" value="${hasLegacyBuff ? 'legado' : (buffAtivo || 'false')}">
-            <input type="hidden" id="poder_modo_${index}" class="save-input" value="${modoAtivoPas}">
+        <div class="poder-card-fields">
+            <label class="poder-card-field">
+                <span>Origem</span>
+                <select id="poder_classe_${safeIndex}" class="save-input inv-input" onchange="atualizarTudo()">
+                    ${getOpcoesClassesPod(classe || tipo)}
+                </select>
+            </label>
+            <label class="poder-card-field">
+                <span>Custo</span>
+                <span class="cost-container">
+                    <input type="text" id="poder_custo_${safeIndex}" class="save-input inv-input" inputmode="numeric" placeholder="0" value="${_escapePoderAttr(custo)}">
+                    <select id="poder_tipo_custo_${safeIndex}" class="save-input inv-input" aria-label="Recurso do custo">
+                        <option value="PM" ${tipoCusto === 'PM' ? 'selected' : ''}>PM</option>
+                        <option value="PV" ${tipoCusto === 'PV' ? 'selected' : ''}>PV</option>
+                        <option value="Outro" ${tipoCusto === 'Outro' ? 'selected' : ''}>Outro</option>
+                    </select>
+                </span>
+            </label>
+        </div>
+
+        <div class="poder-card-summary">
+            <span data-poder-resumo-acao>${_escapePoderHTML(resumoAcao)}</span>
+            <span data-poder-resumo-duracao>${_escapePoderHTML(resumoDuracao)}</span>
+            <span data-poder-resumo-alcance>${_escapePoderHTML(resumoAlcance)}</span>
+        </div>
+
+        <div class="poder-card-actions">
+            <button type="button" class="poder-details-button" onclick="abrirModalPod(this.closest('.poder-card').dataset.index)">⌕ Ver detalhes</button>
+            <button type="button" class="poder-duplicate-button" onclick="duplicarPoder(this.closest('.poder-card').dataset.index)" title="Duplicar poder" aria-label="Duplicar poder">⧉</button>
+            <button type="button" id="btn_usar_poder_${safeIndex}"
+                    class="btn-use-skill${isAtivo ? ' buff-ativo' : ''}"
+                    onclick="toggleBuffPoder(this.closest('.poder-card').dataset.index)"
+                    style="${isPassiva ? 'display:none' : ''}">
+                ${isAtivo ? 'Ativo' : 'Usar'}
+            </button>
+        </div>
+
+        <div class="item-hidden-data" hidden>
+            <input type="hidden" id="poder_tipo_${safeIndex}" class="save-input" value="${_escapePoderAttr(tipo)}">
+            <textarea id="poder_desc_${safeIndex}" class="save-input">${_escapePoderHTML(desc)}</textarea>
+            <input type="hidden" id="poder_duracao_${safeIndex}" class="save-input" value="${_escapePoderAttr(duracao)}">
+            <input type="hidden" id="poder_alcance_${safeIndex}" class="save-input" value="${_escapePoderAttr(alcance)}">
+            <input type="hidden" id="poder_acao_${safeIndex}" class="save-input" value="${_escapePoderAttr(acao)}">
+            <input type="hidden" id="poder_pv_bonus_${safeIndex}" class="save-input" value="${_escapePoderAttr(pv_bonus)}">
+            <input type="hidden" id="poder_pm_bonus_${safeIndex}" class="save-input" value="${_escapePoderAttr(pm_bonus)}">
+            <input type="hidden" id="poder_mods_${safeIndex}" class="save-input" value="${_escapePoderAttr(mods)}">
+            <input type="hidden" id="poder_buff_ativo_${safeIndex}" class="save-input" value="${hasLegacyBuff ? 'legado' : (buffAtivo || 'false')}">
+            <input type="hidden" id="poder_modo_${safeIndex}" class="save-input" value="${_escapePoderAttr(modoAtivoPas)}">
         </div>
     `;
     container.appendChild(row);
@@ -105,11 +148,13 @@ function filtrarPoderes() {
         const t = document.getElementById(`poder_classe_${idx}`)?.value.toLowerCase() || "";
 
         const match = n.includes(termo) && (fTipo === 'todos' || t === fTipo.toLowerCase());
-        row.style.display = match ? 'grid' : 'none';
+        row.style.display = match ? 'flex' : 'none';
         if (match) contador++;
     });
     const countEl = document.getElementById('poderes-counter');
-    if (countEl) countEl.innerText = `Poderes visíveis: ${contador}`;
+    const summaryEl = document.getElementById('poderes-summary-count');
+    if (countEl) countEl.innerText = `${contador} ${contador === 1 ? 'poder visível' : 'poderes visíveis'}`;
+    if (summaryEl) summaryEl.textContent = contador;
 }
 
 function limparPoderes() {
@@ -126,7 +171,10 @@ function limparPoderes() {
 }
 
 function resetarFiltrosPoderes() {
-    document.getElementById('search-poder').value = '';
-    document.getElementById('filter-poder-tipo').value = 'todos';
+    const search = document.getElementById('search-poder');
+    const filter = document.getElementById('filter-poder-tipo');
+    if (search) search.value = '';
+    if (filter) filter.value = 'todos';
     filtrarPoderes();
+    if (typeof showNotification === 'function') showNotification('Filtros de poderes limpos.', 'info', 2000);
 }

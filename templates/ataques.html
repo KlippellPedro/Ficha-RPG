@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../statics/css/ataques/ataque.css" />
     <link rel="stylesheet" href="../statics/css/ataques/ataques_responsive.css" />
     <link rel="stylesheet" href="../statics/css/responsive.css" />
+    <link rel="stylesheet" href="../statics/css/design_system.css" />
     <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/ficha/classes/classes_data.js"></script>
     <script src="../statics/js/ficha/classes/class_loader.js"></script>
@@ -23,11 +24,12 @@
     <script src="../statics/js/global_images.js"></script>
     <script src="../statics/js/global_modals.js"></script>
     <script src="../statics/js/menu.js"></script>
-    <script src="../statics/js/inventario/inventario.js"></script>
+    <script src="../statics/js/global_dragdrop.js"></script>
     <script src="../statics/js/ataques/ataques_data.js"></script>
     <script src="../statics/js/ataques/ataques_ui.js"></script>
     <script src="../statics/js/ataques/modais/ataques_modais.js"></script>
     <script src="../statics/js/ataques/ataque.js"></script>
+    <script src="../statics/js/design_system.js"></script>
   </head>
   <body>
     <nav class="top-menu">
@@ -39,16 +41,26 @@
       <span class="message"></span>
     </div>
 
-    <div class="container">
-      <header>
-        <h1>ATAQUES</h1>
+    <main class="container ataques-page">
+      <header class="page-hero ui-reveal">
+        <div class="page-hero-copy">
+          <span class="page-eyebrow">Arsenal de combate</span>
+          <h1>ATAQUES</h1>
+          <p>Organize armas, técnicas e conjurações ofensivas com seus testes, danos, críticos e alcances.</p>
+        </div>
+        <div class="page-hero-summary" aria-label="Resumo dos ataques">
+          <strong id="ataques-summary-count">0</strong>
+          <span>ataques registrados</span>
+        </div>
       </header>
 
-      <div class="filter-bar">
+      <div class="filter-bar page-toolbar ui-reveal" role="search" aria-label="Filtros de ataques">
         <div class="search-group">
-          <input type="text" id="search-ataque" class="inv-input" placeholder="🔍 Pesquisar arma ou ataque..." oninput="filtrarAtaques()" />
+          <label class="sr-only" for="search-ataque">Pesquisar arma ou ataque</label>
+          <input type="search" id="search-ataque" class="inv-input" placeholder="Pesquisar arma ou ataque..." oninput="filtrarAtaques()" />
         </div>
-        <select id="filter-ataque-tipo" class="inv-input" style="max-width: 180px" onchange="filtrarAtaques()">
+        <label class="sr-only" for="filter-ataque-tipo">Filtrar por tipo</label>
+        <select id="filter-ataque-tipo" class="inv-input ataque-type-filter" onchange="filtrarAtaques()">
           <option value="todos">Todos os Tipos</option>
           <option value="Corpo-a-Corpo">Corpo-a-Corpo</option>
           <option value="À Distância">À Distância</option>
@@ -56,34 +68,36 @@
           <option value="Magia">Magia</option>
           <option value="Outro">Outro</option>
         </select>
-        <button type="button" class="btn-open-desc" onclick="resetarFiltrosAtaque()" title="Limpar Filtros">🔄</button>
+        <button type="button" class="btn-open-desc toolbar-clear-button" onclick="resetarFiltrosAtaque()" title="Limpar filtros">
+          Limpar
+        </button>
       </div>
 
-      <div
-        id="ataques-counter"
-        style="color: #888; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; padding-left: 5px"
-      >
-        Ataques visíveis: 0
-      </div>
+      <section class="collection-panel ataques-collection ui-reveal" aria-labelledby="ataques-section-title">
+        <div class="collection-heading">
+          <div>
+            <span class="page-section-eyebrow">Todos os registros</span>
+            <h2 id="ataques-section-title">Ataques preparados</h2>
+            <p>Edite os dados rápidos no card ou abra os detalhes para uma visão completa.</p>
+          </div>
+          <strong id="ataques-counter" class="page-counter" aria-live="polite">0 visíveis</strong>
+        </div>
 
-      <div class="inv-header atk-header-grid">
-        <span>Nome</span>
-        <span>Teste</span>
-        <span>Dano</span>
-        <span>Tipo</span>
-        <span>Crítico</span>
-        <span>Alcance</span>
-        <span>Info</span>
-        <span>Dup</span>
-        <span>X</span>
-      </div>
+        <section id="ataques-container" class="inventory-list ataques-grid" aria-live="polite">
+          <!-- Injetado via JS -->
+        </section>
 
-      <section id="ataques-container" class="inventory-list">
-        <!-- Injetado via JS -->
+        <div id="ataques-empty-state" class="collection-empty-state" hidden>
+          <span aria-hidden="true">⚔</span>
+          <strong>Nenhum ataque encontrado</strong>
+          <p>Registre um novo ataque ou ajuste os filtros para encontrar outro resultado.</p>
+        </div>
       </section>
 
-      <button type="button" class="btn-add-card" onclick="adicionarAtaqueUI()">+ Registrar Novo Ataque</button>
-      <button type="button" class="btn-clear-inventory" onclick="limparAtaques()">Limpar Todos os Ataques</button>
-    </div>
+      <div class="page-actions ataques-page-actions ui-reveal">
+        <button type="button" class="btn-clear-inventory" onclick="limparAtaques()">Limpar ataques</button>
+        <button type="button" class="btn-add-card" onclick="adicionarAtaqueUI()">+ Registrar novo ataque</button>
+      </div>
+    </main>
   </body>
 </html>

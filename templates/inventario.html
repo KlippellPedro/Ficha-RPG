@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="../statics/css/global_modals.css" />
     <link rel="stylesheet" href="../statics/css/menu.css" />
     <link rel="stylesheet" href="../statics/css/inventario/inventario.css" />
+    <link rel="stylesheet" href="../statics/css/inventario/inventario_cards.css" />
     <link rel="stylesheet" href="../statics/css/inventario/inventario_responsive.css" />
     <link rel="stylesheet" href="../statics/css/responsive.css" />
+    <link rel="stylesheet" href="../statics/css/design_system.css" />
     <script src="../statics/js/ficha/classes/classes_data.js"></script>
     <script src="../statics/js/ficha/classes/class_loader.js"></script>
     <script src="../statics/js/ficha/racas/racas_data.js"></script>
@@ -23,12 +25,13 @@
     <script src="../statics/js/responsive.js"></script>
     <script src="../statics/js/inventario/inventario_data.js"></script>
     <script src="../statics/js/inventario/materiais.js"></script>
-    <script src="../statics/js/inventario/modais/inventario_modais.js"></script>
-    <script src="../statics/js/inventario/inventario.js"></script>
-    <script src="../statics/js/inventario/inventario_ui.js"></script>
+    <script src="../statics/js/inventario/inventario_model.js"></script>
+    <script src="../statics/js/inventario/inventario_details.js"></script>
+    <script src="../statics/js/inventario/inventario_render.js"></script>
     <script src="../statics/js/inventario/inventario_carga.js"></script>
+    <script src="../statics/js/design_system.js"></script>
   </head>
-  <body>
+  <body data-page="inventario">
     <nav class="top-menu">
       <div class="menu-links"></div>
     </nav>
@@ -40,9 +43,19 @@
     </div>
 
     <div class="container">
-      <header class="inventory-container">
-        <h1 class="inventory-title">Mochila & Equipamentos</h1>
+      <header class="page-hero inventory-hero">
+        <div class="page-hero-copy">
+          <span class="page-eyebrow">Recursos e equipamentos</span>
+          <h1 class="inventory-title page-title">Mochila & Equipamentos</h1>
+          <p class="page-subtitle">Organize sua carga, acompanhe durabilidade e abra os detalhes completos de cada item.</p>
+        </div>
+        <div class="page-hero-summary" aria-live="polite">
+          <strong id="inv-contador" class="inv-contador">0 de 0</strong>
+          <span>resultado do filtro</span>
+        </div>
+      </header>
 
+      <section class="inventory-container">
         <div class="weight-stats">
           <div class="weight-card current">
             <span class="weight-label">Carga Atual</span>
@@ -60,7 +73,14 @@
           </div>
         </div>
 
-        <div class="inventory-list">
+        <div class="inventory-list collection-panel">
+          <div class="collection-heading">
+            <div>
+              <span class="page-section-eyebrow">Acervo do personagem</span>
+              <h2>Todos os itens</h2>
+              <p>Filtre, ordene e gerencie seus equipamentos sem perder contexto.</p>
+            </div>
+          </div>
           <div class="filter-bar">
             <div class="filter-group">
               <select id="filter-category" class="inv-input filter-input-red" onchange="filtrarItens()">
@@ -72,46 +92,54 @@
                 <option value="outros">Outros</option>
               </select>
             </div>
+            <div class="filter-group">
+              <select id="filter-state" class="inv-input" onchange="filtrarPorEstado()">
+                <option value="todos">Todos os Estados</option>
+                <option value="equipados">Equipados</option>
+                <option value="favoritos">Favoritos</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <select id="sort-inventory" class="inv-input" onchange="ordenarInventario()">
+                <option value="padrao">Ordenar: Padrão</option>
+                <option value="nome">Nome (A-Z)</option>
+                <option value="peso">Peso (maior-menor)</option>
+                <option value="raridade">Raridade (maior-menor)</option>
+              </select>
+            </div>
             <div class="search-group">
               <input type="text" id="search-item" class="inv-input" placeholder="🔍 Pesquisar no inventário..." oninput="filtrarItens()" />
             </div>
           </div>
-          <div class="inv-header">
-            <span title="Equipado">Eqp.</span>
-            <span>Item</span>
-            <span>Categoria</span>
-            <span>Info</span>
-            <span title="Excluir">X</span>
-          </div>
-          <div id="items-container">
+          <div id="items-container" class="inv-cards-grid">
             <!-- Itens inseridos dinamicamente -->
           </div>
-          <button type="button" class="btn-add-item" onclick="adicionarItemUI()">+ Adicionar Novo Item</button>
-          <button type="button" class="btn-clear-notas" style="margin-left: 0; margin-top: 15px" onclick="limparInventario()">
-            Limpar Inventário
-          </button>
+          <div class="page-actions inventory-footer-actions">
+            <button type="button" class="btn-clear-notas" onclick="limparInventario()">Limpar Inventário</button>
+            <button type="button" class="btn-add-item" onclick="novoItemInventario()">+ Adicionar novo item</button>
+          </div>
         </div>
-      </header>
+      </section>
     </div>
 
     <!-- Modal para Edição Ampliada de Descrição -->
-    <div id="modal-desc" class="modal-overlay">
+    <dialog id="modal-desc" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
           <h3 id="modal-title" class="modal-title">Descrição do Item</h3>
           <button type="button" class="btn-remove-class" onclick="fecharModalDescricao()">×</button>
         </div>
         <div class="modal-body" id="modal-body-content">
-          <!-- Conteúdo gerado dinamicamente pelo abrirModalItem no inventario.js -->
+          <!-- Conteúdo gerado dinamicamente por abrirModalItem em inventario_details.js -->
         </div>
         <div class="modal-footer">
           <button type="button" class="btn-save-modal" onclick="salvarDetalhesItem()">Salvar e Fechar</button>
         </div>
       </div>
-    </div>
+    </dialog>
 
     <!-- Modal para Detalhes do Material (Centro/Base da Arma) -->
-    <div id="modal-material-details" class="modal-overlay">
+    <dialog id="modal-material-details" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
           <h3 id="modal-material-title" class="modal-title" style="margin: 0">Detalhes do Material</h3>
@@ -131,10 +159,10 @@
           <button type="button" class="btn-save-modal" onclick="salvarDetalhesMaterial()">Salvar Material</button>
         </div>
       </div>
-    </div>
+    </dialog>
 
     <!-- Modal para Modificações do Item -->
-    <div id="modal-item-mods" class="modal-overlay">
+    <dialog id="modal-item-mods" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
           <h3 class="modal-title" style="margin: 0">Propriedades e Encantamentos</h3>
@@ -151,10 +179,10 @@
           <button type="button" class="btn-save-modal" onclick="salvarDetalhesModificacoes()">Salvar Modificações</button>
         </div>
       </div>
-    </div>
+    </dialog>
 
     <!-- Modal para Raridade e Buffs Mágicos -->
-    <div id="modal-item-rarity" class="modal-overlay">
+    <dialog id="modal-item-rarity" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
           <h3 class="modal-title" style="margin: 0">Raridade e Encantamentos</h3>
@@ -182,6 +210,6 @@
           <button type="button" class="btn-save-modal" onclick="salvarDetalhesRaridade()">Salvar Raridade</button>
         </div>
       </div>
-    </div>
+    </dialog>
   </body>
 </html>

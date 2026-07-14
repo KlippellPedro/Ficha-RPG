@@ -71,7 +71,7 @@ window.calcularBonusItens = function (dados) {
     const totais = {};
     const fontes = {};
     const addBonus = (attr, val, nome) => {
-        if (!attr || attr === 'nenhum' || val === 0) return;
+        if (!attr || attr === 'nenhum' || !val) return;
         totais[attr] = (totais[attr] || 0) + val;
         if (!fontes[attr]) fontes[attr] = [];
         fontes[attr].push(`${nome} (${val > 0 ? '+' : ''}${val})`);
@@ -79,74 +79,41 @@ window.calcularBonusItens = function (dados) {
 
     if (dados.vampiro_forma_morcego) addBonus('reflexos', 6, 'Forma de Morcego');
 
-    Object.keys(dados).forEach(key => {
-        if (key.startsWith('inv_eqp_') && dados[key] === true) {
-            const id = key.replace('inv_eqp_', '');
-            const nome = dados[`inv_nome_${id}`] || "Item";
-            const attr = dados[`inv_attr_${id}`];
-            const val = parseInt(dados[`inv_mod_${id}`]) || 0;
-            addBonus(attr, val, nome);
+    (dados.inventario || []).filter(item => item.equipado).forEach(item => {
+        const nome = item.nome || "Item";
+        addBonus(item.attrMod, parseInt(item.valMod) || 0, nome);
 
-            const categoria = dados[`inv_cat_${id}`];
-            if (categoria === 'armaduras') {
-                addBonus('defesa', parseInt(dados[`inv_defesa_bonus_${id}`]) || 0, nome);
-                addBonus('movimentacao', -(parseInt(dados[`inv_defesa_penalidade_${id}`]) || 0), `${nome} (Peso)`);
-            }
-
-            // Processa materiais (cabo e base) com suporte a formato contextual por categoria
-            ['cabo', 'base'].forEach(f => {
-                const raw = dados[`inv_${f}_${id}`];
-                if (raw && raw.startsWith('{')) {
-                    try {
-                        const mat = JSON.parse(raw);
-                        const matName = mat.nome || (f === 'cabo' ? 'Centro' : 'Base');
-
-                        let attributesToProcess = [];
-                        if (Array.isArray(mat.attributes)) {
-                            attributesToProcess = mat.attributes;
-                        } else if (mat.attributes && typeof mat.attributes === 'object') {
-                            attributesToProcess = mat.attributes[categoria] || mat.attributes['geral'] || [];
-                        }
-
-                        attributesToProcess.forEach(a => {
-                            const val = parseInt(a.mod);
-                            if (!isNaN(val)) {
-                                addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (${matName})`);
-                            }
-                        });
-                    } catch (e) { }
-                }
-            });
-
-            // ─── MODIFICAÇÕES DO ITEM (encantamentos, melhorias) ─────────────────
-            const modsRaw = dados[`inv_mods_item_${id}`];
-            if (modsRaw && modsRaw.startsWith('{')) {
-                try {
-                    const modsData = JSON.parse(modsRaw);
-                    (modsData.attributes || []).forEach(a => {
-                        const val = parseInt(a.mod);
-                        if (!isNaN(val) && a.attr && a.attr !== 'nenhum') {
-                            addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (Modificação)`);
-                        }
-                    });
-                } catch (e) { }
-            }
-
-            // ─── RARIDADE DO ITEM ─────────────────────────────────────────────────
-            const raroRaw = dados[`inv_raro_${id}`];
-            if (raroRaw && raroRaw.startsWith('{')) {
-                try {
-                    const raroData = JSON.parse(raroRaw);
-                    const rarLabel = raroData.raridade ? raroData.raridade.charAt(0).toUpperCase() + raroData.raridade.slice(1) : 'Raro';
-                    (raroData.attributes || []).forEach(a => {
-                        const val = parseInt(a.mod);
-                        if (!isNaN(val) && a.attr && a.attr !== 'nenhum') {
-                            addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (${rarLabel})`);
-                        }
-                    });
-                } catch (e) { }
-            }
+        if (item.tipo === 'armaduras') {
+            addBonus('defesa', parseInt(item.defesaBonus) || 0, nome);
+            addBonus('movimentacao', -(parseInt(item.defesaPenalidade) || 0), `${nome} (Peso)`);
         }
+
+        // Materiais (Centro e Base)
+        [[item.materialCabo, 'Centro'], [item.materialBase, 'Base']].forEach(([mat, labelPadrao]) => {
+            if (!mat) return;
+            const matName = mat.nome || labelPadrao;
+            (mat.attributes || []).forEach(a => {
+                const val = parseInt(a.mod);
+                if (!isNaN(val)) addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (${matName})`);
+            });
+        });
+
+        // Modificações (encantamentos, melhorias)
+        (item.mods || []).forEach(a => {
+            const val = parseInt(a.mod);
+            if (!isNaN(val) && a.attr && a.attr !== 'nenhum') {
+                addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (Modificação)`);
+            }
+        });
+
+        // Raridade do item
+        const rarLabel = item.raridade ? item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1) : 'Raro';
+        (item.raridadeBonus || []).forEach(a => {
+            const val = parseInt(a.mod);
+            if (!isNaN(val) && a.attr && a.attr !== 'nenhum') {
+                addBonus(a.isAdv ? `adv_${a.attr}` : a.attr, val, `${nome} (${rarLabel})`);
+            }
+        });
     });
     return { totals: totais, sources: fontes };
 }

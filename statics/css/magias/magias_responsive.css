@@ -1,224 +1,31 @@
-/* Responsividade específica para a Página de Magias */
+/* Responsividade exclusiva de Magias. */
 
-@media (max-width: 768px) {
-  /* Esconde o cabeçalho da lista */
-  html body .mag-header-grid {
-    display: none !important;
-  }
-
-  /* Transforma cada linha em um Card (Magias) */
-  html body .mag-row-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    grid-template-areas:
-      "nome-area nome-area nome-area fechar-area"
-      "tipo-area tipo-area nivel-area nivel-area"
-      "custo-area custo-area custo-area custo-area"
-      "lupa-btn dup-btn usar-btn usar-btn" !important;
-    gap: 12px !important;
-    padding: 18px !important;
-    height: auto !important;
-    background: #151518 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-left: 5px solid var(--primary-color) !important;
-    border-radius: 12px !important;
-    margin-bottom: 16px !important;
-    align-items: center !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+@media (max-width: 760px) {
+  .page-magias .circle-chips {
+    width: 100%;
   }
 
-  /* CRUCIAL: Remove campos ocultos e containers de dados do fluxo do Grid */
-  html body .mag-row-grid > div[style*="display:none"],
-  html body .mag-row-grid > div[style*="display: none"] {
-    display: none !important;
-    grid-area: auto !important;
-    position: absolute !important;
-    visibility: hidden !important;
+  .page-magias .circle-chip {
+    flex: 1 1 42px;
+  }
+}
+
+@media (max-width: 620px) {
+  .page-magias .entity-card-fields {
+    grid-template-columns: 1fr 1fr;
   }
 
-  /* NOME */
-  html body .mag-row-grid input[id^="mag_nome_"] {
-    grid-area: nome-area !important;
-    font-size: 1.2rem !important;
-    font-weight: bold !important;
-    text-transform: uppercase;
-    min-width: 0 !important;
-    letter-spacing: 1px;
-    background: transparent !important;
-    border: none !important;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
-    padding: 0 0 8px 0 !important;
-    color: white !important;
-    margin-bottom: 5px !important;
+  .page-magias .entity-card-field--cost {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 430px) {
+  .page-magias .entity-card-fields {
+    grid-template-columns: 1fr;
   }
 
-  /* TIPO (Comum, Elemental, etc) */
-  html body .mag-row-grid select[id^="mag_tipo_"] {
-    grid-area: tipo-area !important;
-    width: 100% !important;
-    height: 34px !important;
-    font-size: 0.8rem !important;
-    color: #fff !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border-radius: 4px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    padding-left: 10px !important;
-  }
-
-  /* Label de Apoio para Tipo */
-  html body .mag-row-grid select[id^="mag_tipo_"]::before {
-    content: "TIPO";
-    display: block;
-    font-size: 0.6rem;
-    color: var(--primary-color);
-    margin-bottom: 2px;
-  }
-
-  /* NÍVEL (I, II, III, IV ou %) */
-  html body .mag-row-grid div[id^="container_nivel_"] {
-    grid-area: nivel-area !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  html body .mag-row-grid div[id^="container_nivel_"]::before {
-    content: "NÍVEL / CÍRCULO";
-    font-size: 0.6rem;
-    color: var(--primary-color);
-    font-weight: bold;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-  }
-
-  html body .mag-row-grid div[id^="container_nivel_"] select,
-  html body .mag-row-grid div[id^="container_nivel_"] input {
-    width: 100% !important;
-    height: 34px !important;
-    font-size: 0.9rem !important;
-    text-align: center !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 4px !important;
-  }
-
-  /* Container de Custo (PM/PV) */
-  html body .mag-row-grid > div:nth-child(4) {
-    grid-area: custo-area !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 8px !important;
-    background: rgba(0, 0, 0, 0.4) !important;
-    padding: 10px 12px !important;
-    border-radius: 8px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    height: auto !important;
-    box-sizing: border-box !important;
-  }
-
-  html body .mag-row-grid > div:nth-child(4)::before {
-    content: "CUSTO:";
-    font-size: 0.65rem;
-    font-weight: bold;
-    color: var(--primary-color);
-    margin-right: 4px;
-  }
-
-  html body .mag-row-grid > div:nth-child(4) input {
-    flex: 1 !important;
-    height: 38px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 4px !important;
-    text-align: center !important;
-    color: var(--primary-color) !important;
-    font-weight: bold !important;
-  }
-
-  html body .mag-row-grid > div:nth-child(4) select {
-    width: 85px !important;
-    height: 38px !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 4px !important;
-    font-size: 0.85rem !important;
-    color: white !important;
-  }
-
-  /* BOTÕES DE AÇÃO */
-  html body .mag-row-grid .btn-open-desc {
-    display: flex !important;
-    width: 100% !important;
-    height: 44px !important;
-    font-size: 1.2rem !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    color: white !important;
-    border-radius: 8px !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Lupa (Descrição) - Primeiro botão desta classe */
-  html body .mag-row-grid .btn-open-desc:nth-of-type(1) {
-    grid-area: lupa-btn !important;
-  }
-
-  /* Duplicar - Segundo botão desta classe ou com classe específica */
-  html body .mag-row-grid .btn-open-desc:nth-of-type(2),
-  html body .mag-row-grid .btn-duplicate {
-    grid-area: dup-btn !important;
-    display: flex !important; /* Garante visibilidade se for duplicado via JS */
-  }
-
-  html body .mag-row-grid .btn-use-skill {
-    grid-area: usar-btn !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    height: 44px !important;
-    background: #4ade80 !important;
-    color: black !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 10px rgba(74, 222, 128, 0.2) !important;
-    font-size: 1rem !important;
-    text-transform: uppercase !important;
-    white-space: nowrap !important;
-    box-sizing: border-box !important;
-  }
-
-  /* REMOVER (X) */
-  html body .mag-row-grid .btn-remove-class {
-    grid-area: fechar-area !important;
-    width: 40px !important;
-    height: 40px !important;
-    font-size: 1.2rem !important;
-    justify-self: end !important;
-    background: var(--primary-glow) !important;
-    border: 1px solid var(--primary-color) !important;
-    color: var(--primary-color) !important;
-    border-radius: 8px !important;
-    opacity: 0.7 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-    transition: all 0.2s ease !important;
-  }
-  html body .mag-row-grid .btn-remove-class:hover {
-    opacity: 1 !important;
-    background: var(--primary-color) !important;
-    color: black !important;
-  }
-
-  /* Filtros Mobile */
-  html body .filter-bar {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 10px !important;
+  .page-magias .entity-card-field--cost {
+    grid-column: auto;
   }
 }

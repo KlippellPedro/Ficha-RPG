@@ -1,312 +1,494 @@
-/* Estilos Específicos para Habilidades e Poderes */
+/* Cards compartilhados por Habilidades e Magias. */
 
-/* Alinhamento dos textos do cabeçalho com os botões abaixo */
-.inv-header span {
-  display: flex;
-  justify-content: flex-start;
-  text-align: left;
-  padding-left: 10px;
+.page-habilidades {
+  --ui-page-accent: #8b5cf6;
+  --ui-page-accent-soft: rgba(139, 92, 246, 0.2);
+  --ui-page-accent-2: #22d3ee;
+  --ui-page-accent-2-soft: rgba(34, 211, 238, 0.13);
 }
 
-/* Centraliza colunas de ações e ícones (as últimas 4 colunas em todas as páginas) */
-.hab-header-grid span:nth-last-child(-n + 4),
-.pod-header-grid span:nth-last-child(-n + 4),
-.mag-header-grid span:nth-last-child(-n + 4),
-.atk-header-grid span:nth-last-child(-n + 3) {
-  justify-content: center;
-  padding-left: 0;
-  text-align: center;
+.page-habilidades .toolbar-select,
+.page-magias .toolbar-select,
+.page-poderes .toolbar-select {
+  flex: 0 1 190px;
+  width: auto;
+  min-width: 154px;
 }
 
-.inv-header {
+.page-habilidades .toolbar-reset,
+.page-magias .toolbar-reset,
+.page-poderes .toolbar-reset {
+  min-width: 82px;
+  min-height: 38px;
+}
+
+.page-habilidades .collection-footer,
+.page-magias .collection-footer,
+.page-poderes .collection-footer {
+  padding: 16px 18px;
+  border-top: 1px solid var(--ui-line);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.page-habilidades .collection-footer .btn-add-card,
+.page-magias .collection-footer .btn-add-card,
+.page-poderes .collection-footer .btn-add-card,
+.page-habilidades .collection-footer .btn-history,
+.page-magias .collection-footer .btn-history,
+.page-habilidades .collection-footer .btn-clear-inventory,
+.page-magias .collection-footer .btn-clear-inventory,
+.page-poderes .collection-footer .btn-clear-inventory {
+  width: auto;
+  min-height: 42px;
+  margin: 0;
+  padding: 10px 16px;
+}
+
+.page-habilidades .entity-card-grid,
+.page-magias .entity-card-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 410px), 1fr));
   gap: 15px;
-  padding: 12px 20px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 8px 8px 0 0;
-  border-bottom: 1px solid var(--primary-color);
-  font-weight: bold;
-  color: var(--primary-color);
-  align-items: center;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  padding: 16px;
 }
 
-/* Botões de Ação */
-.btn-open-desc,
-.btn-duplicate {
-  background: var(--primary-glow);
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
-  border-radius: 4px;
-  cursor: pointer;
-  padding: 5px 8px;
-  font-size: 0.8rem;
-  transition: 0.2s;
-  justify-self: center;
+.page-habilidades .entity-card,
+.page-magias .entity-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 248px;
+  padding: 17px;
+  overflow: hidden;
+  cursor: grab;
+  border-left: 3px solid var(--ui-page-accent);
+  background:
+    radial-gradient(circle at 100% 0, var(--ui-page-accent-soft), transparent 45%),
+    linear-gradient(145deg, rgba(32, 32, 43, 0.96), rgba(14, 14, 20, 0.98));
 }
 
-.btn-open-desc:hover,
-.btn-duplicate:hover {
-  background: var(--primary-color);
-  color: #fff;
-}
-
-/* Badge de tipo: Passiva vs Ativa */
-.item-row[data-tipo="Passiva"] {
-  border-left: 3px solid #4ade80;
-  background: rgba(74, 222, 128, 0.03) !important;
-}
-
-.item-row[data-tipo="Passiva"]::after {
-  content: 'PASSIVA';
+.page-habilidades .entity-card::before,
+.page-magias .entity-card::before {
+  content: "";
   position: absolute;
-  top: 4px; right: 40px;
-  font-family: var(--font-heading, serif);
-  font-size: 0.5rem;
-  letter-spacing: 0.15em;
-  color: #4ade80;
-  background: rgba(74, 222, 128, 0.12);
-  border: 1px solid rgba(74, 222, 128, 0.3);
-  border-radius: 3px;
-  padding: 1px 5px;
-  pointer-events: none;
+  inset: 0 0 auto;
+  height: 1px;
+  opacity: 0.8;
+  background: linear-gradient(90deg, var(--ui-page-accent), var(--ui-page-accent-2), transparent 72%);
 }
 
-.item-row[data-tipo] { position: relative; }
-
-.btn-add-card {
-  margin: 30px auto;
-  display: block;
-  background: transparent;
-  border: 2px dashed var(--primary-color);
-  color: var(--primary-color);
-  padding: 15px 40px;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: 0.3s;
-}
-.btn-add-card:hover {
-  background: var(--primary-glow);
+.page-habilidades .entity-card[data-tipo="Passiva"] {
+  border-left-color: var(--ui-success);
 }
 
-.filter-bar {
+.page-habilidades .entity-card.has-active-buff,
+.page-magias .entity-card.has-active-buff {
+  border-left-color: var(--ui-success);
+  box-shadow: -3px 0 17px rgba(83, 223, 162, 0.14), 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.page-habilidades .entity-card.mana-insufficient,
+.page-magias .entity-card.mana-insufficient {
+  border-left-color: var(--ui-danger);
+}
+
+.entity-card-head {
   display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-  padding: 12px 15px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  border-left: 4px solid var(--primary-color);
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
 }
 
-.search-group {
+.entity-card-grip {
+  flex: 0 0 16px;
+  padding-top: 10px;
+  color: var(--ui-text-dim);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+}
+
+.entity-card-symbol {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  color: var(--ui-page-accent-2);
+  font-family: var(--ui-font-display);
+  font-size: 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--ui-page-accent-2) 34%, transparent);
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
+  text-shadow: 0 0 14px var(--ui-page-accent-2-soft);
+}
+
+.entity-card-identity {
   flex: 1;
+  min-width: 0;
 }
 
-/* Container de Custo (Input + Select) */
-.cost-container {
+.page-habilidades .entity-card-name,
+.page-magias .entity-card-name {
+  width: 100%;
+  min-width: 0;
+  padding: 2px 0 6px;
+  color: var(--ui-text);
+  font-size: 1.03rem;
+  font-weight: 750;
+  line-height: 1.25;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-habilidades .entity-card-name:hover,
+.page-habilidades .entity-card-name:focus,
+.page-magias .entity-card-name:hover,
+.page-magias .entity-card-name:focus {
+  border-bottom-color: var(--ui-line-strong);
+  background: transparent;
+  box-shadow: none;
+}
+
+.entity-card-badges {
   display: flex;
-  gap: 4px;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
 }
 
-/* Definição das colunas para Habilidades e Poderes */
-.hab-header-grid,
-.hab-row-grid {
-  display: grid;
-  grid-template-columns: 2fr 160px 180px 50px 70px 50px 40px;
+.entity-badge {
+  max-width: 100%;
+  padding: 3px 7px;
+  overflow: hidden;
+  color: var(--ui-page-accent-2);
+  font-family: var(--ui-font-display);
+  font-size: 0.52rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
 }
 
-.pod-header-grid,
-.pod-row-grid {
-  display: grid;
-  grid-template-columns: 2fr 110px 160px 50px 60px 50px 40px;
+.entity-badge--muted {
+  color: var(--ui-text-dim);
 }
 
-/* Configuração de Magias (9 colunas totais) */
-.mag-header-grid,
-.mag-row-grid {
+.entity-card.has-active-buff .entity-badge--state,
+.entity-card[data-tipo="Passiva"] .entity-badge--type {
+  color: var(--ui-success);
+}
+
+.entity-card-remove {
   display: grid;
-  grid-template-columns: 2fr 120px 100px 160px 50px 70px 50px 40px;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: var(--ui-text-dim);
+  font-size: 1.08rem;
+  border: 1px solid var(--ui-line);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.entity-card-remove:hover {
+  color: #fff;
+  border-color: var(--ui-danger);
+  background: rgba(255, 111, 135, 0.15);
+}
+
+.entity-card-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.72fr);
   gap: 10px;
 }
 
-/* Botão "Usar" / "Ativo" */
-.btn-use-skill {
-  background: #166534;
-  color: #4ade80;
-  border: 1px solid #16a34a;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 0.78rem;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-  white-space: nowrap;
-  position: relative;
-  overflow: hidden;
-}
-.btn-use-skill:hover {
-  background: #16a34a;
-  color: #fff;
+.entity-card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
-/* Estado: buff ativo */
-.btn-use-skill.buff-ativo {
-  background: #14532d;
-  color: #4ade80;
-  border-color: #4ade80;
-  box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
-  animation: buff-pulse 2s infinite ease-in-out;
-  overflow: hidden;
-  text-overflow: clip;
+.entity-card-field > span:first-child {
+  color: var(--ui-text-dim);
+  font-family: var(--ui-font-display);
+  font-size: 0.57rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
-.btn-use-skill.buff-ativo:hover {
-  background: #7f1d1d;
-  color: #fca5a5;
-  border-color: #ef4444;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+
+.entity-card .inv-input,
+.entity-card .level-control .inv-input {
+  min-width: 0;
+  height: 39px;
+  font-size: 0.8rem;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.entity-card .cost-container {
+  display: grid;
+  grid-template-columns: minmax(54px, 1fr) 72px;
+  gap: 6px;
+}
+
+.entity-card .cost-container input {
+  text-align: center;
+}
+
+.entity-card-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 27px;
+}
+
+.entity-card-summary span {
+  max-width: 100%;
+  padding: 5px 8px;
+  overflow: hidden;
+  color: var(--ui-text-dim);
+  font-size: 0.68rem;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.entity-card-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px minmax(78px, auto);
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--ui-line);
+}
+
+.entity-details-button,
+.entity-duplicate-button,
+.entity-card .btn-use-skill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  color: var(--ui-text-soft);
+  font-size: 0.75rem;
+  border: 1px solid var(--ui-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: none;
+}
+
+.entity-details-button {
+  background: linear-gradient(135deg, var(--ui-page-accent-soft), rgba(255, 255, 255, 0.025));
+}
+
+.entity-details-button:hover,
+.entity-duplicate-button:hover {
+  color: #fff;
+  border-color: var(--ui-page-accent);
+  background: var(--ui-page-accent-soft);
+}
+
+.entity-duplicate-button {
+  width: 42px;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.entity-card .btn-use-skill {
+  min-width: 78px;
+  color: #08140e;
+  font-weight: 800;
+  border-color: rgba(83, 223, 162, 0.62);
+  background: var(--ui-success);
+}
+
+.entity-card .btn-use-skill.buff-ativo {
+  color: var(--ui-success);
+  border-color: var(--ui-success);
+  background: rgba(83, 223, 162, 0.12);
+  box-shadow: 0 0 16px rgba(83, 223, 162, 0.16);
+  animation: entity-buff-pulse 2.2s ease-in-out infinite;
+}
+
+.entity-card .btn-use-skill.buff-ativo:hover {
+  color: #fff;
+  border-color: var(--ui-danger);
+  background: rgba(255, 111, 135, 0.16);
   animation: none;
 }
 
-@keyframes buff-pulse {
-  0%, 100% { box-shadow: 0 0 6px rgba(74, 222, 128, 0.4); }
-  50%       { box-shadow: 0 0 14px rgba(74, 222, 128, 0.8); }
+.entity-card-hidden {
+  display: none !important;
 }
 
-/* Row com buff ativo — destaque sutil */
-.item-row.has-active-buff {
-  border-left-color: #4ade80 !important;
-  background: rgba(74, 222, 128, 0.04) !important;
+.entity-card.dragging {
+  opacity: 0.35;
+  filter: grayscale(0.8);
+  transform: scale(0.985) !important;
 }
 
-/* Estilos para feedback de custo de Mana */
-.item-row.mana-ok {
-  border-left-color: #4ade80; /* Verde */
+.entity-card.drag-insert-top {
+  box-shadow: 0 -3px 0 var(--ui-page-accent), 0 14px 34px rgba(0, 0, 0, 0.24) !important;
 }
 
-.item-row.mana-insufficient {
-  border-left-color: var(--danger); /* Mantido vermelho para erro de mana */
+.entity-card.drag-insert-bottom {
+  box-shadow: 0 3px 0 var(--ui-page-accent), 0 14px 34px rgba(0, 0, 0, 0.24) !important;
 }
 
-.btn-history {
-  background: transparent;
-  border: 2px dashed var(--primary-color);
-  color: var(--primary-color);
-  padding: 15px;
-  cursor: pointer;
-  margin-top: 15px;
-  border-radius: 8px;
-  transition: 0.3s;
-  font-weight: bold;
-  margin-left: 10px;
-}
-.btn-history:hover {
-  background: var(--primary-glow);
-  box-shadow: 0 0 10px var(--primary-glow);
+/* Modais de detalhes e de modificadores. */
+.page-habilidades #modal-hab .modal-content,
+.page-magias #modal-magia .modal-content {
+  width: min(94vw, 1040px);
+  max-width: 1040px;
 }
 
-/* Estilo unificado para botões de Limpar Tudo nas páginas de lista */
-.btn-clear-habilidades,
-.btn-clear-poderes,
-.btn-clear-magias,
-.btn-clear-ataques {
-  background: transparent;
-  border: 2px dashed var(--primary-color);
-  color: var(--primary-color);
-  padding: 15px;
-  cursor: pointer;
-  margin-top: 15px;
-  border-radius: 8px;
-  transition: 0.3s;
-  font-weight: bold;
-  margin-left: 10px;
+.entity-modal-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.86fr) minmax(360px, 1.14fr);
+  gap: 16px;
 }
 
-.btn-clear-habilidades:hover,
-.btn-clear-poderes:hover,
-.btn-clear-magias:hover,
-.btn-clear-ataques:hover {
-  background: var(--primary-glow);
-  box-shadow: 0 0 10px var(--primary-glow);
+.entity-modal-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--ui-line);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
 }
 
-/* Estilos para Drag and Drop */
-.draggable {
-  cursor: grab !important;
+.entity-modal-section-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  color: var(--ui-page-accent);
+  font-family: var(--ui-font-display);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
 }
 
-.draggable:active {
-  cursor: grabbing;
+.entity-modal-section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--ui-page-accent), transparent);
+  opacity: 0.45;
 }
 
-.dragging {
-  opacity: 0.3 !important;
-  filter: grayscale(1) blur(1px);
-  border: 1px dashed var(--primary-color) !important;
-  transform: scale(0.98);
+.entity-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
-.hab-row-grid.drag-insert-top,
-.pod-row-grid.drag-insert-top,
-.mag-row-grid.drag-insert-top,
-.atk-row-grid.drag-insert-top {
-  border-top: 2px solid var(--primary-color) !important;
-  box-shadow: 0 -4px 8px var(--primary-glow);
+.entity-form-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.hab-row-grid.drag-insert-bottom,
-.pod-row-grid.drag-insert-bottom,
-.mag-row-grid.drag-insert-bottom,
-.atk-row-grid.drag-insert-bottom {
-  border-bottom: 2px solid var(--primary-color) !important;
-  box-shadow: 0 4px 8px var(--primary-glow);
+.entity-modal-panel .input-group {
+  min-width: 0;
 }
 
-/* --- Cores e Efeitos de Raridade de Itens --- */
-.rarity-comum {
-  color: #ffffff !important;
-}
-.rarity-incomum {
-  color: #4ade80 !important;
-}
-.rarity-raro {
-  color: #3b82f6 !important;
-}
-.rarity-epico {
-  color: #a855f7 !important;
+.entity-modal-panel .input-group label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--ui-text-soft);
 }
 
-/* Mítico: Vermelho com Brilho */
-.rarity-mitico {
-  color: var(--primary-color) !important;
-  text-shadow: 0 0 15px var(--primary-glow);
-  font-weight: bold !important;
+.entity-modal-panel .input-group label small {
+  color: var(--ui-text-dim);
+  font-family: var(--ui-font-interface);
+  font-size: 0.63rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
-/* Relíquia (Especial): Azul com Brilho e Pulsação */
-.rarity-especial {
-  color: #00d4ff !important;
-  text-shadow: 0 0 20px rgba(0, 212, 255, 0.9);
-  font-weight: bold !important;
-  animation: rarity-reliquia-glow 2s infinite ease-in-out;
+.entity-modal-description {
+  flex: 1;
+  min-height: 270px;
+  line-height: 1.55;
 }
 
-@keyframes rarity-reliquia-glow {
-  0%,
-  100% {
-    text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
-    filter: brightness(1);
-  }
-  50% {
-    text-shadow:
-      0 0 25px rgba(0, 212, 255, 1),
-      0 0 10px rgba(255, 255, 255, 0.5);
-    filter: brightness(1.5);
+.entity-modal-cost {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 86px;
+  gap: 7px;
+}
+
+.entity-buff-launcher {
+  width: 100%;
+  min-height: 44px;
+  color: var(--ui-page-accent-2);
+  border: 1px solid color-mix(in srgb, var(--ui-page-accent-2) 45%, var(--ui-line));
+  background: var(--ui-page-accent-2-soft);
+  box-shadow: none;
+}
+
+.page-habilidades #modal-pod-buffs .modal-content,
+.page-magias #modal-pod-buffs .modal-content,
+.page-poderes #modal-pod-buffs .modal-content {
+  width: min(92vw, 850px);
+  max-width: 850px;
+}
+
+.page-habilidades #pod-buffs-container,
+.page-magias #pod-buffs-container,
+.page-poderes #pod-buffs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.page-habilidades .material-attr-row,
+.page-magias .material-attr-row,
+.page-poderes .material-attr-row {
+  display: grid !important;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(190px, 1.3fr) minmax(76px, 0.45fr) 38px;
+  gap: 9px !important;
+  align-items: center;
+  margin: 0 !important;
+  padding: 10px;
+  border: 1px solid var(--ui-line);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+@keyframes entity-buff-pulse {
+  50% { box-shadow: 0 0 22px rgba(83, 223, 162, 0.28); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entity-card .btn-use-skill.buff-ativo {
+    animation: none;
   }
 }

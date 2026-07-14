@@ -6,10 +6,8 @@ function atualizarCarga(infoAttr, dados) {
     const cargaMax = forcaVal * 3;
 
     let cargaAtual = 0;
-    document.querySelectorAll('.item-row').forEach(row => {
-        const peso = parseFloat(row.querySelector('.item-peso').value) || 0;
-        const qtd = parseInt(row.querySelector('.item-qtd').value) || 0;
-        cargaAtual += (peso * qtd);
+    (dados.inventario || []).forEach(item => {
+        cargaAtual += (item.peso || 0) * (item.quantidade || 0);
     });
 
     const displayAtual = document.getElementById('display-carga-atual');

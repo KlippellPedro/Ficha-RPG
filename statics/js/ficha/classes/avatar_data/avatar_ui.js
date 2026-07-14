@@ -305,7 +305,7 @@
         let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
         dados[`class_avatar_element_${idx}`] = elemento;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-        document.getElementById('modal-avatar-despertar').close();
+        fecharDialogoAnimado(document.getElementById('modal-avatar-despertar'));
 
         const select = document.getElementById(`class_name_${idx}`);
         if (select) {
@@ -330,7 +330,7 @@
         let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
         dados[`class_avatar_subelement_${idx}`] = subKey;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-        document.getElementById('modal-avatar-despertar').close();
+        fecharDialogoAnimado(document.getElementById('modal-avatar-despertar'));
 
         const select = document.getElementById(`class_name_${idx}`);
         if (select) {

@@ -1,0 +1,402 @@
+/* Modais específicos de Perícias */
+.pericia-roll-dialog .modal-content,
+.pericia-calc-dialog .modal-content {
+  width: min(92vw, 700px);
+  max-width: 700px;
+  max-height: min(88vh, 820px);
+  box-sizing: border-box;
+}
+
+.pericia-roll-dialog .modal-header {
+  align-items: flex-start;
+  padding-right: 42px;
+}
+
+.pericia-roll-dialog .modal-header > div {
+  min-width: 0;
+}
+
+.modal-kicker,
+.roll-counter-kicker {
+  display: block;
+  color: var(--primary-color);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.pericia-roll-dialog .modal-title {
+  margin: 5px 0 0;
+  color: var(--text-main);
+  font-size: clamp(1.15rem, 3vw, 1.55rem);
+  line-height: 1.25;
+  text-align: left;
+}
+
+.roll-modal-intro {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.roll-auto-sources {
+  padding: 12px 14px;
+  border: 1px solid var(--primary-glow);
+  border-radius: 8px;
+  background: var(--primary-glow);
+}
+
+.roll-auto-sources[hidden] {
+  display: none;
+}
+
+.roll-auto-sources strong {
+  color: var(--text-main);
+  font-size: 0.78rem;
+}
+
+.roll-auto-sources p {
+  margin: 4px 0 8px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.roll-auto-sources ul,
+.pericia-calc-sources ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.roll-source-adv::marker {
+  color: #34d399;
+}
+
+.roll-source-disadv::marker {
+  color: #fb7185;
+}
+
+.roll-counter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.roll-counter {
+  min-width: 0;
+  min-height: 118px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.roll-counter--advantage {
+  border-color: rgba(52, 211, 153, 0.32);
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(255, 255, 255, 0.018));
+}
+
+.roll-counter--disadvantage {
+  border-color: rgba(244, 63, 94, 0.32);
+  background: linear-gradient(145deg, rgba(244, 63, 94, 0.08), rgba(255, 255, 255, 0.018));
+}
+
+.roll-counter h4 {
+  margin: 3px 0 0;
+  color: var(--text-main);
+  font-size: 0.92rem;
+}
+
+.roll-counter--advantage .roll-counter-kicker {
+  color: #5ee9b5;
+}
+
+.roll-counter--disadvantage .roll-counter-kicker {
+  color: #ff8ba0;
+}
+
+.roll-stepper {
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  gap: 10px;
+}
+
+.roll-stepper button {
+  width: 42px;
+  height: 38px;
+  padding: 0;
+  color: var(--text-main);
+  font-size: 1.15rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.18s;
+}
+
+.roll-stepper button:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-glow);
+  transform: translateY(-1px);
+}
+
+.roll-stepper output {
+  color: var(--text-main);
+  font-size: 1.35rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.roll-counter--advantage .roll-stepper output {
+  color: #5ee9b5;
+}
+
+.roll-counter--disadvantage .roll-stepper output {
+  color: #ff8ba0;
+}
+
+.roll-balance-summary,
+.pericia-calc-roll {
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.roll-balance-summary strong,
+.pericia-calc-roll strong {
+  color: var(--text-main);
+  font-size: 0.84rem;
+}
+
+.roll-balance-summary p,
+.pericia-calc-roll p {
+  margin: 5px 0 0;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.roll-balance-summary[data-state="vantagem"],
+.pericia-calc-roll[data-state="vantagem"] {
+  border-left-color: #34d399;
+  background: rgba(16, 185, 129, 0.07);
+}
+
+.roll-balance-summary[data-state="desvantagem"],
+.pericia-calc-roll[data-state="desvantagem"] {
+  border-left-color: #fb7185;
+  background: rgba(244, 63, 94, 0.07);
+}
+
+.roll-balance-summary[data-state="neutro"],
+.pericia-calc-roll[data-state="neutro"] {
+  border-left-color: #fbbf24;
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.pericia-roll-actions {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1.4fr;
+}
+
+.btn-modal-secondary,
+.pericia-roll-actions .btn-save-modal {
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn-modal-secondary {
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.btn-modal-secondary:hover {
+  color: var(--text-main);
+  border-color: var(--primary-color);
+  background: var(--primary-glow);
+}
+
+/* Detalhamento do cálculo */
+.pericia-calc-dialog .modal-content {
+  width: min(92vw, 660px);
+  max-width: 660px;
+}
+
+.pericia-calc-dialog .modal-title {
+  padding-right: 38px;
+  text-align: left;
+}
+
+.pericia-calc-modal-body {
+  gap: 12px;
+}
+
+.pericia-calc-intro p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.pericia-calc-formula {
+  padding: 10px 12px;
+  color: var(--primary-color);
+  font-size: 0.72rem;
+  font-weight: 750;
+  text-align: center;
+  border: 1px solid var(--primary-glow);
+  border-radius: 7px;
+  background: var(--primary-glow);
+}
+
+.pericia-calc-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.pericia-calc-row {
+  min-height: 50px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-left: 3px solid var(--primary-color);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.pericia-calc-row[data-tone="positive"] {
+  border-left-color: #4ade80;
+}
+
+.pericia-calc-row[data-tone="negative"] {
+  border-left-color: #fb7185;
+}
+
+.pericia-calc-row[data-tone="training"] {
+  border-left-color: #f59e0b;
+}
+
+.pericia-calc-row-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pericia-calc-row-copy strong {
+  color: var(--text-main);
+  font-size: 0.78rem;
+}
+
+.pericia-calc-row-copy small {
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.pericia-calc-value {
+  flex-shrink: 0;
+  color: #78e36d;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.pericia-calc-row[data-tone="negative"] .pericia-calc-value {
+  color: #fb7185;
+}
+
+.pericia-calc-sources {
+  padding: 11px 13px;
+  border: 1px dashed var(--border-color);
+  border-radius: 7px;
+}
+
+.pericia-calc-sources > strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-main);
+  font-size: 0.72rem;
+}
+
+.pericia-calc-total {
+  min-height: 52px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  color: #fff;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color, var(--primary-color)));
+  box-shadow: 0 8px 25px var(--primary-glow);
+}
+
+.pericia-calc-total span {
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.pericia-calc-total strong {
+  font-size: 1.15rem;
+}
+
+@media (max-width: 600px) {
+  .pericia-roll-dialog .modal-content,
+  .pericia-calc-dialog .modal-content {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    padding: 20px 16px;
+    gap: 16px;
+  }
+
+  .roll-counter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .roll-counter {
+    min-height: auto;
+    padding: 13px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .roll-stepper {
+    width: min(190px, 55%);
+    grid-template-columns: 38px 1fr 38px;
+    gap: 6px;
+  }
+
+  .roll-stepper button {
+    width: 38px;
+    height: 36px;
+  }
+
+  .pericia-roll-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pericia-roll-actions .btn-save-modal {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}

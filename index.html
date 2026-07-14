@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ficha de RPG - Herói</title>
+    <title>Supremacia do Protesto</title>
     <link rel="stylesheet" href="./statics/css/global.css" />
     <link rel="stylesheet" href="./statics/css/global_modals.css" />
     <link rel="stylesheet" href="./statics/css/menu.css" />
     <link rel="stylesheet" href="./statics/css/index.css" />
     <link rel="stylesheet" href="./statics/css/responsive.css" />
+    <link rel="stylesheet" href="./statics/css/design_system.css" />
     <script src="./statics/js/responsive.js"></script>
     <script src="./statics/js/global.js"></script>
     <script src="./statics/js/global_calculations.js"></script>
@@ -18,27 +19,155 @@
     <script src="./statics/js/global_modals.js"></script>
     <script src="./statics/js/menu.js"></script>
     <script src="./statics/js/index.js"></script>
+    <script src="./statics/js/design_system.js"></script>
   </head>
-  <body>
-    <!-- Menu Superior Dinâmico -->
+  <body class="landing-page">
     <nav class="top-menu">
       <div class="menu-links"></div>
     </nav>
 
-    <!-- Global Notification Area -->
     <div id="global-notification">
       <span class="icon"></span>
       <span class="message"></span>
     </div>
 
-    <div class="container welcome-container">
-      <header>
-        <h1>Bem-vindo ao Supremacia do Protesto</h1>
-        <p>Pronto para iniciar sua história?</p>
-      </header>
-      <div class="welcome-actions">
-        <button class="btn-large" onclick="window.location.href = 'templates/ficha.html'">Acessar Minha Ficha</button>
-      </div>
-    </div>
+    <main class="landing-shell">
+      <section class="landing-hero page-hero" aria-labelledby="landing-title">
+        <div class="landing-hero-copy">
+          <span class="page-eyebrow">Sistema de personagem</span>
+          <h1 id="landing-title">Supremacia<br /><em>do Protesto</em></h1>
+          <p class="landing-lead">
+            Sua história, seus recursos e suas escolhas reunidos em uma ficha viva, feita para acompanhar a sessão sem esconder o que importa.
+          </p>
+
+          <div class="landing-actions" aria-label="Ações principais">
+            <a class="landing-button landing-button--primary" href="templates/ficha.html">
+              <span>Acessar minha ficha</span>
+              <span aria-hidden="true">→</span>
+            </a>
+            <a class="landing-button landing-button--secondary" href="#visao-geral">Conhecer a ficha</a>
+          </div>
+
+          <ul class="landing-highlights" aria-label="Destaques do sistema">
+            <li><span aria-hidden="true">◆</span> Cálculos explicados</li>
+            <li><span aria-hidden="true">◆</span> Recursos em tempo real</li>
+            <li><span aria-hidden="true">◆</span> Inventário e poderes integrados</li>
+          </ul>
+        </div>
+
+        <aside class="landing-command-card" aria-label="Prévia visual da ficha">
+          <div class="landing-command-header">
+            <div>
+              <span>Painel de personagem</span>
+              <strong>Pronto para a sessão</strong>
+            </div>
+            <span class="landing-live-dot" aria-hidden="true"></span>
+          </div>
+
+          <div class="landing-character-preview">
+            <div class="landing-avatar-preview" aria-hidden="true">SP</div>
+            <div>
+              <span>Identidade editável</span>
+              <strong>Seu personagem</strong>
+              <small>Raça · Classe · Nível</small>
+            </div>
+          </div>
+
+          <div class="landing-resource-preview">
+            <div class="landing-resource landing-resource--life">
+              <div><span>Vida</span><strong>20 / 20</strong></div>
+              <i><b></b></i>
+            </div>
+            <div class="landing-resource landing-resource--mana">
+              <div><span>Mana</span><strong>10 / 10</strong></div>
+              <i><b></b></i>
+            </div>
+            <div class="landing-resource landing-resource--sanity">
+              <div><span>Sanidade</span><strong>100 / 100</strong></div>
+              <i><b></b></i>
+            </div>
+          </div>
+
+          <div class="landing-attribute-preview" aria-label="Atributos representados na ficha">
+            <span><b>FOR</b> +0</span>
+            <span><b>DES</b> +0</span>
+            <span><b>CON</b> +0</span>
+            <span><b>INT</b> +0</span>
+          </div>
+        </aside>
+      </section>
+
+      <section id="visao-geral" class="landing-overview" aria-labelledby="overview-title">
+        <header class="landing-section-heading">
+          <div>
+            <span class="page-section-eyebrow">Visão geral</span>
+            <h2 id="overview-title">Tudo no lugar certo</h2>
+          </div>
+          <p>Uma interface organizada por capítulos, com detalhes disponíveis quando você precisa deles.</p>
+        </header>
+
+        <div class="landing-feature-grid">
+          <article class="landing-feature-card landing-feature-card--identity">
+            <span class="landing-feature-number">01</span>
+            <div class="landing-feature-icon" aria-hidden="true">◇</div>
+            <h3>Sua ficha</h3>
+            <p>Aqui ficam nome, atributos, vida, mana, defesa e tudo o que você consulta durante a sessão.</p>
+            <a href="templates/ficha.html">Abrir ficha <span aria-hidden="true">→</span></a>
+          </article>
+
+          <article class="landing-feature-card landing-feature-card--skills">
+            <span class="landing-feature-number">02</span>
+            <div class="landing-feature-icon" aria-hidden="true">?</div>
+            <h3>Testes e perícias</h3>
+            <p>Veja os bônus de cada perícia, confira o cálculo e marque vantagem ou desvantagem.</p>
+            <a href="templates/pericias.html">Ver perícias <span aria-hidden="true">→</span></a>
+          </article>
+
+          <article class="landing-feature-card landing-feature-card--inventory">
+            <span class="landing-feature-number">03</span>
+            <div class="landing-feature-icon" aria-hidden="true">▣</div>
+            <h3>Itens e equipamentos</h3>
+            <p>Controle seus itens, quantidades e peso. Os detalhes ficam disponíveis quando você precisar.</p>
+            <a href="templates/inventario.html">Ver inventário <span aria-hidden="true">→</span></a>
+          </article>
+
+          <article class="landing-feature-card landing-feature-card--powers">
+            <span class="landing-feature-number">04</span>
+            <div class="landing-feature-icon" aria-hidden="true">✦</div>
+            <h3>Poderes e habilidades</h3>
+            <p>Acompanhe custos, efeitos ativos e as informações de cada poder ou habilidade.</p>
+            <a href="templates/poderes.html">Ver poderes <span aria-hidden="true">→</span></a>
+          </article>
+        </div>
+      </section>
+
+      <section class="landing-flow" aria-labelledby="flow-title">
+        <div class="landing-flow-copy">
+          <span class="page-section-eyebrow">Fluxo de jogo</span>
+          <h2 id="flow-title">Da criação ao confronto</h2>
+          <p>Comece pela identidade, acompanhe os recursos e abra os detalhes somente quando a cena pedir.</p>
+        </div>
+        <ol class="landing-flow-steps">
+          <li><span>1</span><div><strong>Construa</strong><small>Defina identidade, raça, classe e atributos.</small></div></li>
+          <li><span>2</span><div><strong>Prepare</strong><small>Organize perícias, inventário e poderes.</small></div></li>
+          <li><span>3</span><div><strong>Jogue</strong><small>Controle recursos, ações e condições em tempo real.</small></div></li>
+        </ol>
+      </section>
+
+      <section class="landing-final-cta" aria-labelledby="cta-title">
+        <div>
+          <span class="page-section-eyebrow">Sua história começa aqui</span>
+          <h2 id="cta-title">Entre na ficha e assuma o controle.</h2>
+        </div>
+        <a class="landing-button landing-button--primary" href="templates/ficha.html">
+          Criar meu personagem <span aria-hidden="true">→</span>
+        </a>
+      </section>
+    </main>
+
+    <footer class="landing-footer">
+      <span>Supremacia do Protesto</span>
+      <small>Ficha digital de personagem</small>
+    </footer>
   </body>
 </html>
