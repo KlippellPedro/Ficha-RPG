@@ -131,19 +131,10 @@ function toggleFavorito(index) {
 }
 
 function ordenarNotas() {
-    const container = document.getElementById('notas-container');
-    if (!container) return;
-
-    const rows = [...container.querySelectorAll('.item-row')];
-    rows.sort((a, b) => {
-        const favA = document.getElementById(`nota_fav_${a.dataset.index}`)?.checked ? 1 : 0;
-        const favB = document.getElementById(`nota_fav_${b.dataset.index}`)?.checked ? 1 : 0;
-        if (favA !== favB) return favB - favA;
-        const titleA = document.getElementById(`nota_titulo_${a.dataset.index}`)?.value.toLowerCase() || "";
-        const titleB = document.getElementById(`nota_titulo_${b.dataset.index}`)?.value.toLowerCase() || "";
-        return titleA.localeCompare(titleB, 'pt-BR');
-    });
-    rows.forEach(row => container.appendChild(row));
+    // Mantém a sequência definida por arraste. Cards novos, ainda ausentes da
+    // ordem salva, permanecem no final e passam a fazer parte dela.
+    if (typeof loadNotasOrder === 'function') loadNotasOrder();
+    if (typeof saveNotasOrder === 'function') saveNotasOrder();
 }
 
 function filtrarNotas() {
@@ -188,6 +179,7 @@ function removerNota(btn) {
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
         row.remove();
+        if (typeof saveNotasOrder === 'function') saveNotasOrder();
         atualizarTudo();
         filtrarNotas();
         showNotification("Nota removida com sucesso.", "success");

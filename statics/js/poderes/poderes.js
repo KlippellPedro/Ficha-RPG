@@ -117,9 +117,13 @@ function savePoderesOrder() {
 }
 
 function loadPoderesOrder() {
-    const savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_PODERES_ORDER));
     const container = document.getElementById('poderes-container');
-    if (!savedOrder || !container) return;
+    if (!container) return;
+
+    let savedOrder = [];
+    try { savedOrder = JSON.parse(localStorage.getItem(STORAGE_KEY_PODERES_ORDER)) || []; }
+    catch (e) { savedOrder = []; }
+    if (!Array.isArray(savedOrder) || savedOrder.length === 0) return;
 
     const items = new Map();
     Array.from(container.children).forEach(row => {
@@ -128,10 +132,15 @@ function loadPoderesOrder() {
 
     const fragment = document.createDocumentFragment();
     savedOrder.forEach(id => {
-        const item = items.get(id);
-        if (item) fragment.appendChild(item);
+        const item = items.get(String(id));
+        if (item) {
+            fragment.appendChild(item);
+            items.delete(String(id));
+        }
     });
+    items.forEach(item => fragment.appendChild(item));
     container.appendChild(fragment);
+    savePoderesOrder();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -116,6 +116,7 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
         </div>
     `;
     container.appendChild(row);
+    if (idIndex === null && typeof savePoderesOrder === 'function') savePoderesOrder();
     if (idIndex === null) { atualizarTudo(); filtrarPoderes(); }
 }
 
@@ -133,6 +134,7 @@ function removerPoder(btn) {
     Object.keys(dados).forEach(k => { if (k.endsWith(`_${index}`) && k.startsWith('poder_')) delete dados[k]; });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     row.remove();
+    if (typeof savePoderesOrder === 'function') savePoderesOrder();
     atualizarTudo();
     filtrarPoderes();
 }
@@ -160,6 +162,7 @@ function filtrarPoderes() {
 function limparPoderes() {
     showConfirm("Apagar todos os poderes?", () => {
         document.getElementById('poderes-container').innerHTML = '';
+        localStorage.removeItem(STORAGE_KEY_PODERES_ORDER);
         let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
         Object.keys(dados).forEach(k => { if (k.startsWith('poder_')) delete dados[k]; });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));

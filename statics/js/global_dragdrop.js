@@ -1,16 +1,12 @@
 /**
  * Motor genérico de drag-and-drop por arraste, compartilhado entre as listas de
- * Habilidades, Poderes, Magias e Ataques. Extraído de inventario/inventario.js —
- * o Inventário passou a ter seu próprio mecanismo de reordenação (ver inventario_render.js),
- * pois seus itens agora vivem em um array normalizado, não em linhas soltas no DOM.
+ * Ataques. Inventário, Habilidades, Poderes e Magias possuem mecanismos próprios,
+ * pois também precisam sincronizar a ordem com seus respectivos estados e filtros.
  */
 let draggedItem = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const containers = [
-        { id: 'habilidades-container', key: 'habilidades_order' },
-        { id: 'poderes-container', key: 'poderes_order' },
-        { id: 'magias-container', key: 'magias_order' },
         { id: 'ataques-container', key: typeof STORAGE_KEY_ATAQUES_ORDER !== 'undefined' ? STORAGE_KEY_ATAQUES_ORDER : 'ataques_order' }
     ];
 

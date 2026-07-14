@@ -162,6 +162,7 @@ function adicionarMagiaUI(nome = "", tipo = "Comum", nivel = "1", custo = "", ti
     `;
 
     container.appendChild(row);
+    if (idIndex === null && typeof saveMagiasOrder === 'function') saveMagiasOrder();
     atualizarCorNivel(index);
     if (idIndex === null) {
         atualizarTudo();
@@ -216,6 +217,7 @@ function removerMagia(btn) {
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
     row.remove();
+    if (typeof saveMagiasOrder === 'function') saveMagiasOrder();
     atualizarTudo();
     filtrarMagias();
 }
@@ -224,6 +226,7 @@ function limparMagias() {
     const limpar = () => {
         const container = document.getElementById('magias-container');
         if (container) container.innerHTML = '';
+        localStorage.removeItem(STORAGE_KEY_MAGIAS_ORDER);
         let dados = {};
         try { dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { dados = {}; }
         Object.keys(dados).forEach(key => { if (key.startsWith('mag_')) delete dados[key]; });

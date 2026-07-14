@@ -191,6 +191,7 @@ function limparNotas() {
             if (key.startsWith('nota_')) delete dados[key];
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+        localStorage.removeItem(window.STORAGE_KEY_NOTAS_ORDER);
         atualizarTudo();
         filtrarNotas();
         showNotification("Todas as anotações foram removidas.", "success");
