@@ -68,11 +68,6 @@ function adicionarAtaqueUI(nome = "", teste = "", dano = "", critico = "", alcan
             </label>
         </div>
 
-        <div class="atk-card-accordion">
-            <p class="atk-card-description"></p>
-        </div>
-        <button type="button" class="btn-toggle-atk-desc" onclick="toggleDescAtaque(this)">Mostrar detalhes</button>
-
         <footer class="atk-card-footer" style="margin-top: 10px;">
             <button type="button" class="btn-open-desc atk-details-button">Configurar</button>
             <button type="button" class="btn-duplicate atk-duplicate-button" title="Duplicar ataque">Duplicar</button>
@@ -115,13 +110,6 @@ function adicionarAtaqueUI(nome = "", teste = "", dano = "", critico = "", alcan
         filtrarAtaques();
         nameInput.focus();
     }
-}
-
-function toggleDescAtaque(btn) {
-    const card = btn.closest('.atk-card');
-    if (!card) return;
-    const isExpanded = card.classList.toggle('is-expanded');
-    btn.innerHTML = isExpanded ? 'Ocultar detalhes' : 'Mostrar detalhes';
 }
 
 function atualizarBadgeDano(index) {

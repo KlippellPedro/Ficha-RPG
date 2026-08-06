@@ -140,11 +140,6 @@ function adicionarMagiaUI(nome = "", tipo = "Comum", nivel = "1", custo = "", ti
             <span data-mag-resumo-alcance>${_escapeMagHTML(resumoAlcance)}</span>
         </div>
 
-        <div class="entity-card-accordion">
-            <div class="entity-card-accordion-content" id="mag_desc_display_${safeIndex}">${_escapeMagHTML(desc) || 'Sem descrição.'}</div>
-        </div>
-        <button type="button" class="btn-toggle-desc" onclick="toggleDescMagia(this)">Mostrar detalhes</button>
-
         <div class="entity-card-actions" style="margin-top: 10px;">
             <button type="button" class="entity-details-button" onclick="abrirModalMag(this.closest('.entity-card').dataset.index)">Configurar</button>
             <button type="button" class="entity-duplicate-button" onclick="duplicarMagia(this.closest('.entity-card').dataset.index)" title="Duplicar magia" aria-label="Duplicar magia">⧉</button>
@@ -173,13 +168,6 @@ function adicionarMagiaUI(nome = "", tipo = "Comum", nivel = "1", custo = "", ti
         atualizarTudo();
         filtrarMagias();
     }
-}
-
-function toggleDescMagia(btn) {
-    const card = btn.closest('.entity-card');
-    if (!card) return;
-    const isExpanded = card.classList.toggle('is-expanded');
-    btn.innerHTML = isExpanded ? 'Ocultar detalhes' : 'Mostrar detalhes';
 }
 
 function alternarTipoNivel(index) {
