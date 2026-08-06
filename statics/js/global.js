@@ -453,10 +453,32 @@ function alterarValor(id, delta) {
     const input = document.getElementById(id);
     if (input) {
         const newValue = Math.max(0, (parseInt(input.value) || 0) + delta);
+        if (newValue !== parseInt(input.value)) {
+            triggerBarPulse(input, newValue - (parseInt(input.value) || 0));
+        }
         input.value = newValue;
         input.dataset.prevVal = String(newValue);
         atualizarTudo();
     }
+}
+
+function triggerBarPulse(inputEl, delta) {
+    if (delta === 0) return;
+    const barOuter = inputEl.closest('.bar-outer');
+    if (!barOuter) return;
+    
+    const pulseClass = delta > 0 ? 'pulse-heal' : 'pulse-damage';
+    
+    // Remove class if already exists to re-trigger animation
+    barOuter.classList.remove('pulse-heal', 'pulse-damage');
+    
+    // Force reflow
+    void barOuter.offsetWidth;
+    
+    barOuter.classList.add(pulseClass);
+    setTimeout(() => {
+        barOuter.classList.remove(pulseClass);
+    }, 600);
 }
 
 // ── Input aritmético nas barras de status ────────────────────────
@@ -488,6 +510,10 @@ function barInputApply(inputEl) {
         newVal = Math.max(0, Math.round(parseFloat(raw)));
     } else {
         newVal = prev; // Input inválido → restaura
+    }
+
+    if (newVal !== prev) {
+        triggerBarPulse(inputEl, newVal - prev);
     }
 
     inputEl.value = newVal;

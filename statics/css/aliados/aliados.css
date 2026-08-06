@@ -1040,3 +1040,54 @@
     animation: none;
   }
 }
+/* Melhorias Visuais de Aliados (Phase 7) */
+
+.ally-card {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.ally-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 15px rgba(100, 200, 255, 0.15);
+  border-color: rgba(100, 200, 255, 0.4);
+}
+
+.ally-inputs input {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.ally-stat-group:hover .ally-inputs input {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ally-inputs input:focus {
+  border-color: var(--ui-page-accent);
+  box-shadow: 0 0 8px rgba(100, 200, 255, 0.4);
+}
+
+/* Transições suaves nas barras de vida/mana/sanidade */
+.ally-bar-inner {
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s ease, box-shadow 0.4s ease !important;
+}
+
+/* Botões do Footer com Glow Effect */
+.ally-secondary-actions button {
+  transition: all 0.2s ease;
+}
+
+.ally-secondary-actions button:hover {
+  background: rgba(100, 200, 255, 0.2);
+  border-color: rgba(100, 200, 255, 0.6);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(100, 200, 255, 0.2);
+}
+
+.btn-open-sheet {
+  transition: all 0.2s ease;
+}
+
+.btn-open-sheet:hover {
+  background: rgba(100, 200, 255, 0.8);
+  box-shadow: 0 0 20px rgba(100, 200, 255, 0.4);
+}

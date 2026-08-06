@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "5500", "--directory", "C:\\Users\\Pedro\\OneDrive\\Documentos\\D.E.V\\T.D.S\\Maruan\\Pokemania-Supremacia-do-Protesto"],
       "port": 5500
+    },
+    {
+      "name": "Supremacia do Protesto",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5501", "--directory", "C:\\Users\\Pedro\\OneDrive\\Documentos\\D.E.V\\T.D.S\\Diversos\\RPG\\Maruan\\Ficha-Supremacia-do-Protesto"],
+      "port": 5501
     }
   ]
 }

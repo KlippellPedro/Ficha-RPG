@@ -158,9 +158,19 @@ function cancelarClasseUnica() {
 let ajusteVitalAtual = null;
 
 const AJUSTE_VITAL_MAP = {
-    vida: { campo: 'pv_ajustes_manuais', label: 'Vida' },
-    mana: { campo: 'pm_ajustes_manuais', label: 'Mana' },
-    sanidade: { campo: 'sanidade_ajustes_manuais', label: 'Sanidade' }
+    vida: { campo: 'pv_ajustes_manuais', label: 'Vida', sufixo: ' Máxima' },
+    mana: { campo: 'pm_ajustes_manuais', label: 'Mana', sufixo: ' Máxima' },
+    sanidade: { campo: 'sanidade_ajustes_manuais', label: 'Sanidade', sufixo: ' Máxima' },
+    forca: { campo: 'forca_ajustes_manuais', label: 'Força' },
+    destreza: { campo: 'destreza_ajustes_manuais', label: 'Destreza' },
+    constituicao: { campo: 'constituicao_ajustes_manuais', label: 'Constituição' },
+    inteligencia: { campo: 'inteligencia_ajustes_manuais', label: 'Inteligência' },
+    sabedoria: { campo: 'sabedoria_ajustes_manuais', label: 'Sabedoria' },
+    carisma: { campo: 'carisma_ajustes_manuais', label: 'Carisma' },
+    aura: { campo: 'aura_ajustes_manuais', label: 'Aura' },
+    movimentacao: { campo: 'movimentacao_ajustes_manuais', label: 'Movimentação' },
+    defesa: { campo: 'defesa_ajustes_manuais', label: 'Defesa' },
+    status: { campo: 'status_info_ajustes_manuais', label: 'Status' }
 };
 
 function abrirAjustePersonalizado(tipo) {
@@ -173,7 +183,7 @@ function abrirAjustePersonalizado(tipo) {
     if (!modal || !title || !container) return;
 
     ajusteVitalAtual = tipo;
-    title.innerText = `Ajustes Personalizados de ${cfg.label} Máxima`;
+    title.innerText = `Ajustes Personalizados de ${cfg.label}${cfg.sufixo || ''}`;
     container.innerHTML = '';
 
     let lista = [];
@@ -228,8 +238,9 @@ function salvarAjustePersonalizado() {
     atualizarTudo();
 
     if (typeof showNotification === 'function') {
-        const cfgLabel = AJUSTE_VITAL_MAP[tipoSalvo]?.label || '';
-        showNotification(`Ajustes personalizados de ${cfgLabel} Máxima salvos!`, 'success');
+        const cfgSalvo = AJUSTE_VITAL_MAP[tipoSalvo];
+        const cfgLabel = cfgSalvo?.label || '';
+        showNotification(`Ajustes personalizados de ${cfgLabel}${cfgSalvo?.sufixo || ''} salvos!`, 'success');
     }
 }
 
@@ -247,7 +258,7 @@ function atualizarAjustesPersonalizadosUI(dados) {
 
         const resultado = somarAjustesManuais(dados, cfg.campo);
         if (resultado.total === 0 || resultado.detalhes.length === 0) {
-            btn.title = `Ajuste personalizado de ${cfg.label} Máxima (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)`;
+            btn.title = `Ajuste personalizado de ${cfg.label}${cfg.sufixo || ''} (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)`;
             btn.classList.remove('btn-calc-ajuste-ativo');
         } else {
             const resumo = resultado.detalhes.map(d => d.replace('Ajuste Personalizado: ', '')).join(' | ');

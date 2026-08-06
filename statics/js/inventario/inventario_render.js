@@ -273,11 +273,26 @@ function removerItemInventario(id) {
         if (item.tipo === 'armas' && item.equipado) {
             removerAtaqueDoItem(item.id);
         }
-        inventoryState = inventoryState.filter(i => i.id !== id);
-        persistirInventario(inventoryState);
-        renderizarInventario();
-        atualizarTudo();
-        showNotification(`"${item.nome}" removido com sucesso.`, "success");
+        
+        // Aplica animação de remoção no DOM
+        const card = document.querySelector(`.inv-card[data-id="${id}"]`);
+        if (card) {
+            card.classList.add('inv-card-removing');
+            setTimeout(() => {
+                executarRemocao();
+            }, 300); // 300ms de duração da animação
+        } else {
+            executarRemocao();
+        }
+
+        function executarRemocao() {
+            inventoryState = inventoryState.filter(i => i.id !== id);
+            persistirInventario(inventoryState);
+            renderizarInventario();
+            atualizarTudo();
+            showNotification(`"${item.nome}" removido com sucesso.`, "success");
+        }
+        
     }, () => {
         showNotification("Remoção cancelada.", "info");
     }, `Remover ${item.nome}?`);

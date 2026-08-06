@@ -26,7 +26,8 @@ function atualizarDefesa(mods, dadosObj, bonusItens = {}, breakdown = null) {
     const outros = parseInt(document.getElementById("defesa_outros")?.value || 0);
     const extraRaca = parseInt(dadosObj.defesa_extra_raca) || 0;
     const itemBonus = bonusItens['defesa'] || 0;
-    const total = 10 + modDes + armadura + outros + itemBonus;
+    const ajustesDef = typeof somarAjustesManuais === 'function' ? somarAjustesManuais(dadosObj, 'defesa_ajustes_manuais') : { total: 0, detalhes: [] };
+    const total = 10 + modDes + armadura + outros + itemBonus + ajustesDef.total;
     const inputDef = document.getElementById("defesa");
     if (inputDef) {
         inputDef.value = total;
@@ -36,6 +37,7 @@ function atualizarDefesa(mods, dadosObj, bonusItens = {}, breakdown = null) {
         if (armadura !== 0) details.push(`Armadura: ${armadura >= 0 ? '+' : ''}${armadura}`);
         if (outros !== 0) details.push(`Outros: ${outros >= 0 ? '+' : ''}${outros}`);
         if (extraRaca !== 0) details.push(`Bônus Raça: ${extraRaca >= 0 ? '+' : ''}${extraRaca}`);
+        ajustesDef.detalhes.forEach(d => details.push(d));
 
         if (breakdown) {
             const sources = [
@@ -175,12 +177,13 @@ function verificarStatusInicial(mods) {
     const inputStatus = document.getElementById('status_info'); //
     if (inputStatus) inputStatus.classList.toggle('status-glow', jaEscolheu);
 
+    // Só é oferecida a escolha de Status quando Carisma atinge +5 no modificador (Carisma 20)
     const modal = document.getElementById('modal-status');
-    if (modCar >= 3 && !jaEscolheu) {
+    if (modCar >= 5 && !jaEscolheu) {
         if (modal && !modal.open) modal.showModal();
     } else {
         if (modal && modal.open) fecharDialogoAnimado(modal);
-        if (modCar < 3 && jaEscolheu) {
+        if (modCar < 5 && jaEscolheu) {
             inputDef.value = "false";
             if (inputStatus) inputStatus.value = "";
         }
@@ -193,7 +196,8 @@ function atualizarMovimento(mods, dadosObj, bonusItens = {}, breakdown = null) {
     const penArmadura = parseInt(document.getElementById("defesa_penalidade")?.value || 0);
     const penMovManual = parseInt(document.getElementById("movimento_penalidade")?.value || 0);
     const extraRaca = parseInt(dadosObj.movimento_extra_raca) || 0;
-    const totalCalculado = (modDes * 3) + (bonusItens['movimentacao'] || 0) - penArmadura - penMovManual;
+    const ajustesMov = typeof somarAjustesManuais === 'function' ? somarAjustesManuais(dadosObj, 'movimentacao_ajustes_manuais') : { total: 0, detalhes: [] };
+    const totalCalculado = (modDes * 3) + (bonusItens['movimentacao'] || 0) - penArmadura - penMovManual + ajustesMov.total;
     const racaMov = state.racaData.movimentoBonus || 0;
     let bonusMorcego = (state.isVampiro && state.formaMorcego) ? 9 : 0;
 
@@ -221,6 +225,7 @@ function atualizarMovimento(mods, dadosObj, bonusItens = {}, breakdown = null) {
         if (bonusMorcego !== 0) details.push(`Forma Morcego: +${bonusMorcego}`);
         if (penArmadura !== 0) details.push(`Pen. Armadura: -${penArmadura}`);
         if (penMovManual !== 0) details.push(`Penalidade: -${penMovManual}`);
+        ajustesMov.detalhes.forEach(d => details.push(d));
 
         if (breakdown) {
             const sources = [

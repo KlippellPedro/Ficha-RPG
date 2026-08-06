@@ -111,6 +111,9 @@ function salvarDetalhesPod() {
         if (resumoAcao) resumoAcao.textContent = document.getElementById('modal_pod_acao').value || 'Ação não definida';
         if (resumoDuracao) resumoDuracao.textContent = document.getElementById('modal_pod_duracao').value || 'Duração livre';
         if (resumoAlcance) resumoAlcance.textContent = document.getElementById('modal_pod_alcance').value || 'Alcance não definido';
+        
+        const descDisplay = document.getElementById(`poder_desc_display_${idx}`);
+        if (descDisplay) descDisplay.innerHTML = _escapePoderHTML(document.getElementById('modal_pod_desc').value) || 'Sem descrição.';
     }
 
     // Se mudou para Passiva, desativa buff ativo

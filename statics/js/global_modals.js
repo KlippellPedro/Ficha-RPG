@@ -615,14 +615,13 @@ document.addEventListener('DOMContentLoaded', () => {
         </dialog>
     `;
 
-    // Modal de Status Inicial (Carisma 3+)
+    // Modal de Status Inicial (Carisma 20, modificador +5)
     const statusModalHtml = `
         <dialog id="modal-status" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header"><h3 class="modal-title">Status Inicial</h3></div>
-                <div class="modal-body"><p style="text-align: center; color: #ccc;">Escolha seu status social inicial:</p><div class="modal-selection-list">
+                <div class="modal-body"><p style="text-align: center; color: #ccc;">Seu Carisma excepcional chama atenção. Escolha seu status social inicial:</p><div class="modal-selection-list">
                     <div class="selection-option" onclick="escolherStatus(1)"><strong>Status +1</strong><p>Bem visto pela sociedade.</p></div>
-                    <div class="selection-option" onclick="escolherStatus(0)"><strong>Status 0</strong><p>Um cidadão comum.</p></div>
                     <div class="selection-option" onclick="escolherStatus(-1)"><strong>Status -1</strong><p>Pária ou mal visto.</p></div>
                 </div></div>
             </div>

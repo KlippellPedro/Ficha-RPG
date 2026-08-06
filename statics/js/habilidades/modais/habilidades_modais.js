@@ -149,9 +149,12 @@ function salvarDetalhesHab() {
     const resumoAcao = card?.querySelector('[data-hab-resumo-acao]');
     const resumoDuracao = card?.querySelector('[data-hab-resumo-duracao]');
     const resumoAlcance = card?.querySelector('[data-hab-resumo-alcance]');
+    const descDisplay = document.getElementById(`hab_desc_display_${habSendoEditadaIdx}`);
+
     if (resumoAcao) resumoAcao.textContent = document.getElementById('modal_hab_acao').value || 'Ação não definida';
     if (resumoDuracao) resumoDuracao.textContent = document.getElementById('modal_hab_duracao').value || 'Duração livre';
     if (resumoAlcance) resumoAlcance.textContent = document.getElementById('modal_hab_alcance').value || 'Alcance não definido';
+    if (descDisplay) descDisplay.innerHTML = _escapeHabHTML(document.getElementById('modal_hab_desc').value) || 'Sem descrição.';
 
     fecharModalHab();
     atualizarTudo();

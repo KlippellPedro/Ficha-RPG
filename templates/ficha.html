@@ -83,9 +83,8 @@
           <header class="chapter-heading">
             <div>
               <span class="page-section-eyebrow">Capítulo 01</span>
-              <h2 id="identity-title" class="section-title">Identidade do personagem</h2>
+              <h2 id="identity-title" class="section-title">Identidade do Personagem</h2>
             </div>
-            <p>O retrato, a origem e as escolhas que definem quem ocupa o centro desta história.</p>
           </header>
           <div class="char-header">
           <div class="char-avatar-container" onclick="triggerCharImageInput(this)">
@@ -186,10 +185,9 @@
         <section class="sheet-chapter sheet-chapter--classes" aria-labelledby="classes-title">
           <header class="chapter-heading">
             <div>
-              <span class="page-section-eyebrow">Progressão</span>
-              <h2 id="classes-title" class="section-title">Classes</h2>
+              <span class="page-section-eyebrow">Capítulo 02</span>
+              <h2 id="classes-title" class="section-title">Classes e progressão</h2>
             </div>
-            <p>Organize as classes e os níveis que formam a trajetória do personagem.</p>
           </header>
           <div id="classes-container" class="classes-dynamic-list">
             <!-- Gerado via JavaScript -->
@@ -201,74 +199,101 @@
         <section class="attributes-section-header sheet-chapter sheet-chapter--attributes" aria-labelledby="attributes-title">
           <header class="chapter-heading">
             <div>
-              <span class="page-section-eyebrow">Capítulo 02</span>
+              <span class="page-section-eyebrow">Capítulo 03</span>
               <h2 id="attributes-title" class="section-title">Atributos</h2>
             </div>
-            <p>Edite os valores-base e consulte a composição de cada modificador pelo botão de ajuda.</p>
           </header>
           <div class="atributos-grid">
             <div class="attribute-card">
-              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('forca')">?</button>
+              <div class="attr-card-actions">
+                <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('forca')">?</button>
+                <button type="button" class="btn-calc-ajuste attr-adjust-btn" onclick="abrirAjustePersonalizado('forca')" title="Ajuste personalizado de Força (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <div class="attr-label-box">
                 <label for="forca" title="Força">FOR</label>
                 <input type="number" id="forca" class="attr-input" value="10" oninput="atualizarTudo()" />
               </div>
               <div class="modificador" id="modForca">+0</div>
               <span class="attr-full-name">Força</span>
+              <input type="hidden" id="forca_ajustes_manuais" class="save-input" value="" />
             </div>
             <div class="attribute-card">
-              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('destreza')">?</button>
+              <div class="attr-card-actions">
+                <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('destreza')">?</button>
+                <button type="button" class="btn-calc-ajuste attr-adjust-btn" onclick="abrirAjustePersonalizado('destreza')" title="Ajuste personalizado de Destreza (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <div class="attr-label-box">
                 <label for="destreza" title="Destreza">DES</label>
                 <input type="number" id="destreza" class="attr-input" value="10" oninput="atualizarTudo()" />
               </div>
               <div class="modificador" id="modDestreza">+0</div>
               <span class="attr-full-name">Destreza</span>
+              <input type="hidden" id="destreza_ajustes_manuais" class="save-input" value="" />
             </div>
             <div class="attribute-card">
-              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('constituicao')">?</button>
+              <div class="attr-card-actions">
+                <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('constituicao')">?</button>
+                <button type="button" class="btn-calc-ajuste attr-adjust-btn" onclick="abrirAjustePersonalizado('constituicao')" title="Ajuste personalizado de Constituição (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <div class="attr-label-box">
                 <label for="constituicao" title="Constituição">CON</label>
                 <input type="number" id="constituicao" class="attr-input" value="10" oninput="atualizarTudo()" />
               </div>
               <div class="modificador" id="modConstituicao">+0</div>
               <span class="attr-full-name">Constituição</span>
+              <input type="hidden" id="constituicao_ajustes_manuais" class="save-input" value="" />
             </div>
             <div class="attribute-card">
-              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('inteligencia')">?</button>
+              <div class="attr-card-actions">
+                <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('inteligencia')">?</button>
+                <button type="button" class="btn-calc-ajuste attr-adjust-btn" onclick="abrirAjustePersonalizado('inteligencia')" title="Ajuste personalizado de Inteligência (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <div class="attr-label-box">
                 <label for="inteligencia" title="Inteligência">INT</label>
                 <input type="number" id="inteligencia" class="attr-input" value="10" oninput="atualizarTudo()" />
               </div>
               <div class="modificador" id="modInteligencia">+0</div>
               <span class="attr-full-name">Inteligência</span>
+              <input type="hidden" id="inteligencia_ajustes_manuais" class="save-input" value="" />
             </div>
             <div class="attribute-card">
-              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('sabedoria')">?</button>
+              <div class="attr-card-actions">
+                <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('sabedoria')">?</button>
+                <button type="button" class="btn-calc-ajuste attr-adjust-btn" onclick="abrirAjustePersonalizado('sabedoria')" title="Ajuste personalizado de Sabedoria (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <div class="attr-label-box">
                 <label for="sabedoria" title="Sabedoria">SAB</label>
                 <input type="number" id="sabedoria" class="attr-input" value="10" oninput="atualizarTudo()" />
               </div>
               <div class="modificador" id="modSabedoria">+0</div>
               <span class="attr-full-name">Sabedoria</span>
+              <input type="hidden" id="sabedoria_ajustes_manuais" class="save-input" value="" />
             </div>
             <div class="attribute-card">
-              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('carisma')">?</button>
+              <div class="attr-card-actions">
+                <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('carisma')">?</button>
+                <button type="button" class="btn-calc-ajuste attr-adjust-btn" onclick="abrirAjustePersonalizado('carisma')" title="Ajuste personalizado de Carisma (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <div class="attr-label-box">
                 <label for="carisma" title="Carisma">CAR</label>
                 <input type="number" id="carisma" class="attr-input" value="10" oninput="atualizarTudo()" />
               </div>
               <div class="modificador" id="modCarisma">+0</div>
               <span class="attr-full-name">Carisma</span>
+              <input type="hidden" id="carisma_ajustes_manuais" class="save-input" value="" />
             </div>
             <div class="attribute-card">
-              <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('aura')">?</button>
+              <div class="attr-card-actions">
+                <button type="button" class="btn-calc-ajuda attr-help-btn" onclick="mostrarAjudaAtributo('aura')">?</button>
+                <button type="button" class="btn-calc-ajuste attr-adjust-btn" onclick="abrirAjustePersonalizado('aura')" title="Ajuste personalizado de Aura (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <div class="attr-label-box">
                 <label for="aura" title="Aura">AUR</label>
                 <input type="number" id="aura" class="attr-input" value="10" oninput="atualizarTudo()" />
               </div>
               <div class="modificador" id="modAura">+0</div>
               <span class="attr-full-name">Aura</span>
+              <input type="hidden" id="aura_ajustes_manuais" class="save-input" value="" />
             </div>
           </div>
           <div class="stats-section-header">
@@ -280,10 +305,9 @@
         <section class="stats-section-header sheet-chapter sheet-chapter--resources" aria-labelledby="resources-title">
           <header class="chapter-heading">
             <div>
-              <span class="page-section-eyebrow">Capítulo 03</span>
-              <h2 id="resources-title" class="section-title">Recursos vitais</h2>
+              <span class="page-section-eyebrow">O Essencial</span>
+              <h2 class="section-title">Recursos Vitais</h2>
             </div>
-            <p>Vida, Mana e Sanidade ficam lado a lado, com ajustes rápidos e detalhes do cálculo.</p>
           </header>
           <div class="stats-container">
             <!-- Barra de Vida -->
@@ -425,22 +449,18 @@
               <span class="page-section-eyebrow">Capítulo 04</span>
               <h2 id="combat-title" class="section-title">Combate e estado</h2>
             </div>
-            <p>Resultados defensivos, movimento, resistências e condições reunidos em um único painel tático.</p>
           </header>
           <div class="combat-header-row combat-overview-grid">
           <!-- Coluna 1: Sistema de Defesa -->
           <div class="combat-col">
             <div class="input-group" style="position: relative">
               <label>Defesa</label>
-              <button
-                type="button"
-                class="btn-calc-ajuda"
-                onclick="mostrarAjudaCalculoGenerico('defesa')"
-                style="position: absolute; right: 0; top: 0"
-              >
-                ?
-              </button>
+              <div class="stat-label-actions" style="position: absolute; right: 0; top: 0">
+                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculoGenerico('defesa')">?</button>
+                <button type="button" class="btn-calc-ajuste" onclick="abrirAjustePersonalizado('defesa')" title="Ajuste personalizado de Defesa (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <input type="number" id="defesa" class="save-input header-input" value="10" readonly />
+              <input type="hidden" id="defesa_ajustes_manuais" class="save-input" value="" />
             </div>
             <div class="input-group">
               <label>Armadura</label>
@@ -460,15 +480,12 @@
           <div class="combat-col">
             <div class="input-group" style="position: relative">
               <label>Movimento</label>
-              <button
-                type="button"
-                class="btn-calc-ajuda"
-                onclick="mostrarAjudaCalculoGenerico('movimentacao')"
-                style="position: absolute; right: 0; top: 0"
-              >
-                ?
-              </button>
+              <div class="stat-label-actions" style="position: absolute; right: 0; top: 0">
+                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculoGenerico('movimentacao')">?</button>
+                <button type="button" class="btn-calc-ajuste" onclick="abrirAjustePersonalizado('movimentacao')" title="Ajuste personalizado de Movimentação (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <input type="number" id="movimentacao" class="save-input header-input" value="0" readonly />
+              <input type="hidden" id="movimentacao_ajustes_manuais" class="save-input" value="" />
             </div>
             <div class="input-group">
               <label>Penalidade</label>
@@ -476,15 +493,12 @@
             </div>
             <div class="input-group" style="position: relative">
               <label>Status</label>
-              <button
-                type="button"
-                class="btn-calc-ajuda"
-                onclick="mostrarAjudaCalculoGenerico('status_info')"
-                style="position: absolute; right: 0; top: 0"
-              >
-                ?
-              </button>
+              <div class="stat-label-actions" style="position: absolute; right: 0; top: 0">
+                <button type="button" class="btn-calc-ajuda" onclick="mostrarAjudaCalculoGenerico('status_info')">?</button>
+                <button type="button" class="btn-calc-ajuste" onclick="abrirAjustePersonalizado('status')" title="Ajuste personalizado de Status (eventos, maldições, bênçãos e outras situações que não sejam poderes/itens)">±</button>
+              </div>
               <input type="hidden" id="status_inicial_definido" class="save-input" value="false" />
+              <input type="hidden" id="status_info_ajustes_manuais" class="save-input" value="" />
               <input type="text" id="status_info" class="save-input header-input" placeholder="+1 ou -1" />
             </div>
             <div class="input-group">
@@ -514,11 +528,17 @@
             </div>
           </div>
 
-          <!-- Coluna 5: Condições (Parecido com Resistências) -->
-          <div class="combat-col flex-grow">
-            <div class="input-group" style="height: 100%">
-              <label>Condições Ativas</label>
-              <textarea id="condicao" class="save-input detail-textarea" style="flex: 1" placeholder="Ex: Envenenado (3 turnos), Caído..."></textarea>
+          <!-- Coluna 5: Condições -->
+          <div class="combat-col flex-grow" style="min-width: 200px;">
+            <div class="input-group" style="height: 100%; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; background: rgba(0,0,0,0.1);">
+              <label>CONDIÇÕES ATIVAS</label>
+              
+              <div id="condicoes-list" style="display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; margin-bottom: 12px; min-height: 80px;">
+                <!-- Lista injetada pelo JS -->
+              </div>
+              
+              <button type="button" class="btn-add-condicao" style="background: transparent; border: 1px dashed var(--primary-color); color: var(--primary-color); padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-glow)'" onmouseout="this.style.background='transparent'" onclick="abrirModalNovaCondicao()">+ ADICIONAR CONDIÇÃO</button>
+              <input type="hidden" id="condicoes_ativas_json" class="save-input" value="[]" />
             </div>
           </div>
           </div>
@@ -532,7 +552,6 @@
             <span class="page-section-eyebrow">Economia de turno</span>
             <h2 id="actions-title" class="section-title">Ações de combate</h2>
           </div>
-          <p>Acompanhe as ações disponíveis e o avanço dos turnos durante a cena.</p>
         </header>
         <div class="actions-container">
           <div class="action-item">
@@ -571,7 +590,6 @@
             <span class="page-section-eyebrow">Progressão</span>
             <h2 id="experience-title" class="section-title">Experiência</h2>
           </div>
-          <p>Visualize o avanço até o próximo nível e ajuste o XP em passos rápidos.</p>
         </header>
         <div class="stat-group" style="max-width: 600px; margin: 0 auto; width: 100%">
           <div class="stat-labels">
@@ -916,7 +934,6 @@ Toda fada tem asas, as quais são uma parte importante da mesma. As Asas são co
             <span class="page-section-eyebrow">Dados da ficha</span>
             <h2 id="data-actions-title">Importar, exportar ou limpar</h2>
           </div>
-          <p>Use estas ações para transportar os dados da ficha ou começar novamente.</p>
         </header>
         <div class="controles">
           <button type="button" onclick="exportarFicha()">Exportar JSON</button>
@@ -926,5 +943,34 @@ Toda fada tem asas, as quais são uma parte importante da mesma. As Asas são co
         </div>
       </section>
     </main>
+
+    <!-- Modal Nova Condição -->
+    <dialog id="modal-nova-condicao" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Nova Condição</h3>
+          <button type="button" class="btn-remove-class" onclick="fecharModalNovaCondicao()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <label>Nome da Condição</label>
+            <input type="text" id="condicao-nome" class="save-input header-input" placeholder="Ex: Perna Ferida" />
+          </div>
+          <div class="input-group">
+            <label>Descrição</label>
+            <textarea id="condicao-desc" class="save-input detail-textarea" placeholder="Ex: O personagem perdeu muito sangue e não consegue correr..."></textarea>
+          </div>
+          <div class="input-group">
+            <label>Penalidade / Afeta o quê?</label>
+            <input type="text" id="condicao-penalidade" class="save-input header-input" placeholder="Ex: Destreza -2, Movimento reduzido pela metade" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-save-modal" onclick="salvarNovaCondicao()">Adicionar Condição</button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="../statics/js/ficha/condicoes.js"></script>
   </body>
 </html>

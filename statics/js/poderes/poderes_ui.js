@@ -91,8 +91,13 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
             <span data-poder-resumo-alcance>${_escapePoderHTML(resumoAlcance)}</span>
         </div>
 
-        <div class="poder-card-actions">
-            <button type="button" class="poder-details-button" onclick="abrirModalPod(this.closest('.poder-card').dataset.index)">⌕ Ver detalhes</button>
+        <div class="entity-card-accordion">
+            <div class="entity-card-accordion-content" id="poder_desc_display_${safeIndex}">${_escapePoderHTML(desc) || 'Sem descrição.'}</div>
+        </div>
+        <button type="button" class="btn-toggle-desc" onclick="toggleDescPoder(this)">Mostrar detalhes</button>
+
+        <div class="poder-card-actions" style="margin-top: 10px;">
+            <button type="button" class="poder-details-button" onclick="abrirModalPod(this.closest('.poder-card').dataset.index)">Configurar</button>
             <button type="button" class="poder-duplicate-button" onclick="duplicarPoder(this.closest('.poder-card').dataset.index)" title="Duplicar poder" aria-label="Duplicar poder">⧉</button>
             <button type="button" id="btn_usar_poder_${safeIndex}"
                     class="btn-use-skill${isAtivo ? ' buff-ativo' : ''}"
@@ -118,6 +123,13 @@ function adicionarPoderUI(nome = "", tipo = "Poder de Classe", custo = "", tipoC
     container.appendChild(row);
     if (idIndex === null && typeof savePoderesOrder === 'function') savePoderesOrder();
     if (idIndex === null) { atualizarTudo(); filtrarPoderes(); }
+}
+
+function toggleDescPoder(btn) {
+    const card = btn.closest('.poder-card');
+    if (!card) return;
+    const isExpanded = card.classList.toggle('is-expanded');
+    btn.innerHTML = isExpanded ? 'Ocultar detalhes' : 'Mostrar detalhes';
 }
 
 function duplicarPoder(index) {

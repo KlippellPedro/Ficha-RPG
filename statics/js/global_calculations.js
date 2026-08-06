@@ -152,32 +152,25 @@ window.engineCalcularAtributos = function (dadosObj, bonusItens = {}, racaKey, b
         const totalBonus = (bonusItens[id] || 0) + (bonusRaca[id] || 0);
         const modBonus = (modBonusRaca[id] || 0);
 
-        // 1. Calcula os bônus externos primeiro
-        let bonusExtraMod = 0;
-        let fonteExtraMod = "";
-        if (id === 'status_info') {
-            const modCarisma = cache.mods['carisma'] || 0;
-            if (modCarisma >= 3) {
-                bonusExtraMod = 1; // Bônus por ser influente
-                fonteExtraMod = "Carisma (Influência) (+1)";
-            } else if (modCarisma <= -1) {
-                bonusExtraMod = -1; // Penalidade por ser antisocial
-                fonteExtraMod = "Carisma (Antisocial) (-1)";
-            }
-        }
+        // Ajustes personalizados: ganhos/perdas manuais fora de poderes/itens/raça
+        // (maldições, bênçãos, eventos especiais, regras de mesa, etc — definidos pelo jogador via "±")
+        const ajusteCampo = id === 'status_info' ? 'status_info_ajustes_manuais' : `${id}_ajustes_manuais`;
+        const ajustesManuais = typeof somarAjustesManuais === 'function'
+            ? somarAjustesManuais(dadosObj, ajusteCampo)
+            : { total: 0, detalhes: [] };
 
         // Correção: Se for status_info, o padrão é 0. Para os demais atributos core, o padrão é 10.
         const defaultValue = (id === 'status_info') ? 0 : 10;
 
         // 2. Determina a BASE. Se estivermos editando, subtraímos os bônus do valor digitado.
         let base = input === document.activeElement
-            ? (parseInt(input.value) || 0) - totalBonus - bonusExtraMod
+            ? (parseInt(input.value) || 0) - totalBonus - ajustesManuais.total
             : (dadosObj[id] !== undefined && dadosObj[id] !== "" ? parseInt(dadosObj[id]) : defaultValue);
 
         if (isNaN(base)) base = defaultValue;
 
         // 3. Soma tudo para o TOTAL final
-        const total = base + totalBonus + bonusExtraMod;
+        const total = base + totalBonus + ajustesManuais.total;
 
         // Status Info não usa a fórmula de modificador (Total - 10) / 2
         let finalMod = 0;
@@ -194,9 +187,9 @@ window.engineCalcularAtributos = function (dadosObj, bonusItens = {}, racaKey, b
             if (input && input !== document.activeElement) input.value = total;
 
             let details = [`Base: ${base}`];
-            if (fonteExtraMod) details.push(fonteExtraMod);
             if (bonusRaca[id]) details.push(`Raça: ${bonusRaca[id] > 0 ? '+' : ''}${bonusRaca[id]}`);
             if (modBonus !== 0) details.push(`Mod. Raça: ${modBonus > 0 ? '+' : ''}${modBonus}`);
+            ajustesManuais.detalhes.forEach(d => details.push(d));
 
             if (breakdown) {
                 const sources = [

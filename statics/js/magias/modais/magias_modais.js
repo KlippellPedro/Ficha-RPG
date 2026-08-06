@@ -148,6 +148,9 @@ function salvarDetalhesMag() {
     if (resumoDuracao) resumoDuracao.textContent = document.getElementById('modal_mag_duracao').value || 'Duração livre';
     if (resumoAlcance) resumoAlcance.textContent = document.getElementById('modal_mag_alcance').value || 'Alcance não definido';
 
+    const descDisplay = document.getElementById(`mag_desc_display_${index}`);
+    if (descDisplay) descDisplay.innerHTML = _escapeMagHTML(document.getElementById('modal_mag_desc').value) || 'Sem descrição.';
+
     fecharModalMag();
     atualizarTudo();
     filtrarMagias();
