@@ -75,8 +75,8 @@
 .inv-card[data-raridade="incomum"] { border-left-color: #4ade80; }
 .inv-card[data-raridade="raro"] { border-left-color: #3b82f6; }
 .inv-card[data-raridade="epico"] { border-left-color: #a855f7; box-shadow: -3px 0 12px rgba(168, 85, 247, 0.2), 0 12px 30px rgba(0, 0, 0, 0.28); }
-.inv-card[data-raridade="mitico"] { border-left-color: #00ffff; box-shadow: -3px 0 12px rgba(0, 255, 255, 0.4), 0 12px 30px rgba(0, 0, 0, 0.28); }
-.inv-card[data-raridade="especial"] { border-left-color: #00d4ff; box-shadow: -3px 0 14px rgba(0, 212, 255, 0.28), 0 12px 30px rgba(0, 0, 0, 0.28); }
+.inv-card[data-raridade="mitico"] { border-left-color: #ff0000; box-shadow: -3px 0 12px rgba(255, 0, 0, 0.4), 0 12px 30px rgba(0, 0, 0, 0.28); }
+.inv-card[data-raridade="especial"] { border-left-color: #00ffff; box-shadow: -3px 0 14px rgba(0, 255, 255, 0.35), 0 12px 30px rgba(0, 0, 0, 0.28); }
 
 .inv-card--equipado {
   background:

@@ -40,8 +40,8 @@ const OPTIONS_RARIDADE = [
     { v: "incomum", t: "Incomum" },
     { v: "raro", t: "Raro" },
     { v: "epico", t: "Épico" },
-    { v: "mitico", t: "#00ffff" },
-    { v: "especial", t: "Relíquia" }
+    { v: "mitico", t: "Mítico" },
+    { v: "especial", t: "#00ffff" }
 ];
 
 const OPTIONS_ATK_TIPO = [
