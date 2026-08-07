@@ -139,7 +139,8 @@ function renderPericias() {
     const salvo = lerDadosPericiasSalvos();
     container.innerHTML = listaPericias.map(pericia => {
         const slug = pericia.nome.toLowerCase().replace(/\s/g, "_");
-        const rowClass = "skill-row";
+        const isFav = (salvo[`skill_fav_${slug}`] == 1 || salvo[`skill_fav_${slug}`] === "1");
+        const rowClass = `skill-row ${isFav ? 'is-favorite' : ''}`;
         const rowMarkup = criarMarkupPericia({
             slug,
             nome: pericia.nome,
@@ -161,7 +162,8 @@ function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", trainin
 
     const index = idIndex !== null ? String(idIndex) : `oficio_${Date.now()}`;
     const row = document.createElement("article");
-    row.className = "skill-row dynamic-skill";
+    const isFav = (fav == 1 || fav === "1");
+    row.className = `skill-row dynamic-skill ${isFav ? 'is-favorite' : ''}`;
     row.dataset.skillSlug = index;
     row.innerHTML = criarMarkupPericia({
         slug: index,
@@ -201,12 +203,19 @@ function atualizarDescricaoAtributoPericia(select) {
 
 window.toggleFavSkill = function(slug) {
     const input = document.getElementById(`skill_fav_${slug}`);
-    const btn = document.querySelector(`.skill-row[data-skill-slug="${slug}"] .btn-fav-skill`);
-    if(input && btn) {
+    const row = document.querySelector(`.skill-row[data-skill-slug="${slug}"]`);
+    const btn = row?.querySelector(`.btn-fav-skill`);
+    if(input && btn && row) {
         const isFav = input.value === "1";
         input.value = isFav ? "0" : "1";
-        if(isFav) btn.classList.remove('active');
-        else btn.classList.add('active');
+        
+        if (isFav) {
+            btn.classList.remove('active');
+            row.classList.remove('is-favorite');
+        } else {
+            btn.classList.add('active');
+            row.classList.add('is-favorite');
+        }
         
         if (typeof atualizarTudo === 'function') atualizarTudo();
         filtrarPericias();

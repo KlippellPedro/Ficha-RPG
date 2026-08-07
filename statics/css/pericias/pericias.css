@@ -244,6 +244,11 @@
   background: rgba(255, 255, 255, 0.018);
   transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
   animation: pericia-card-in 0.3s ease-out both;
+  order: 1; /* Default order */
+}
+
+.skill-row.is-favorite {
+  order: 0; /* Favorited items go to the top */
 }
 
 .skill-row[hidden] {
