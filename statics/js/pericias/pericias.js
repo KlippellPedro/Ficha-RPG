@@ -72,10 +72,11 @@ function opcoesTreinoPericia(selecionado) {
     ).join("");
 }
 
-function criarMarkupPericia({ slug, nome, attr, treino, bonus, vantagem, desvantagem, customizada = false }) {
+function criarMarkupPericia({ slug, nome, attr, treino, bonus, vantagem, desvantagem, customizada = false, fav = 0 }) {
     const safeSlug = escaparHtmlPericia(slug);
     const safeNome = escaparHtmlPericia(nome);
     const attrLabel = PERICIA_ATRIBUTOS[attr] || "Atributo";
+    const isFav = fav == 1 || fav === "1";
     const nomeMarkup = customizada
         ? `<input type="text" id="skill_name_${safeSlug}" class="save-input skill-name-input" value="${safeNome}" placeholder="Nome do ofício" oninput="filtrarPericias()" />`
         : `<span class="skill-name static-skill-name">${safeNome}</span>`;
@@ -83,7 +84,10 @@ function criarMarkupPericia({ slug, nome, attr, treino, bonus, vantagem, desvant
     return `
         <div class="skill-card-head">
             <div class="skill-identity">
-                ${nomeMarkup}
+                <div class="skill-name-row">
+                    <button type="button" class="btn-fav-skill ${isFav ? 'active' : ''}" onclick="toggleFavSkill('${safeSlug}')" title="Favoritar" aria-label="Favoritar ${safeNome}">★</button>
+                    ${nomeMarkup}
+                </div>
                 <small>Teste baseado em <span class="skill-attr-description">${escaparHtmlPericia(attrLabel)}</span>.</small>
             </div>
 
@@ -124,6 +128,7 @@ function criarMarkupPericia({ slug, nome, attr, treino, bonus, vantagem, desvant
 
         <input type="hidden" id="skill_adv_${safeSlug}" class="save-input skill-adv" value="${limitarContadorPericia(vantagem)}" />
         <input type="hidden" id="skill_disadv_${safeSlug}" class="save-input skill-disadv" value="${limitarContadorPericia(desvantagem)}" />
+        <input type="hidden" id="skill_fav_${safeSlug}" class="save-input skill-fav" value="${isFav ? 1 : 0}" />
     `;
 }
 
@@ -142,14 +147,15 @@ function renderPericias() {
             treino: salvo[`skill_train_${slug}`] || "nenhum",
             bonus: salvo[`skill_bonus_${slug}`] ?? 0,
             vantagem: salvo[`skill_adv_${slug}`] ?? 0,
-            desvantagem: salvo[`skill_disadv_${slug}`] ?? 0
+            desvantagem: salvo[`skill_disadv_${slug}`] ?? 0,
+            fav: salvo[`skill_fav_${slug}`] ?? 0
         });
 
         return `<article class="${rowClass}" data-skill-slug="${escaparHtmlPericia(slug)}">${rowMarkup}</article>`;
     }).join("");
 }
 
-function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", training = "nenhum", bonus = 0, adv = 0, idIndex = null, disadv = 0) {
+function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", training = "nenhum", bonus = 0, adv = 0, idIndex = null, disadv = 0, fav = 0) {
     const container = document.getElementById("skills-container");
     if (!container) return;
 
@@ -165,7 +171,8 @@ function adicionarOficioUI(nome = "Novo Ofício", attr = "inteligencia", trainin
         bonus,
         vantagem: adv,
         desvantagem: disadv,
-        customizada: true
+        customizada: true,
+        fav
     });
     container.appendChild(row);
 
@@ -190,6 +197,20 @@ function removerOficioPericia(row) {
 function atualizarDescricaoAtributoPericia(select) {
     const descricao = select?.closest(".skill-row")?.querySelector(".skill-attr-description");
     if (descricao) descricao.textContent = PERICIA_ATRIBUTOS[select.value] || "Atributo";
+}
+
+window.toggleFavSkill = function(slug) {
+    const input = document.getElementById(`skill_fav_${slug}`);
+    const btn = document.querySelector(`.skill-row[data-skill-slug="${slug}"] .btn-fav-skill`);
+    if(input && btn) {
+        const isFav = input.value === "1";
+        input.value = isFav ? "0" : "1";
+        if(isFav) btn.classList.remove('active');
+        else btn.classList.add('active');
+        
+        if (typeof atualizarTudo === 'function') atualizarTudo();
+        filtrarPericias();
+    }
 }
 
 function coletarFontesPericia(breakdown, chaves) {
@@ -369,7 +390,8 @@ document.addEventListener("DOMContentLoaded", () => {
             salvo[`skill_bonus_${id}`],
             salvo[`skill_adv_${id}`] || 0,
             id,
-            salvo[`skill_disadv_${id}`] || 0
+            salvo[`skill_disadv_${id}`] || 0,
+            salvo[`skill_fav_${id}`] || 0
         );
     });
 
@@ -394,8 +416,11 @@ function filtrarPericias() {
     rows.forEach(row => {
         const nome = nomePericiaDaLinha(row).toLocaleLowerCase("pt-BR");
         const attrSel = row.querySelector('[id^="skill_attr_"]')?.value || "";
+        const isFav = row.querySelector('.skill-fav')?.value === "1";
         const matchNome = nome.includes(termo);
-        const matchAttr = _filtroAttrPericia === "todos" || attrSel === _filtroAttrPericia;
+        const matchAttr = _filtroAttrPericia === "todos" || 
+                          (_filtroAttrPericia === "favoritas" && isFav) ||
+                          (_filtroAttrPericia !== "favoritas" && attrSel === _filtroAttrPericia);
         row.hidden = !(matchNome && matchAttr);
         if (!row.hidden) visiveis += 1;
     });

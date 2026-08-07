@@ -277,6 +277,38 @@
   gap: 4px;
 }
 
+.skill-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.btn-fav-skill {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.btn-fav-skill:hover {
+  transform: scale(1.15);
+  color: var(--primary-color);
+}
+
+.btn-fav-skill.active {
+  color: #fbbf24;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+}
+
 .skill-name,
 .skill-name-input {
   min-width: 0;
