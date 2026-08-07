@@ -998,3 +998,26 @@ body .modal-header > .btn-remove-class:active {
     animation: none;
   }
 }
+
+/* Mostrar Descrições Inline */
+body.show-descriptions .entity-card-hidden,
+body.show-descriptions .item-hidden-data {
+  display: block !important;
+  margin-top: 12px;
+  width: 100%;
+}
+body.show-descriptions .entity-card-hidden textarea,
+body.show-descriptions .item-hidden-data textarea {
+  display: block;
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  background-color: var(--color-surface-sunken);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  margin-top: 8px;
+}

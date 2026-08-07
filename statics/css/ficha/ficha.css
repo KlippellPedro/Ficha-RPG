@@ -657,6 +657,32 @@ body.hp-critical .critical-vignette {
   gap: 6px;
 }
 
+/* Botão Sincronizar Atributos */
+.btn-sync-attrs {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.btn-sync-attrs:hover {
+  background: var(--primary-glow);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: scale(1.03);
+}
+
+.btn-sync-attrs:active {
+  transform: scale(0.97);
+}
+
 .btn-calc-ajuda {
   background: var(--primary-glow);
   border: 1px solid var(--primary-glow);

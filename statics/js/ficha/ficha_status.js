@@ -53,13 +53,86 @@ function atualizarDefesa(mods, dadosObj, bonusItens = {}, breakdown = null) {
     }
 }
 
+/**
+ * ─── Snapshot de Modificadores para PV / PM ───
+ * Os modificadores de atributo usados no cálculo de PV e PM máximos são "travados"
+ * (snapshot) para que mudanças de atributo durante a sessão NÃO recalculem Vida/Mana.
+ * O snapshot é atualizado quando: o personagem é criado, sobe de nível, muda de classe,
+ * ou o mestre clica em "Sincronizar Atributos".
+ */
+
+/** Flag global — quando true, o próximo cálculo atualiza o snapshot com os mods atuais */
+window._forceRecalcPvPm = false;
+
+/**
+ * Retorna os mods que devem ser usados nos cálculos de PV/PM.
+ * Se já existe um snapshot salvo E não estamos forçando recálculo, retorna o snapshot.
+ * Caso contrário, salva os mods atuais como novo snapshot e retorna-os.
+ */
+function _getSnapshotMods(dados, currentMods) {
+    const key = '_snapshot_mods_pvpm';
+    let snapshot = null;
+
+    try {
+        const raw = dados[key];
+        if (raw && typeof raw === 'string') snapshot = JSON.parse(raw);
+        else if (raw && typeof raw === 'object') snapshot = raw;
+    } catch { snapshot = null; }
+
+    // Se existe snapshot válido e NÃO estamos forçando recálculo → usa o snapshot
+    if (snapshot && typeof snapshot === 'object' && !window._forceRecalcPvPm) {
+        return snapshot;
+    }
+
+    // Cria/atualiza snapshot com os mods atuais
+    const novoSnapshot = {};
+    Object.keys(currentMods).forEach(k => novoSnapshot[k] = currentMods[k]);
+    dados[key] = JSON.stringify(novoSnapshot);
+    window._forceRecalcPvPm = false;
+    return novoSnapshot;
+}
+
+/**
+ * Sincroniza os atributos com PV/PM — atualiza o snapshot com os mods atuais
+ * e recalcula tudo. Chamado pelo botão "Sincronizar Atributos".
+ */
+function sincronizarAtributosPvPm() {
+    const doSync = () => {
+        window._forceRecalcPvPm = true;
+        atualizarTudo();
+        if (typeof showNotification === 'function') {
+            showNotification('Atributos sincronizados com PV e PM máximos.', 'success');
+        }
+    };
+
+    if (typeof showConfirm === 'function') {
+        showConfirm(
+            'Isso vai recalcular Vida e Mana máximas usando os modificadores de atributo atuais. Continuar?',
+            doSync,
+            null,
+            'Sincronizar Atributos?'
+        );
+    } else {
+        doSync();
+    }
+}
+
 function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
     const state = getSheetState(dados);
-    const modFor = mods['forca'] || 0, modCon = mods['constituicao'] || 0;
+
+    // Obtém os mods travados (snapshot) para o cálculo de PV
+    const snapMods = _getSnapshotMods(dados, mods);
+    const modFor = snapMods['forca'] || 0, modCon = snapMods['constituicao'] || 0;
     const vidaInicial = (modFor + modCon) * 4;
     let details = [`Inicial (FOR+CON x4): ${vidaInicial}`];
 
-    const vidaGanha = typeof calcularVidaPorClasses === 'function' ? calcularVidaPorClasses(mods, modCon) : 0;
+    // Nota no tooltip se os mods estão travados
+    const modsAtuaisFor = mods['forca'] || 0, modsAtuaisCon = mods['constituicao'] || 0;
+    if (modFor !== modsAtuaisFor || modCon !== modsAtuaisCon) {
+        details.push(`⚡ Mods travados (FOR ${modFor >= 0 ? '+' : ''}${modFor}, CON ${modCon >= 0 ? '+' : ''}${modCon})`);
+    }
+
+    const vidaGanha = typeof calcularVidaPorClasses === 'function' ? calcularVidaPorClasses(snapMods, modCon) : 0;
     if (vidaGanha !== 0) details.push(`Classes: +${vidaGanha}`);
 
     const racaBonus = state.racaData.pvBonus || 0;
@@ -91,8 +164,8 @@ function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
     }
 
     if (state.isCorrompido) {
-        const manaGanha = typeof calcularManaPorClasses === 'function' ? calcularManaPorClasses(mods) : 0;
-        const modInt = mods['inteligencia'] || 0, modSab = mods['sabedoria'] || 0;
+        const manaGanha = typeof calcularManaPorClasses === 'function' ? calcularManaPorClasses(snapMods) : 0;
+        const modInt = snapMods['inteligencia'] || 0, modSab = snapMods['sabedoria'] || 0;
         const manaInicial = (modInt + modSab) * 3;
         const totalMana = manaInicial + manaGanha + (bonusItens['pm_max'] || 0) + (state.racaData.manaBonus || 0) + (state.racaData.pmBonus || 0);
         total += totalMana;
@@ -119,11 +192,20 @@ function atualizarVida(mods, dados, bonusItens = {}, breakdown = null) {
 
 function atualizarMana(mods, dados, bonusItens = {}, breakdown = null) {
     const state = getSheetState(dados);
-    const modInt = mods['inteligencia'] || 0, modSab = mods['sabedoria'] || 0;
+
+    // Obtém os mods travados (snapshot) para o cálculo de PM
+    const snapMods = _getSnapshotMods(dados, mods);
+    const modInt = snapMods['inteligencia'] || 0, modSab = snapMods['sabedoria'] || 0;
     const manaInicial = (modInt + modSab) * 3;
     let details = [`Inicial (INT+SAB x3): ${manaInicial}`];
 
-    const manaGanha = typeof calcularManaPorClasses === 'function' ? calcularManaPorClasses(mods) : 0;
+    // Nota no tooltip se os mods estão travados
+    const modsAtuaisInt = mods['inteligencia'] || 0, modsAtuaisSab = mods['sabedoria'] || 0;
+    if (modInt !== modsAtuaisInt || modSab !== modsAtuaisSab) {
+        details.push(`⚡ Mods travados (INT ${modInt >= 0 ? '+' : ''}${modInt}, SAB ${modSab >= 0 ? '+' : ''}${modSab})`);
+    }
+
+    const manaGanha = typeof calcularManaPorClasses === 'function' ? calcularManaPorClasses(snapMods) : 0;
     if (manaGanha !== 0) details.push(`Classes: +${manaGanha}`);
 
     const racaBonus = (state.racaData.manaBonus || 0) + (state.racaData.pmBonus || 0);
@@ -165,9 +247,12 @@ function atualizarMana(mods, dados, bonusItens = {}, breakdown = null) {
     const elInv = document.getElementById("invocacoes_max");
     if (elInv) {
         const invBonus = (bonusItens['invocacoes_max'] || 0);
-        elInv.value = Math.max(0, Math.floor(modInt / 2) + invBonus);
+        // Invocações usam mod ATUAL (não travado), pois não é PV/PM
+        const modIntAtual = mods['inteligencia'] || 0;
+        elInv.value = Math.max(0, Math.floor(modIntAtual / 2) + invBonus);
     }
 }
+
 
 function verificarStatusInicial(mods) {
     const modCar = mods['carisma'] || 0;

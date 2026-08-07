@@ -173,6 +173,7 @@ function concluirNovaClasseLevelUp(className) {
             xpAtualEl.value = Math.max(0, atualXP - xpMaxGasto);
 
             if (typeof showNotification === 'function') showNotification("Nova classe adquirida!", "success");
+            window._forceRecalcPvPm = true;
             if (typeof atualizarTudo === 'function') atualizarTudo();
         }
     }
@@ -205,6 +206,7 @@ function processarLevelUp(idx) {
         xpAtualEl.value = Math.max(0, atualXP - xpMaxGasto);
 
         if (typeof showNotification === 'function') showNotification("Nível aumentado com sucesso!", "success");
+        window._forceRecalcPvPm = true;
         if (typeof atualizarTudo === 'function') atualizarTudo();
     }
 }

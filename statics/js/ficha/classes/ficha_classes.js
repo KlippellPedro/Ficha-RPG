@@ -180,6 +180,7 @@ function handleClassChange(selectEl) {
     }
 
     atualizarEstiloClasse(selectEl);
+    window._forceRecalcPvPm = true;
     atualizarTudo();
 }
 
@@ -312,7 +313,7 @@ function adicionarClasseUI(nome = "", lvl = 0, idIndex = null, sub = "") {
         <input type="hidden" id="class_sub_${index}" class="save-input" value="${sub}">
         <div class="input-group">
             <label>Lvl</label>
-            <input type="number" id="class_lvl_${index}" class="save-input header-input" value="${lvl}" min="0" ${maxAttr} oninput="atualizarEstiloClasse(document.getElementById('class_name_${index}')); atualizarTudo();" />
+            <input type="number" id="class_lvl_${index}" class="save-input header-input" value="${lvl}" min="0" ${maxAttr} oninput="atualizarEstiloClasse(document.getElementById('class_name_${index}')); window._forceRecalcPvPm = true; atualizarTudo();" />
         </div>
         <button type="button" class="btn-remove-class" onclick="removerClasseUI(this)">×</button>`;
     container.appendChild(row);
@@ -411,6 +412,7 @@ function confirmarSelecionarClasse(index, className) {
 
     fecharDialogoAnimado(document.getElementById('modal-class-select'));
     if (typeof atualizarEstiloClasse === 'function') atualizarEstiloClasse(select);
+    window._forceRecalcPvPm = true;
     if (typeof atualizarTudo === 'function') atualizarTudo();
 }
 
@@ -474,6 +476,7 @@ function removerClasseUI(btn) {
     }
 
     row.remove();
+    window._forceRecalcPvPm = true;
     atualizarTudo();
 }
 

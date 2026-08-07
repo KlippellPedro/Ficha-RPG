@@ -121,6 +121,7 @@ window.confirmarSelecionarRaca = function (key) {
     const racasDB = window.RACAS_DATA || {};
     if (select) {
         select.value = key;
+        window._forceRecalcPvPm = true;
         select.dispatchEvent(new Event('change', { bubbles: true }));
     }
     if (btn) {
