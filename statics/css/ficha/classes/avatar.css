@@ -211,10 +211,20 @@
   background: rgba(18, 241, 167, 0.1) !important;
   box-shadow: 0 0 15px rgba(18, 241, 167, 0.2) !important;
 }
+.row-element-vida_sub {
+  border: 1px solid #33ff77 !important;
+  background: rgba(51, 255, 119, 0.1) !important;
+  box-shadow: 0 0 15px rgba(51, 255, 119, 0.25) !important;
+}
 .row-element-luz {
   border: 1px solid #f3e737 !important;
   background: rgba(243, 231, 55, 0.05) !important;
   box-shadow: 0 0 15px rgba(243, 231, 55, 0.1) !important;
+}
+.row-element-luz_sub {
+  border: 1px solid #fff5aa !important;
+  background: rgba(255, 245, 170, 0.08) !important;
+  box-shadow: 0 0 15px rgba(255, 245, 170, 0.15) !important;
 }
 
 /* ── Subelementos ─────────────────────────────────────── */

@@ -74,6 +74,16 @@
                 p.style.boxShadow = `0 0 8px rgba(0,200,60,0.6)`;
             }
         },
+        vida_sub: {
+            dir: 'up', rate: 600,
+            build: (p) => {
+                const s = 4 + Math.random() * 6;
+                p.style.width = s + 'px'; p.style.height = s + 'px';
+                p.style.borderRadius = '50%';
+                p.style.background = `hsl(${130 + Math.random() * 30},90%,${55 + Math.random() * 20}%)`;
+                p.style.boxShadow = `0 0 10px rgba(50,255,100,0.7)`;
+            }
+        },
         luz: {
             dir: 'up', rate: 500,
             build: (p) => {
@@ -82,6 +92,16 @@
                 p.style.borderRadius = '50%';
                 p.style.background = `hsl(45,100%,${70 + Math.random() * 25}%)`;
                 p.style.boxShadow = `0 0 10px #ffd700, 0 0 18px rgba(255,220,80,0.5)`;
+            }
+        },
+        luz_sub: {
+            dir: 'up', rate: 450,
+            build: (p) => {
+                const s = 3 + Math.random() * 5;
+                p.style.width = s + 'px'; p.style.height = s + 'px';
+                p.style.borderRadius = '50%';
+                p.style.background = `hsl(50,100%,${80 + Math.random() * 20}%)`;
+                p.style.boxShadow = `0 0 12px #fff5aa, 0 0 24px rgba(255,245,170,0.7)`;
             }
         },
         energia: {

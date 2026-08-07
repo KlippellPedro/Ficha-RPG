@@ -217,9 +217,31 @@ window.toggleFavSkill = function(slug) {
             row.classList.add('is-favorite');
         }
         
+        ordenarPericias();
         if (typeof atualizarTudo === 'function') atualizarTudo();
         filtrarPericias();
     }
+}
+
+function ordenarPericias() {
+    const container = document.getElementById("skills-container");
+    if (!container) return;
+
+    const rows = Array.from(container.querySelectorAll(".skill-row"));
+    rows.sort((a, b) => {
+        const isFavA = a.classList.contains("is-favorite") ? 1 : 0;
+        const isFavB = b.classList.contains("is-favorite") ? 1 : 0;
+        
+        if (isFavA !== isFavB) {
+            return isFavB - isFavA;
+        }
+        
+        const nomeA = (a.querySelector(".static-skill-name")?.textContent || a.querySelector(".skill-name-input")?.value || "").trim().toLowerCase();
+        const nomeB = (b.querySelector(".static-skill-name")?.textContent || b.querySelector(".skill-name-input")?.value || "").trim().toLowerCase();
+        return nomeA.localeCompare(nomeB, 'pt-BR');
+    });
+
+    rows.forEach(row => container.appendChild(row));
 }
 
 function coletarFontesPericia(breakdown, chaves) {
@@ -405,6 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (typeof atualizarTudo === "function") atualizarTudo();
+    ordenarPericias();
     filtrarPericias();
 });
 

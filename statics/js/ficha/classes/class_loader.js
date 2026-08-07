@@ -30,8 +30,8 @@
             'ar', 'ar_sub', 'gas', 'atm',
             'raio', 'raio_sub', 'energia',
             'terra', 'terra_sub', 'metal', 'cristal',
-            'vida', 'morte',
-            'luz', 'escuridao',
+            'vida', 'vida_sub', 'morte',
+            'luz', 'luz_sub', 'escuridao',
             'avatar_ui', 'avatar_ambient'
         ]
     };
