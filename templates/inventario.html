@@ -190,6 +190,20 @@
         </div>
         <div class="modal-body">
           <div class="input-group">
+            <label>Nível de Raridade</label>
+            <select id="modal_rarity_level" class="inv-input" onchange="this.className = 'inv-input rarity-' + this.value">
+              <option value="comum">Comum</option>
+              <option value="incomum">Incomum</option>
+              <option value="raro">Raro</option>
+              <option value="epico">Épico</option>
+              <option value="mitico">Mítico</option>
+              <option value="especial">#00ffff</option>
+            </select>
+          </div>
+          <div class="section-divider">Bônus</div>
+          <div id="modal-rarity-buffs-container">
+            <!-- Injetado via JS -->
+          </div>
           <button type="button" class="btn-add-class" onclick="adicionarLinhaBuffRaridade()">+ Adicionar Bônus</button>
         </div>
         <div class="modal-footer">
